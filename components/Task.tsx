@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import React, { useState, JSX } from 'react';
+import { Card,  CardContent } from './ui/Card';
 import { CheckCircle2, Clock, AlertCircle, Calendar } from 'lucide-react';
 
 const TaskManagement = () => {
-  const [tasks, setTasks] = useState([
+  const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
       title: "Verificar temperatura do freezer 1",
@@ -30,7 +30,16 @@ const TaskManagement = () => {
     }
   ]);
 
-  const getStatusColor = (status) => {
+  interface Task {
+    id: number;
+    title: string;
+    time: string;
+    status: 'pending' | 'completed' | 'late';
+    responsible: string;
+    priority: 'high' | 'medium' | 'low';
+  }
+
+  const getStatusColor = (status: Task['status']): string => {
     switch(status) {
       case 'completed':
         return 'bg-green-100 border-green-500';
@@ -41,7 +50,11 @@ const TaskManagement = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  interface StatusIconProps {
+    status: 'pending' | 'completed' | 'late';
+  }
+
+  const getStatusIcon = ({ status }: StatusIconProps): JSX.Element => {
     switch(status) {
       case 'completed':
         return <CheckCircle2 className="text-green-600" />;
@@ -52,7 +65,11 @@ const TaskManagement = () => {
     }
   };
 
-  const completeTask = (taskId) => {
+  interface CompleteTask {
+    (taskId: number): void;
+  }
+
+  const completeTask: CompleteTask = (taskId) => {
     setTasks(tasks.map(task => 
       task.id === taskId 
         ? { ...task, status: task.status === 'completed' ? 'pending' : 'completed' }
@@ -94,7 +111,7 @@ const TaskManagement = () => {
           >
             <CardContent className="flex items-center gap-4 p-4">
               <div className="flex-shrink-0">
-                {getStatusIcon(task.status)}
+                {getStatusIcon({ status: task.status })}
               </div>
               
               <div className="flex-grow">

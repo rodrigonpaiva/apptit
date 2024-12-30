@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardContent  } from './ui/Card';
 import { Camera, BarChart, Package, AlertTriangle, Search, Plus } from 'lucide-react';
 
 const InventoryManagement = () => {
   const [activeTab, setActiveTab] = useState('inventory');
   
-  const inventory = [
+
+  interface InventoryItem {
+    id: number;
+    name: string;
+    quantity: number;
+    unit: string;
+    status: 'normal' | 'low' | 'warning';
+    expiration: string;
+  }
+
+  const inventory: InventoryItem[] = [
     {
       id: 1,
       name: "Arroz Integral",
@@ -32,7 +42,7 @@ const InventoryManagement = () => {
     }
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: 'normal' | 'low' | 'warning'): string => {
     switch(status) {
       case 'low':
         return 'text-red-600 bg-red-100';
@@ -44,10 +54,10 @@ const InventoryManagement = () => {
   };
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="flex">
       <h1 className="text-2xl font-bold mb-6">Gestão de Estoque</h1>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="gap-4 mb-4">
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow"
           onClick={() => setActiveTab('scan')}

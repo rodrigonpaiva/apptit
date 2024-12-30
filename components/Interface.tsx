@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from './ui/Card';
 import { Thermometer, CheckSquare, Package, Utensils } from 'lucide-react';
 
 const AppInterface = () => {

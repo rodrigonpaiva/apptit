@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Camera, ThermometerSnowflake, AlertTriangle, Check } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent } from './ui/Card';
+import { Alert, AlertDescription, AlertTitle } from './ui/Alert';
 
 const TemperatureMonitoring = () => {
   const [scanMode, setScanMode] = useState(false);
-  const [temperature, setTemperature] = useState(null);
-  const [status, setStatus] = useState(null);
+  const [temperature, setTemperature] = useState<number | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
   const handleScan = () => {
     setScanMode(true);

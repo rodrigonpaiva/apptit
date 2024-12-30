@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from './ui/Card';
 import { 
-  Utensils, Heart, Leaf, 
+  Heart, Leaf, 
   AlertTriangle, Calendar, 
   ChevronLeft, ChevronRight,
   Star
 } from 'lucide-react';
 
 const MenuSystem = () => {
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentWeek] = useState(new Date());
   
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       id: 1,
       name: "Arroz Integral com Legumes",
@@ -39,11 +39,28 @@ const MenuSystem = () => {
     }
   ];
 
-  const getHealthScoreColor = (score) => {
+  interface Nutrients {
+    protein: string;
+    carbs: string;
+    fat: string;
+  }
+
+  interface MenuItem {
+    id: number;
+    name: string;
+    category: string;
+    healthScore: number;
+    calories: number;
+    allergies: string[];
+    nutrients: Nutrients;
+  }
+
+  const getHealthScoreColor = (score: number): string => {
     if (score >= 90) return 'bg-green-500';
     if (score >= 70) return 'bg-yellow-500';
     return 'bg-red-500';
   };
+
 
   return (
     <div className="p-4 max-w-2xl mx-auto">

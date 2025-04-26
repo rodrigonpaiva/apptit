@@ -1,23 +1,24 @@
-# Base image for Node.js
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY ./apps/dashboard/package*.json ./
+COPY package.json package-lock.json turbo.json ./
 
-# Install dependencies
+COPY apps/dashboard/package.json apps/dashboard/package.json
+COPY apps/landing/package.json apps/landing/package.json
+COPY apps/api/package.json apps/api/package.json
+COPY packages/eslint-config/package.json packages/eslint-config/package.json
+COPY packages/typescript-config/package.json packages/typescript-config/package.json
+COPY packages/ui/package.json packages/ui/package.json
+
 RUN npm install --frozen-lockfile
 
-# Copy the rest of the application files
-COPY ./apps/dashboard .
+COPY . .
 
-# Build the Next.js application
+WORKDIR /app/apps/dashboard
+
 RUN npm run build
 
-# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
 CMD ["npm", "run", "start"]

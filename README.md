@@ -1,84 +1,100 @@
-# Turborepo starter
+# Apptit
 
-This Turborepo starter is maintained by the Turborepo core team.
+## 🚀 Badges
 
-## Using this example
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)
+![React Native](https://img.shields.io/badge/React%20Native-20232A?logo=react&logoColor=61DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
+![Kafka](https://img.shields.io/badge/Kafka-231F20?logo=apachekafka&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL-E10098?logo=graphql&logoColor=white)
+![Turborepo](https://img.shields.io/badge/Turborepo-000000?logo=vercel&logoColor=white)
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## 📘 Description
+
+**Apptit** is an intelligent system for managing kitchens and inventories in the **collective catering** sector.
+
+- Created to solve issues like food waste, lack of traceability, and low efficiency in managing supplies and meal planning.
+- Built with modern technologies such as **NestJS**, **Next.js**, **React Native**, **MongoDB**, **Kafka**, and **Redis**, all structured in a **monorepo using Turborepo**.
+- Developed to provide real-time control, task automation, smart recipe suggestions, and consumption forecasting using data.
+
+---
+
+## 🛠️ Installation Instructions
+
+### ✅ Prerequisites
+
+- Node.js v18+
+- NPM
+- Docker + Docker Compose
+- MongoDB (local or Atlas)
+- Kafka + Zookeeper (or Redpanda)
+- Redis
+
+### 📦 Steps
+
+1.Clone the repository:
+
+```bash
+git clone https://github.com/youruser/apptit.git
+cd apptit
 ```
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
+2.Install monorepo dependencies:
+```bash
+npm install
 ```
-cd my-turborepo
-pnpm build
+3.Start the necessary containers (Mongo, Kafka, Redis):
+```bash
+docker-compose up -d
 ```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
+4.Run services using Turborepo:
+```bash
+npx turbo run dev
 ```
-cd my-turborepo
-pnpm dev
+Or run individual apps:
+```bash
+npx turbo run dev --filter=gateway
+npx turbo run dev --filter=web
+npx turbo run dev --filter=mobile
 ```
+---
 
-### Remote Caching
+## 📲 Usage Instructions
+ • Access the admin dashboard via your browser at <http://localhost:3000>
+ • Use the mobile app to log entries, audits, and field operations
+ • The system scans product labels using OCR and retrieves metadata from Open Food Facts
+ • The backend (Gateway + Microservices) orchestrates business logic via GraphQL and Kafka
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+### Main features:
+ • Inventory Management
+ • Expiration Alerts and Anomaly Detection
+ • Audit Trails and Traceability
+ • Meal Forecasting Based on History
+ • AI-Powered Recipe Suggestions
+ • Internal Product Marketplace
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+---
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## 📄 License
 
-```
-cd my-turborepo
-npx turbo login
-```
+This is a private project and protected by copyright.
+All rights reserved © Rodrigo Paiva – 2025.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## 👤 Owner and Contributors
+ • Rodrigo Paiva – Creator and CEO of Apptit
+ • Deborah Malheiro – Frontend Developer
+@debsmalheiro
 
-```
-npx turbo link
-```
+---
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turborepo.com/docs/core-concepts/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🙏 Acknowledgments
+ • Open Food Facts (open food metadata)
+ • All engineers, testers, and collaborators who contributed.

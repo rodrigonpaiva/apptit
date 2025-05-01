@@ -1,0 +1,25 @@
+{
+  "name": "@repo/tailwind-config",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "exports": {
+    "./tailwindConfig": "./tailwind.config.cjs",
+    "./postcssConfig": "./postcss.config.cjs",
+    "./globalStyles": "./globals.css"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.5",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.5"
+  }
+}

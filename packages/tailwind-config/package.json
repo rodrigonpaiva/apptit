@@ -6,8 +6,7 @@
   "main": "index.js",
   "exports": {
     "./tailwindConfig": "./tailwind.config.cjs",
-    "./postcssConfig": "./postcss.config.cjs",
-    "./globalStyles": "./globals.css"
+    "./postcssConfig": "./postcss.config.cjs"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

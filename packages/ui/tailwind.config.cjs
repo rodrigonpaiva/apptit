@@ -1,7 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-const config = require("../tailwind-config/tailwind.config.cjs");
+import tailwindcssAnimate from "tailwindcss-animate";
 
-module.exports = {
-  ...config,
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+const config = {
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "../../apps/dashboard/**/*.{js,ts,jsx,tsx}",
+    "../../packages/ui/src/components/**/*.{js,ts,jsx,tsx}",
+  ],
+  prefix: "ui-",
+  plugins: [tailwindcssAnimate],
 };
+
+export default config;

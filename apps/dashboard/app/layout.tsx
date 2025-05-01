@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@repo/tailwind-config/globalStyles"
+import "@repo/ui/globalStyles"
 
 export const metadata: Metadata = {
   title: "Apptit",

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@api/common": ["packages/common/src"],
+      "@api/config": ["packages/config/src"],
+      "@api/clients": ["packages/clients/src"]
+    }
+  },
+  "include": ["apps/**/*", "packages/**/*"]
+}

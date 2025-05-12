@@ -6,12 +6,14 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AuthModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.REDIS,
       options: {
-        port: 8001,
+        host: 'localhost',
+        port: 6379,
       },
     },
   );
   await app.listen();
+  console.log('Auth microservice is listening');
 }
 bootstrap();

@@ -1,0 +1,7 @@
+{
+    "AuthPage": {
+        "greeting": "Hello",
+        "signIn": "Sign In",
+        "welcome": "Welcome to our website!"
+    }
+}

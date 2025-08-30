@@ -1,135 +1,152 @@
-# Turborepo starter
+# 🍽️ Apptit - FoodTech SaaS for Collective Catering
 
-This Turborepo starter is maintained by the Turborepo core team.
+Apptit is a **FoodTech SaaS** designed for **collective catering**.  
+Its mission is to **digitize and optimize** stock management, order forecasting, sanitary compliance, and sustainability reporting, bringing **simplicity and intelligence** to professional kitchens.
 
-## Using this example
+---
 
-Run the following command:
+## 📂 Monorepo Structure
 
-```sh
-npx create-turbo@latest
-```
+The project is organized as a **monorepo** using **Turborepo**.  
+Current structure:
 
-## What's inside?
+apptit/
+├─ apps/
+│  ├─ api-gateway/       # GraphQL Gateway (BFF)
+│  ├─ auth/              # Authentication microservice
+│  └─ users/             # User management microservice
+│
+├─ packages/
+│  ├─ @apptit/common/    # Decorators, DTOs, Guards, Interfaces, Pipes, Utils
+│  ├─ @apptit/config/    # Centralized configuration (.env, Redis, DB, services)
+│  ├─ @apptit/prisma/    # Shared Prisma client (MongoDB)
+│  ├─ @apptit/eslint-config/     # Shared ESLint configuration
+│  ├─ @apptit/typescript-config/ # Shared TS configs (base, NestJS, Next.js, React)
+│  └─ @apptit/ui/                # Shared UI components
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## 🚀 Tech Stack
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- **Backend**
+  - [NestJS](https://nestjs.com/) (microservices mode)
+  - **GraphQL** at the Gateway
+  - Inter-service communication via **Redis** (RPC + Streams)
+  - **Prisma ORM** + **MongoDB**
+  - **Kafka** (planned for event streaming)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Frontend**
+  - [Next.js](https://nextjs.org/) (web)
+  - [React Native](https://reactnative.dev/) (mobile)
 
-### Utilities
+- **Infrastructure**
+  - **Docker & Docker Compose**
+  - **CI/CD with GitHub Actions**
+  - **Dedicated VPS**
 
-This Turborepo has some additional tools already setup for you:
+- **Additional Tools**
+  - **Tesseract.js** (OCR for invoices/labels)
+  - **JWT** (authentication)
+  - **TailwindCSS** (UI styling)
+  - **Open Food Facts API** (product metadata)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
+## 📌 MVP Features
 
-To build all apps and packages, run the following command:
+- 🔑 **Authentication & accounts** *(in progress)* 
+- 👥 **User & role management** *(in progress)* 
+- 🏢 **Organization / tenant management** *(planned)*  
+- 🛒 **Product & multi-stock management** *(in progress)*  
+- 📦 **Procurement & menus** *(planned)*  
+- 🌡️ **IoT monitoring & HACCP compliance** *(planned)*  
+- 📊 **Order & consumption forecasting** *(planned)*  
+- 📩 **Notifications (e-mail / SMS)** *(planned)*  
+- 📑 **Reporting & dashboards** *(planned)*  
 
-```
-cd my-turborepo
+---
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+## 🧩 Internal Packages Implemented
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+- `@apptit/common` → global abstractions (DTOs, guards, decorators, utils)  
+- `@apptit/config` → strongly-typed environment configuration  
+- `@apptit/prisma` → centralized MongoDB connection for all microservices  
+- `@apptit/eslint-config` 
+- `@apptit/typescript-config` 
+- `@apptit/ui`  
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## 🛠️ Project Setup
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### Requirements
+- Node.js (>= 20.x)  
+- npm  
+- Docker & Docker Compose  
+- MongoDB  
+- Redis  
 
-### Develop
+### Installation
 
-To develop all apps and packages, run the following command:
+```bash
+# Install dependencies
+npm install
 
-```
-cd my-turborepo
+# Run all services with Docker
+docker-compose up -d
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+# Run in development mode
+npm run dev
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+⸻
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+📊 MVP Architecture
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+flowchart LR
+    subgraph Gateway
+      G[GraphQL Gateway]
+    end
 
-### Remote Caching
+    subgraph Services
+      A[Auth] --> R[(Redis)]
+      U[Users] --> R
+    end
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+    subgraph Data
+      M[(MongoDB)]
+    end
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+    G --> R
+    R --> M
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
 
-```
-cd my-turborepo
+⸻
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+🧾 Current Progress
+	•	✅ Monorepo setup with Turborepo
+	•	⏳ Created microservices auth and users
+	•	🔄  Implemented GraphQL Gateway
+	•	🔄 Integrated with MongoDB + Prisma
+	•	🔄 Inter-service communication via Redis RPC
+	•	🔄 Initial Docker Compose setup
+	•	🔄 CI/CD pipeline with GitHub Actions
+	•	🔄 Developing design system (UI / Figma)
+	•	🔄 Writing the Professional Dossier (École Studi final project)
+	•	🔮 Next: services products, inventory, tenants, IoT
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+⸻
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+📚 References
+	•	NestJS Microservices
+	•	GraphQL
+	•	Prisma ORM
+	•	Open Food Facts
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+⸻
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+👤 Author
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Rodrigo Paiva
+CEO & Creator of Apptit
+[LinkedIn](https://www.linkedin.com/in/rodrigonpaiva/) | [GitHub](https://github.com/rodrigonpaiva)

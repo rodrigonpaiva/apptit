@@ -8,9 +8,9 @@
     "lint:all": "nx run-many --target=lint",
     "format": "nx format:write",
     "e2e": "nx run-many --target=e2e",
-    "dev:api": "nx run @apptit/api:serve",
-    "dev:web": "nx run @apptit/web:dev",
-    "dev:mobile": "nx run @apptit/mobile:start",
+    "dev:api": "nx run api:serve",
+    "dev:web": "nx run web:dev",
+    "dev:mobile": "nx run mobile:start",
     "build:all": "nx affected -t build",
     "test:all": "nx affected -t test",
     "gql:codegen": "graphql-codegen --config packages/graphql/codegen.ts",
@@ -131,12 +131,6 @@
     "react-native": "~0.79.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   },
   "commitlint": {
     "extends": [

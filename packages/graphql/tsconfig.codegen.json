@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2022", "dom"],
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["codegen.ts"]
+}

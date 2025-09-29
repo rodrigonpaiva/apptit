@@ -1,5 +1,5 @@
 {
-  "name": "@apptit/graphql",
+  "name": "graphql",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/graphql/src",
   "projectType": "library",
@@ -11,8 +11,6 @@
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "tsConfig": "packages/graphql/tsconfig.lib.json",
-        "main": "packages/graphql/src/index.ts",
-        "outputPath": "dist/packages/graphql",
         "assets": []
       }
     },
@@ -26,6 +24,13 @@
       "executor": "@nx/js:tsc",
       "options": {
         "tsConfig": "packages/graphql/tsconfig.lib.json",
+        "noEmit": true
+      }
+    },
+    "codegen-check": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "tsConfig": "packages/graphql/tsconfig.codegen.json",
         "noEmit": true
       }
     },

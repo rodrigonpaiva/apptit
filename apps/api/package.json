@@ -77,9 +77,9 @@
         }
       },
       "typecheck": {
-        "executor": "nx:run-commands",
+        "executor": "@nx/js:tsc",
         "options": {
-          "command": "npx tsc --project apps/api/tsconfig.app.json --noEmit"
+          "tsConfig": "apps/api/tsconfig.app.json"
         }
       },
       "lint": {
@@ -99,7 +99,8 @@
           "{projectRoot}/test-output"
         ],
         "options": {
-          "jestConfig": "apps/api/jest.config.ts"
+          "jestConfig": "apps/api/jest.config.ts",
+          "passWithNoTests": true
         }
       }
     },

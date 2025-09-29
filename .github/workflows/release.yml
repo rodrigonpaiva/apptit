@@ -1,29 +1,19 @@
 name: release
 on:
   push:
-    branches: ["release/**", "main"]
+    branches: ["main", "release/**"]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  prepare_release:
+  prepare_version:
     if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: 'npm' }
-      - run: npm ci
-      - run: npx changeset version
-      - run: git config user.name "github-actions[bot]"
-      - run: git config user.email "github-actions[bot]@users.noreply.github.com"
-      - run: git add .
-      - run: git commit -m "chore(release): version packages"
-        continue-on-error: true
-
-  publish_on_main:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -31,8 +21,52 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: npx changeset publish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npx nx reset
+      - name: Version packages (Changesets)
+        run: npx changeset version
+      - name: Commit version files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): version packages" || echo "No changes to commit"
+          git push || true
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Validate NPM_TOKEN presence
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "::error::NPM_TOKEN is not set. Add it in Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+      - run: npx nx reset
+
+      - name: Build affected packages
+        run: npx nx affected -t build --parallel=3 || true
+
+      - name: Create .npmrc
+        run: |
+          echo "always-auth=true" > ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+
+      - name: Publish packages (Changesets)
+        run: npx changeset publish

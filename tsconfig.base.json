@@ -16,6 +16,19 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@apptit/source"]
+    "customConditions": ["@apptit/source"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "baseUrl": ".",
+    "paths": {
+      "@apptit/common": ["packages/common/src/index.ts"],
+      "@apptit/config": ["packages/config/src/index.ts"],
+      "@apptit/graphql": ["packages/graphql/src/index.ts"],
+      "@apptit/prisma": ["packages/prisma/src/index.ts"],
+      "@apptit/testing": ["packages/testing/src/index.ts"],
+      "@apptit/types": ["packages/types/src/index.ts"],
+      "@apptit/ui": ["packages/ui/src/index.ts"]
+    }
   }
 }

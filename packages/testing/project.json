@@ -1,0 +1,42 @@
+{
+  "name": "testing",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/testing/src",
+  "projectType": "library",
+  "tags": [
+    "scope:shared",
+    "type:test"
+  ],
+  "// targets": "to see all targets run: nx show project testing --web",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "tsConfig": "packages/testing/tsconfig.lib.json",
+        "main": "packages/testing/src/index.ts",
+        "outputPath": "dist/packages/testing"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsc --project packages/testing/tsconfig.lib.json --noEmit"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "packages/testing/**/*.ts",
+          "packages/testing/**/*.tsx"
+        ]
+      }
+    }
+  }
+}

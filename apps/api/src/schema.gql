@@ -1,0 +1,23 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Product {
+  id: ID!
+  name: String!
+  price: Float!
+  sku: String!
+}
+
+type Query {
+  health: String!
+  me: User
+  products: [Product!]!
+}
+
+type User {
+  email: String!
+  id: ID!
+  name: String
+  role: String!
+}

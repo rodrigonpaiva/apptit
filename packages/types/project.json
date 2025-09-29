@@ -1,0 +1,41 @@
+{
+  "name": "types",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/types/src",
+  "projectType": "library",
+  "tags": [
+    "scope:shared",
+    "type:lib"
+  ],
+  "// targets": "to see all targets run: nx show project types --web",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "tsConfig": "packages/types/tsconfig.lib.json",
+        "main": "packages/types/src/index.ts",
+        "outputPath": "dist/packages/types"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsc --project packages/types/tsconfig.lib.json --noEmit"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "packages/types/**/*.ts"
+        ]
+      }
+    }
+  }
+}

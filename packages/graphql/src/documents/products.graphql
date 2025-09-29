@@ -1,0 +1,10 @@
+# Exemple de liste produits (adapter au schéma)
+query Products {
+  products {
+    ...ProductFields
+  }
+}
+# Include le fragment
+# NOTE: codegen détecte automatiquement les imports si bien configuré
+# Sinon, coller le fragment à la suite:
+# fragment ProductFields on Product { id name sku price }

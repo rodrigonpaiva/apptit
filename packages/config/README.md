@@ -1,0 +1,1 @@
+@apptit/config shared configuration (dotenv + zod).

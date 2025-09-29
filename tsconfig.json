@@ -4,19 +4,40 @@
   "files": [],
   "references": [
     {
-      "path": "./api-e2e"
+      "path": "./apps/api-e2e"
     },
     {
-      "path": "./api"
+      "path": "./apps/api"
     },
     {
-      "path": "./web-e2e"
+      "path": "./apps/web-e2e"
     },
     {
-      "path": "./web"
+      "path": "./apps/web"
     },
     {
-      "path": "./mobile"
+      "path": "./apps/mobile"
+    },
+    {
+      "path": "./packages/config"
+    },
+    {
+      "path": "./packages/common"
+    },
+    {
+      "path": "./packages/ui"
+    },
+    {
+      "path": "./packages/graphql"
+    },
+    {
+      "path": "./packages/prisma"
+    },
+    {
+      "path": "./packages/types"
+    },
+    {
+      "path": "./packages/testing"
     }
   ]
 }

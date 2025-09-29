@@ -9,7 +9,9 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/src/test-setup.[jt]s"
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/test-setup.[jt]s"
     ],
     "sharedGlobals": []
   },
@@ -71,17 +73,20 @@
       }
     },
     {
-      "plugin": "@nx/vite/plugin",
+      "plugin": "@nx/jest/plugin",
+      "options": {
+        "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/react/router-plugin",
       "options": {
         "buildTargetName": "build",
-        "testTargetName": "test",
-        "serveTargetName": "serve",
         "devTargetName": "dev",
-        "previewTargetName": "preview",
-        "serveStaticTargetName": "serve-static",
-        "typecheckTargetName": "typecheck",
+        "startTargetName": "start",
+        "watchDepsTargetName": "watch-deps",
         "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
+        "typecheckTargetName": "typecheck"
       }
     }
   ],
@@ -91,6 +96,18 @@
         "style": "css",
         "linter": "none"
       }
+    },
+    "@nx/react": {
+      "library": {
+        "unitTestRunner": "vitest"
+      }
+    }
+  },
+  "targetDefaults": {
+    "test": {
+      "dependsOn": [
+        "^build"
+      ]
     }
   }
 }

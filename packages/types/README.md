@@ -1,0 +1,1 @@
+@apptit/types shared TypeScript types.

@@ -1,0 +1,44 @@
+{
+  "name": "@apptit/graphql",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/graphql/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:lib"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "dependsOn": ["codegen"],
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "tsConfig": "packages/graphql/tsconfig.lib.json",
+        "main": "packages/graphql/src/index.ts",
+        "outputPath": "dist/packages/graphql",
+        "assets": []
+      }
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "graphql-codegen --config packages/graphql/codegen.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "tsConfig": "packages/graphql/tsconfig.lib.json",
+        "noEmit": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "packages/graphql/**/*.ts",
+          "packages/graphql/**/*.tsx",
+          "packages/graphql/**/*.graphql"
+        ]
+      }
+    }
+  }
+}

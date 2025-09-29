@@ -1,0 +1,41 @@
+{
+  "name": "prisma",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/prisma/src",
+  "projectType": "library",
+  "tags": [
+    "scope:shared",
+    "type:lib"
+  ],
+  "// targets": "to see all targets run: nx show project prisma --web",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "options": {
+        "tsConfig": "packages/prisma/tsconfig.lib.json",
+        "main": "packages/prisma/src/index.ts",
+        "outputPath": "dist/packages/prisma"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsc --project packages/prisma/tsconfig.lib.json --noEmit"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "packages/prisma/**/*.ts"
+        ]
+      }
+    }
+  }
+}

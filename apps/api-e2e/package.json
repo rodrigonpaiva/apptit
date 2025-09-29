@@ -1,0 +1,28 @@
+{
+  "name": "@apptit/api-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@apptit/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "name": "api-e2e",
+    "tags": [
+      "scope:api-e2e",
+      "type:e2e"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}

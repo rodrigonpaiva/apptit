@@ -1,0 +1,38 @@
+name: release
+on:
+  push:
+    branches: ["release/**", "main"]
+  workflow_dispatch:
+
+jobs:
+  prepare_release:
+    if: startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: 'npm' }
+      - run: npm ci
+      - run: npx changeset version
+      - run: git config user.name "github-actions[bot]"
+      - run: git config user.email "github-actions[bot]@users.noreply.github.com"
+      - run: git add .
+      - run: git commit -m "chore(release): version packages"
+        continue-on-error: true
+
+  publish_on_main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npx changeset publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

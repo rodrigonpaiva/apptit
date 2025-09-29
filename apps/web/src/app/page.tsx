@@ -1,23 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 'use client';
-import type { DocumentNode } from 'graphql';
-import { documents } from '@apptit/graphql';
-import { useQuery } from '@apollo/client';
+import { HealthDocument, type HealthQuery, type HealthQueryVariables } from '@apptit/graphql';
+import { useQuery } from '@apollo/client/react';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { z } from 'zod';
 
-type HealthQueryResult = { health: string };
-
-type HealthQueryVariables = Record<string, never>;
-
-const typedDocuments = documents as {
-  HealthDocument: DocumentNode<HealthQueryResult, HealthQueryVariables>;
-};
+const HealthResponseSchema = z.object({
+  health: z.string()
+});
 
 export default function HomePage() {
-  const { data, loading, error } = useQuery<HealthQueryResult, HealthQueryVariables>(
-    typedDocuments.HealthDocument
+  const result = useQuery<HealthQuery, HealthQueryVariables>(
+    HealthDocument as TypedDocumentNode<HealthQuery, HealthQueryVariables>
   );
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  return <p>API health: {data?.health}</p>;
+  if (result.loading) return <p>Loading…</p>;
+  if (result.error) return <p>Error: {result.error.message}</p>;
+
+  if (!result.data) {
+    return <p>API health: unavailable</p>;
+  }
+
+  const parsed = HealthResponseSchema.safeParse(result.data);
+  if (!parsed.success) {
+    return <p>API health: invalid response</p>;
+  }
+
+  return <p>API health: {parsed.data.health}</p>;
 }

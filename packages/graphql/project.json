@@ -22,6 +22,7 @@
     },
     "typecheck": {
       "executor": "@nx/js:tsc",
+      "dependsOn": ["codegen"],
       "options": {
         "tsConfig": "packages/graphql/tsconfig.lib.json",
         "noEmit": true

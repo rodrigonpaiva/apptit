@@ -1,7 +1,7 @@
 'use client';
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
 
-export function makeClient(): ApolloClient<object> {
+export function makeClient(): ApolloClient {
   return new ApolloClient({
     link: new HttpLink({
       uri: process.env.NEXT_PUBLIC_API_BASE_URL
@@ -9,7 +9,6 @@ export function makeClient(): ApolloClient<object> {
         : 'http://localhost:4000/graphql',
       credentials: 'include'
     }),
-    cache: new InMemoryCache(),
-    connectToDevTools: process.env.NODE_ENV !== 'production'
+    cache: new InMemoryCache()
   });
 }

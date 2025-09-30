@@ -6,7 +6,7 @@ type MatcherResult = {
 };
 
 declare module 'vitest' {
-  interface Assertion<T = unknown> {
+  interface Assertion<T = any> {
     toBeInTheDocument(): T;
   }
   interface AsymmetricMatchersContaining {

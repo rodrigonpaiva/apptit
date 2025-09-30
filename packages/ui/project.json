@@ -7,9 +7,11 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{projectRoot}/dist"],
+      "outputs": ["{workspaceRoot}/dist/packages/ui"],
       "options": {
         "tsConfig": "packages/ui/tsconfig.lib.json",
+        "main": "packages/ui/src/index.ts",
+        "outputPath": "dist/packages/ui",
         "assets": []
       }
     },

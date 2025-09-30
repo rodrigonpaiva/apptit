@@ -8,9 +8,11 @@
     "build": {
       "executor": "@nx/js:tsc",
       "dependsOn": ["codegen"],
-      "outputs": ["{projectRoot}/dist"],
+      "outputs": ["{workspaceRoot}/dist/packages/graphql"],
       "options": {
         "tsConfig": "packages/graphql/tsconfig.lib.json",
+        "main": "packages/graphql/src/index.ts",
+        "outputPath": "dist/packages/graphql",
         "assets": []
       }
     },

@@ -2,14 +2,22 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "types": ["node"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
       "@/*": ["src/*"],
       "@apptit/graphql": ["../../packages/graphql/src/index.ts"]
-    }
+    },
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -19,5 +27,10 @@
     "../../packages/graphql/src/**/*.ts",
     "../../packages/graphql/src/**/*.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "../../packages/graphql"
+    }
+  ]
 }

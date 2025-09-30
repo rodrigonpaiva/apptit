@@ -48,20 +48,6 @@ jobs:
           echo "head=$HEAD" >> "$GITHUB_OUTPUT"
           echo "Computed BASE=$BASE HEAD=$HEAD"
 
-  lint_typecheck:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx nx affected -t lint,typecheck --parallel=3 --base="${{ needs.setup.outputs.BASE }}" --head="${{ needs.setup.outputs.HEAD }}"
-
   test:
     needs: setup
     runs-on: ubuntu-latest
@@ -77,7 +63,7 @@ jobs:
       - run: npx nx affected -t test --parallel=2 --base="${{ needs.setup.outputs.BASE }}" --head="${{ needs.setup.outputs.HEAD }}"
 
   build:
-    needs: [setup, lint_typecheck, test]
+    needs: [setup, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

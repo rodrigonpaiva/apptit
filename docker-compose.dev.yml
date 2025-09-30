@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    command: sh -c "npm ci && npx nx run @apptit/api:serve"
+    command: sh -c "npm ci && npx nx run api:serve"
     env_file: .env
     environment:
       NODE_ENV: development
@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    command: sh -c "npm ci && npx nx run @apptit/web:dev"
+    command: sh -c "npm ci && npx nx run web:dev"
     env_file: .env
     environment:
       NODE_ENV: development

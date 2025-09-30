@@ -1,5 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 node scripts/check-branch-name.js || exit 1
-npx lint-staged
+npx --no -- lint-staged

@@ -9,7 +9,7 @@ FROM node:22-alpine AS builder
 WORKDIR /repo
 COPY . .
 RUN npm ci
-RUN npx nx build @apptit/web
+RUN npx nx build web
 
 # Next.js standalone output (if using output:standalone)
 # Otherwise copy .next + node_modules

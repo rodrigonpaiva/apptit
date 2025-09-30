@@ -1,8 +1,9 @@
 /// <reference types='vitest' />
+import * as path from 'node:path';
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
-import * as path from 'path';
 
 export default defineConfig(() => ({
   root: __dirname,

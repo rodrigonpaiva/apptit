@@ -8,9 +8,9 @@
     "lint:all": "nx run-many --target=lint",
     "format": "nx format:write",
     "e2e": "nx run-many --target=e2e",
-    "dev:api": "nx run @apptit/api:serve",
-    "dev:web": "nx run @apptit/web:dev",
-    "dev:mobile": "nx run @apptit/mobile:start",
+    "dev:api": "nx run api:serve",
+    "dev:web": "nx run web:dev",
+    "dev:mobile": "nx run mobile:start",
     "build:all": "nx affected -t build",
     "test:all": "nx affected -t test",
     "gql:codegen": "graphql-codegen --config packages/graphql/codegen.ts",
@@ -35,6 +35,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
+    "@next/eslint-plugin-next": "^15.5.4",
     "@nx/devkit": "^21.5.3",
     "@nx/eslint": "^21.5.3",
     "@nx/jest": "^21.5.3",
@@ -76,6 +77,11 @@
     "cross-env": "^10.0.0",
     "dotenv-flow": "^4.1.0",
     "eslint": "^9.36.0",
+    "eslint-config-next": "^15.5.4",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jest": "^29.0.1",
+    "globals": "^16.4.0",
     "graphql": "^16.11.0",
     "husky": "^9.1.7",
     "jest": "^30.0.2",
@@ -101,6 +107,7 @@
     "tslib": "^2.3.0",
     "tsx": "^4.20.6",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.45.0",
     "vite": "^7.0.0",
     "vite-plugin-dts": "~4.5.0",
     "vitest": "^3.2.4",
@@ -131,12 +138,6 @@
     "react-native": "~0.79.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   },
   "commitlint": {
     "extends": [

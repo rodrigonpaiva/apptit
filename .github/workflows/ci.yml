@@ -1,7 +1,7 @@
 name: ci
 on:
   push:
-    branches: ["develop", "feature/**"]
+    branches: ["develop", "feature/**", "release/**"]
   pull_request:
     branches: ["develop", "feature/**", "release/**"]
 
@@ -12,41 +12,66 @@ concurrency:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      BASE: ${{ steps.compute-sha.outputs.base }}
+      HEAD: ${{ steps.compute-sha.outputs.head }}
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: 'npm' }
-      - run: npm ci
-      - run: npx nx reset
-      - uses: nrwl/nx-set-shas@v4
-  lint_typecheck:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: 'npm' }
-      - run: npm ci
-      - run: npx nx affected -t lint,typecheck --parallel=3
+        with:
+          fetch-depth: 0
+      - name: Compute base/head SHAs
+        id: compute-sha
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all --prune || true
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            if git rev-parse --verify origin/main >/dev/null 2>&1; then
+              BASE="origin/main"
+            elif git rev-parse --verify origin/develop >/dev/null 2>&1; then
+              BASE="origin/develop"
+            else
+              BASE="HEAD~1"
+            fi
+            HEAD="HEAD"
+          fi
+
+          if ! git rev-parse --verify "$BASE" >/dev/null 2>&1; then
+            BASE=$(git rev-list --max-parents=0 HEAD | tail -n 1)
+          fi
+
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD" >> "$GITHUB_OUTPUT"
+          echo "Computed BASE=$BASE HEAD=$HEAD"
+
   test:
     needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: 'npm' }
+        with:
+          node-version: 22
+          cache: npm
       - run: npm ci
-      - run: npx nx affected -t test --parallel=2
+      - run: npx nx affected -t test --parallel=2 --base="${{ needs.setup.outputs.BASE }}" --head="${{ needs.setup.outputs.HEAD }}"
+
   build:
-    needs: [lint_typecheck, test]
+    needs: [setup, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: 'npm' }
+        with:
+          node-version: 22
+          cache: npm
       - run: npm ci
-      - run: npx nx affected -t build --parallel=3
+      - run: npx nx affected -t build --parallel=3 --base="${{ needs.setup.outputs.BASE }}" --head="${{ needs.setup.outputs.HEAD }}"

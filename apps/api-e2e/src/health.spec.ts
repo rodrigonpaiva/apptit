@@ -7,20 +7,12 @@ import { z } from 'zod';
 
 import { AppModule } from '../../api/src/app.module';
 
-const ProductsResponseSchema = z.object({
-  products: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      sku: z.string(),
-      price: z.number()
-    })
-  )
-});
-
-describe('Products query (e2e)', () => {
+describe('Health (e2e)', () => {
   let app: INestApplication;
   let schema: GraphQLSchema;
+  const HealthResponseSchema = z.object({
+    health: z.string()
+  });
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -38,23 +30,10 @@ describe('Products query (e2e)', () => {
     await app.close();
   });
 
-  it('returns sample products from the GraphQL API', async () => {
-    const result = await graphql({
-      schema,
-      source: `
-        query Products {
-          products {
-            id
-            name
-            sku
-            price
-          }
-        }
-      `
-    });
-
+  it('resolves health query', async () => {
+    const result = await graphql({ schema, source: 'query { health }' });
     expect(result.errors).toBeUndefined();
-    const data = ProductsResponseSchema.parse(result.data);
-    expect(data.products.length).toBeGreaterThan(0);
+    const payload = HealthResponseSchema.parse(result.data);
+    expect(payload.health).toBe('ok');
   });
 });

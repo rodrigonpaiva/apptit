@@ -1,30 +1,18 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
     "emitDeclarationOnly": false,
-    "resolveJsonModule": true,
+    "noEmit": false,
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2022",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
-    "types": ["node"],
     "lib": ["es2022", "dom"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "rootDir": "src"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.graphql",
-    "codegen.ts",
-    "src/generated/**/*"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "dist",
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.graphql", "src/generated/**/*"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "dist", "node_modules", "codegen.ts"]
 }

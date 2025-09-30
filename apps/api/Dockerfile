@@ -7,7 +7,7 @@ FROM node:22-alpine AS builder
 WORKDIR /repo
 COPY . .
 RUN npm ci
-RUN npx nx build @apptit/api
+RUN npx nx build api
 
 FROM node:22-alpine AS runner
 WORKDIR /app

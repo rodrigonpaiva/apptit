@@ -1,12 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "types": ["jest", "node"],
     "noEmit": true
   },
-  "include": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.d.ts"],
+  "include": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.d.ts", "../api/src/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"

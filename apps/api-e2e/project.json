@@ -23,7 +23,7 @@
     "typecheck": {
       "executor": "@nx/js:tsc",
       "options": {
-        "tsConfig": "apps/api-e2e/tsconfig.lib.json",
+        "tsConfig": "apps/api-e2e/tsconfig.spec.json",
         "noEmit": true
       }
     }

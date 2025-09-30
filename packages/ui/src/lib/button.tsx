@@ -1,5 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
+
 import styles from './button.module.css';
 
 type Variant = 'primary' | 'ghost';

@@ -6,19 +6,32 @@
     "name": "api",
     "targets": {
       "build": {
-        "executor": "nx:run-commands",
+        "executor": "@nx/webpack:webpack",
+        "outputs": [
+          "{workspaceRoot}/apps/api/dist"
+        ],
         "options": {
-          "command": "webpack-cli build",
-          "args": [
-            "--node-env=production"
+          "main": "apps/api/src/main.ts",
+          "tsConfig": "apps/api/tsconfig.app.json",
+          "target": "node",
+          "compiler": "tsc",
+          "outputPath": "apps/api/dist",
+          "generatePackageJson": true,
+          "assets": [
+            "apps/api/src/assets"
           ],
-          "cwd": "apps/api"
+          "optimization": false,
+          "sourceMap": true,
+          "webpackConfig": "apps/api/webpack.config.js"
         },
         "configurations": {
           "development": {
-            "args": [
-              "--node-env=development"
-            ]
+            "optimization": false,
+            "sourceMap": true
+          },
+          "production": {
+            "optimization": true,
+            "sourceMap": false
           }
         }
       },

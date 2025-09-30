@@ -10,8 +10,6 @@
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "tsConfig": "packages/ui/tsconfig.lib.json",
-        "main": "packages/ui/src/index.ts",
-        "outputPath": "dist/packages/ui",
         "assets": []
       }
     },

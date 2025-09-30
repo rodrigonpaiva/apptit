@@ -1,32 +1,25 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `api/`: NestJS service (`src/main.ts`, feature modules under `src/app`, static assets in `src/assets/`, build output in `dist/`).
-- `web/`: Next.js 15 app in `src/app`; shared media in `public/`; compiled assets under `.next/`.
-- `mobile/`: React Native client with entrypoints `src/main.tsx` and `src/main-web.tsx`; store shared media in `src/assets/`.
-- End-to-end suites: `api-e2e/src` for Jest API journeys, `web-e2e/src` for Playwright flows.
-- Shared domain utilities live in `packages/`; keep feature-specific assets close to their modules.
+
+This Nx workspace organizes deliverables by surface. `api/` hosts the NestJS service with entry `src/main.ts`, feature modules in `src/app`, assets under `src/assets/`, and build artifacts in `dist/`. `web/` contains the Next.js 15 UI (`src/app` routes, shared media in `public/`, compiled output in `.next/`). `mobile/` ships the React Native clients with `src/main.tsx` for devices, `src/main-web.tsx` for web, and shared assets in `src/assets/`. End-to-end suites live in `api-e2e/src` (Jest) and `web-e2e/src` (Playwright). Shared utilities and types belong in `packages/`. Generated bundles land in workspace `dist/`; keep feature-specific assets close to their modules.
 
 ## Build, Test, and Development Commands
-- `npm install` once to hydrate dependencies; use Nx thereafter.
-- `npx nx run api:serve` watches the API; `...:build` emits the production bundle.
-- `npx nx run web:dev` launches Next.js HMR; `web:start` serves the built app.
-- `npx nx run mobile:start` opens Metro; `...:run-ios` / `...:run-android` target devices; `...:build` publishes to `dist/mobile/web`.
-- `npx nx run-many --target=typecheck` runs TypeScript checks across projects; `npx nx format:write` applies formatting.
+
+Initialize dependencies once with `npm install`; afterward drive everything through Nx. Use `npx nx run api:serve` for a hot-reloading API and `npx nx run api:build` for production bundles. Run the web client with `npx nx run web:dev`; serve a build via `npx nx run web:start`. Start Metro by `npx nx run mobile:start`, and target devices with the `mobile:run-ios` or `mobile:run-android` executors. Run type checks across the graph with `npx nx run-many --target=typecheck`. Format sources using `npx nx format:write`.
 
 ## Coding Style & Naming Conventions
-- TypeScript everywhere with `strict` mode; follow ES2022 and `module nodenext` from `tsconfig.base.json`.
-- Format with Prettier defaults and 2-space indentation; avoid trailing whitespace.
-- Use camelCase for variables/functions, PascalCase for components and providers, kebab-case for directories and file folders.
+
+Code in TypeScript with `strict` settings from `tsconfig.base.json` targeting ES2022 and NodeNext modules. Keep imports sorted logically, prefer descriptive names, and avoid unused exports. Use camelCase for variables and functions, PascalCase for components and providers, and kebab-case for directories. Enforce two-space indentation and Prettier defaults; trim trailing whitespace before commits.
 
 ## Testing Guidelines
-- Place unit specs beside sources (e.g., `component.spec.tsx`) and wire them into the project `package.json` Vitest target.
-- API contracts live in `api-e2e/src/api/*.spec.ts`; run `npx nx run api-e2e:e2e` (auto-starts the API).
-- UI journeys live in `web-e2e/src`; execute `npx nx run web-e2e:e2e` for Playwright runs.
-- Store coverage artefacts under `test-output/`; keep the directory out of version control.
+
+Co-locate unit specs beside their sources as `*.spec.ts` or `*.spec.tsx`. API contract tests belong in `api-e2e/src/api/*.spec.ts`; run them via `npx nx run api-e2e:e2e`, which auto-starts the service. UI journeys live under `web-e2e/src`; execute with `npx nx run web-e2e:e2e`. Store coverage assets under `test-output/` and keep the directory untracked.
 
 ## Commit & Pull Request Guidelines
-- Use Conventional Commits (`feat(api): add menu endpoints`), ≤72-character subjects, lowercase tone.
-- Reference issue IDs in the body, note migrations, and list the Nx commands executed during validation.
-- Pull requests need a clear problem statement, before/after evidence for UI, and confirmation of relevant Nx tasks.
-- Request review before merging; rely on `npx nx affected:graph` or related tooling to scope changes.
+
+Write Conventional Commits such as `feat(api): add menu endpoints`, limit subjects to 72 characters, and keep tone lowercase. Reference issue IDs in the body, list migrations, and record Nx commands executed. PRs need a problem statement, before/after evidence for UI changes, confirmation of validated Nx tasks, and a review request before merging. Use `npx nx affected:graph` to scope reviewers and follow-up work.
+
+## Security & Configuration Tips
+
+Use the provided Docker Compose files (`docker-compose.dev.yml`, `docker-compose.prod.yml`) to orchestrate dependencies consistently. Store secrets outside version control and prefer local environment files ignored by git. Consult `docs/` for environment notes before changing infra or deployment settings.

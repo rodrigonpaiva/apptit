@@ -1,15 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
     "types": ["jest", "node"],
-    "noEmit": true
+    "esModuleInterop": true
   },
-  "include": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.d.ts", "../api/src/**/*.ts"],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    }
-  ]
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts", "../api/src/**/*.ts"]
 }

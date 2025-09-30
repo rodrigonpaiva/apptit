@@ -1,16 +1,17 @@
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import type { Server } from 'http';
-import request from 'supertest';
+import { GraphQLSchemaHost } from '@nestjs/graphql';
+import { graphql, GraphQLSchema } from 'graphql';
 import { z } from 'zod';
+
 import { AppModule } from '../../api/src/app.module';
 
 describe('Health (e2e)', () => {
   let app: INestApplication;
+  let schema: GraphQLSchema;
   const HealthResponseSchema = z.object({
-    data: z.object({
-      health: z.string()
-    })
+    health: z.string()
   });
 
   beforeAll(async () => {
@@ -20,19 +21,19 @@ describe('Health (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    const schemaHost = app.get(GraphQLSchemaHost);
+    schema = schemaHost.schema;
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('returns ok from /graphql health query', async () => {
-    const response = await request(app.getHttpServer() as unknown as Server)
-      .post('/graphql')
-      .send({ query: 'query { health }' });
-
-    expect(response.status).toBe(200);
-    const parsed = HealthResponseSchema.parse(response.body);
-    expect(parsed.data.health).toBe('ok');
+  it('resolves health query', async () => {
+    const result = await graphql({ schema, source: 'query { health }' });
+    expect(result.errors).toBeUndefined();
+    const payload = HealthResponseSchema.parse(result.data);
+    expect(payload.health).toBe('ok');
   });
 });

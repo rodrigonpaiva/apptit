@@ -1,7 +1,10 @@
 import './global.css';
+
+import type { ReactNode } from 'react';
+
 import Providers from '@/app/providers';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fr">
       <body>

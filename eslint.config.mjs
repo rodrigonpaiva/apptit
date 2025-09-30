@@ -1,39 +1,26 @@
-import js from '@eslint/js';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-let nextPlugin = null;
-try {
-  nextPlugin = require('@next/eslint-plugin-next');
-} catch (error) {
-  console.warn('[@apptit] @next/eslint-plugin-next not installed; Next.js specific lint rules disabled.');
-}
+import js from '@eslint/js';
+import globals from 'globals';
+import importPlugin from 'eslint-plugin-import';
+import jestPlugin from 'eslint-plugin-jest';
+import nextPlugin from '@next/eslint-plugin-next';
+import tseslint from 'typescript-eslint';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const [, eslintRecommendedRules, tsTypeCheckedRules] =
-  tsPlugin.configs['flat/recommended-type-checked'];
 
-const baseTsRuleSet = {
-  ...js.configs.recommended.rules,
-  ...(eslintRecommendedRules?.rules ?? {}),
-  ...(tsTypeCheckedRules?.rules ?? {})
+const nextFiles = ['apps/web/**/*.{ts,tsx,js,jsx}'];
+const nextRecommended = {
+  ...nextPlugin.flatConfig.recommended,
+  files: nextFiles
 };
-
-const nodeGlobals = {
-  require: 'readonly',
-  module: 'readonly',
-  process: 'readonly',
-  __dirname: 'readonly',
-  __filename: 'readonly',
-  console: 'readonly'
+const nextCoreWebVitals = {
+  ...nextPlugin.flatConfig.coreWebVitals,
+  files: nextFiles
 };
 
 /** @type {import('eslint').Linter.Config[]} */
-export default [
+export default tseslint.config(
   {
     ignores: [
       'node_modules',
@@ -48,48 +35,62 @@ export default [
     ]
   },
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
-      parser: tsParser,
+      parser: tseslint.parser,
       parserOptions: {
         project: ['./tsconfig.base.json'],
         tsconfigRootDir: __dirname,
         sourceType: 'module'
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node
       }
     },
     plugins: {
-      '@typescript-eslint': tsPlugin,
-      ...(nextPlugin ? { next: nextPlugin } : {})
+      '@typescript-eslint': tseslint.plugin,
+      import: importPlugin
     },
     rules: {
-      ...baseTsRuleSet,
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error'
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommendedTypeChecked.rules,
+      'no-unused-vars': 'off',
+      'import/order': ['warn', { 'newlines-between': 'always' }],
+      'import/no-unresolved': 'off'
+    },
+    settings: {
+      'import/resolver': {
+        typescript: true
+      }
     }
   },
   {
-    files: ['**/*.js', '**/*.jsx'],
+    ...nextRecommended,
+    rules: {
+      ...nextRecommended.rules,
+      '@next/next/no-html-link-for-pages': 'off'
+    }
+  },
+  {
+    ...nextCoreWebVitals,
+    rules: {
+      ...nextCoreWebVitals.rules,
+      '@next/next/no-html-link-for-pages': 'off'
+    }
+  },
+  {
+    files: ['apps/api-e2e/**/*.spec.ts'],
+    plugins: {
+      jest: jestPlugin
+    },
     languageOptions: {
-      sourceType: 'module',
-      ecmaVersion: 'latest',
       globals: {
-        ...(js.configs.recommended.languageOptions?.globals ?? {}),
-        ...nodeGlobals
+        ...globals.jest
       }
     },
     rules: {
-      ...js.configs.recommended.rules
+      ...(jestPlugin.configs.recommended?.rules ?? {})
     }
-  },
-  ...(nextPlugin
-    ? [
-        {
-          files: ['apps/web/**/*.{ts,tsx,js,jsx}'],
-          plugins: { next: nextPlugin },
-          rules: {
-            ...nextPlugin.configs.recommended.rules
-          }
-        }
-      ]
-    : [])
-];
+  }
+);

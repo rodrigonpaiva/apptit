@@ -1,7 +1,7 @@
 'use client';
-import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, HttpLink, InMemoryCache, type NormalizedCacheObject } from '@apollo/client/core';
 
-export function makeClient(): ApolloClient {
+export function makeClient(): ApolloClient<NormalizedCacheObject> {
   return new ApolloClient({
     link: new HttpLink({
       uri: process.env.NEXT_PUBLIC_API_BASE_URL

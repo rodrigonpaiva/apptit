@@ -46,6 +46,7 @@ export default defineConfig({
     reportCompressedSize: true,
     commonjsOptions: { transformMixedEsModules: true },
     outDir: '../../dist/apps/apptit/web',
+    emptyOutDir: true,
     rollupOptions: {
       plugins: [rollupPlugin([/react-native-vector-icons/])],
     },

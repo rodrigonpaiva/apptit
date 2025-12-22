@@ -1,0 +1,26 @@
+{
+  "name": "@apptit/auth-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@apptit/auth"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "auth-e2e/jest.config.cts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@apptit/auth:build",
+          "@apptit/auth:serve"
+        ]
+      }
+    }
+  }
+}

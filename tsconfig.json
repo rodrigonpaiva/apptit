@@ -2,9 +2,22 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
+  "include": [],
   "references": [
     {
-      "path": "./apps/apptit"
+      "path": "./auth-e2e"
+    },
+    {
+      "path": "./apps/mobile"
+    },
+    {
+      "path": "./packages"
+    },
+    {
+      "path": "./apps/auth"
+    },
+    {
+      "path": "./packages/prisma"
     }
   ]
 }

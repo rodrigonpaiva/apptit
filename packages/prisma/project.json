@@ -1,0 +1,24 @@
+{
+  "name": "@apptit/prisma",
+  "projectType": "library",
+  "sourceRoot": "packages/prisma/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/packages/prisma/dist"],
+      "options": {
+        "main": "packages/prisma/src/index.ts",
+        "tsConfig": "packages/prisma/tsconfig.lib.json",
+        "outputPath": "packages/prisma/dist",
+        "assets": [
+          {
+            "input": "packages/prisma",
+            "glob": "package.json",
+            "output": "."
+          }
+        ]
+      }
+    }
+  },
+  "tags": ["npm:private"]
+}

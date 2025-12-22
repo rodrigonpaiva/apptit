@@ -6,6 +6,8 @@
     "importHelpers": true,
     "isolatedModules": true,
     "lib": ["es2022"],
+    "baseUrl": ".",
+    "allowImportingTsExtensions": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -16,6 +18,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@apptit/source"]
+    "customConditions": ["@apptit/source"],
+    "paths": {
+      "@apptit/prisma": ["packages/prisma/dist/index.ts"]
+    }
   }
 }

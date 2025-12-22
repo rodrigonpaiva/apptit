@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: apptit
+      POSTGRES_PASSWORD: apptit
+      POSTGRES_DB: apptit_auth
+    ports:
+      - "5432:5432"
+    volumes:
+      - apptit_pg:/var/lib/postgresql/data
+
+volumes:
+  apptit_pg:

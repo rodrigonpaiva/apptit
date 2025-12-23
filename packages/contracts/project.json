@@ -3,7 +3,7 @@
   "projectType": "library",
   "sourceRoot": "packages/contracts/src",
   "targets": {
-    "build": {
+    "tsc": {
       "executor": "@nx/js:tsc",
       "outputs": ["{workspaceRoot}/packages/contracts/dist"],
       "options": {
@@ -13,10 +13,21 @@
         "assets": [
           {
             "input": "packages/contracts",
-            "glob": "package.json",
+            "glob": "package.dist.json",
             "output": "."
           }
         ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/packages/contracts/dist"],
+      "options": {
+        "commands": [
+          "nx run @apptit/contracts:tsc",
+          "mv packages/contracts/dist/package.dist.json packages/contracts/dist/package.json"
+        ],
+        "parallel": false
       }
     }
   },

@@ -11,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bodyParser: false});
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+  // TODO: configurar transport de microservice para RPC (ex.: Redis/NATS) antes de usar AUTH_ME.
 
   const port = process.env.PORT || 4001;
   await app.listen(port);

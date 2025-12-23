@@ -1,5 +1,9 @@
-import type { ValidateSessionPayload, MeResult } from "@apptit/contracts";
+import type {
+  ValidateSessionPayload,
+  MeResult,
+  RpcResponse,
+} from "@apptit/contracts";
 
 export interface MePort {
-  execute(input: ValidateSessionPayload): Promise<MeResult>;
+  execute(input: ValidateSessionPayload): Promise<RpcResponse<MeResult>>;
 }

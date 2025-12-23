@@ -1,2 +1,2 @@
-export * from "./auth/auth.patterns";
-export * from "./auth/auth.contracts";
+export * from "./auth/auth.patterns.js";
+export * from "./auth/auth.contracts.js";

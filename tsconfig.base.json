@@ -20,7 +20,8 @@
     "target": "es2022",
     "customConditions": ["@apptit/source"],
     "paths": {
-      "@apptit/prisma": ["packages/prisma/dist/index.ts"]
+      "@apptit/prisma": ["packages/prisma/dist/src/index.d.ts"],
+      "@apptit/contracts": ["packages/contracts/dist/src/index.d.ts"]
     }
   }
 }

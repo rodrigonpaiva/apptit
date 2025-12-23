@@ -1,12 +1,11 @@
-export interface SessionContext {
-  userId: string;
-  tenantId: string;
-  role: "OWNER" | "ADMIN" | "MANAGER" | "STAFF";
-}
+import type {
+  ValidateSessionPayload,
+  ValidateSessionResult,
+  SessionContext,
+} from "@apptit/contracts";
 
 export interface ValidateSessionPort {
-  execute(input: { cookie?: string; authorization?: string }): Promise<{
-    isValid: boolean;
-    context?: SessionContext;
-  }>;
+  execute(input: ValidateSessionPayload): Promise<ValidateSessionResult>;
 }
+
+export type { SessionContext };

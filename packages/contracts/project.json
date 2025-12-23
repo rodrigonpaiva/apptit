@@ -1,0 +1,24 @@
+{
+  "name": "@apptit/contracts",
+  "projectType": "library",
+  "sourceRoot": "packages/contracts/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/packages/contracts/dist"],
+      "options": {
+        "main": "packages/contracts/src/index.ts",
+        "tsConfig": "packages/contracts/tsconfig.lib.json",
+        "outputPath": "packages/contracts/dist",
+        "assets": [
+          {
+            "input": "packages/contracts",
+            "glob": "package.json",
+            "output": "."
+          }
+        ]
+      }
+    }
+  },
+  "tags": ["npm:private"]
+}

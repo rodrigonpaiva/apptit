@@ -119,6 +119,66 @@ mutation LeaveOrganization {
 }
 ```
 
+```graphql
+query Orders {
+  orders(input: { tenantId: "tenant-id", limit: 10, offset: 0 }) {
+    total
+    orders {
+      id
+      number
+      status
+      total
+      currency
+      createdAt
+    }
+  }
+}
+```
+
+```graphql
+query Order {
+  order(input: { tenantId: "tenant-id", orderId: "order-id" }) {
+    id
+    number
+    status
+    total
+    currency
+    createdAt
+  }
+}
+```
+
+```graphql
+query Invoices {
+  invoices(input: { tenantId: "tenant-id", limit: 10, offset: 0 }) {
+    total
+    invoices {
+      id
+      number
+      status
+      amount
+      currency
+      issuedAt
+      dueAt
+    }
+  }
+}
+```
+
+```graphql
+query Invoice {
+  invoice(input: { tenantId: "tenant-id", invoiceId: "invoice-id" }) {
+    id
+    number
+    status
+    amount
+    currency
+    issuedAt
+    dueAt
+  }
+}
+```
+
 ## Roles directive usage
 
 The gateway uses a `@roles` directive to enforce role checks at the schema level.

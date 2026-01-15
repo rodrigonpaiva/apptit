@@ -1,4 +1,4 @@
-import { Controller, Inject } from "@nestjs/common";
+import { Controller, Inject, Logger } from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import type {
   AcceptInvitePayload,
@@ -61,6 +61,8 @@ import { LEAVE_ORG_PORT } from "../../app/ports/leave-org.port";
 
 @Controller()
 export class AuthRpcController {
+  private readonly logger = new Logger(AuthRpcController.name);
+
   constructor(
     private readonly meUseCase: MeUseCase,
     @Inject(VALIDATE_SESSION_PORT)
@@ -87,6 +89,7 @@ export class AuthRpcController {
 
   @MessagePattern(AUTH_ME)
   me(payload: ValidateSessionPayload): Promise<RpcResponse<MeResult>> {
+    this.logRequest(AUTH_ME, payload);
     return this.meUseCase.execute(payload);
   }
 
@@ -94,6 +97,7 @@ export class AuthRpcController {
   async validate(
     payload: ValidateSessionPayload,
   ): Promise<ValidateSessionRpcResponse> {
+    this.logRequest(AUTH_VALIDATE_SESSION, payload);
     const result = await this.validateSession.execute(payload);
     if (!result.isValid) {
       return {
@@ -108,11 +112,13 @@ export class AuthRpcController {
   setActiveOrgHandler(
     payload: SetActiveOrgPayload,
   ): Promise<SetActiveOrgRpcResponse> {
+    this.logRequest(AUTH_SET_ACTIVE_ORG, payload);
     return this.setActiveOrg.execute(payload);
   }
 
   @MessagePattern(AUTH_LIST_ORGS)
   listOrgsHandler(payload: ListOrgsPayload): Promise<ListOrgsRpcResponse> {
+    this.logRequest(AUTH_LIST_ORGS, payload);
     return this.listOrgs.execute(payload);
   }
 
@@ -120,6 +126,7 @@ export class AuthRpcController {
   getActiveOrgHandler(
     payload: GetActiveOrgPayload,
   ): Promise<GetActiveOrgRpcResponse> {
+    this.logRequest(AUTH_GET_ACTIVE_ORG, payload);
     return this.getActiveOrg.execute(payload);
   }
 
@@ -127,6 +134,7 @@ export class AuthRpcController {
   listMembersHandler(
     payload: ListMembersPayload,
   ): Promise<ListMembersRpcResponse> {
+    this.logRequest(AUTH_LIST_MEMBERS, payload);
     return this.listMembers.execute(payload);
   }
 
@@ -134,6 +142,7 @@ export class AuthRpcController {
   inviteMemberHandler(
     payload: InviteMemberPayload,
   ): Promise<InviteMemberRpcResponse> {
+    this.logRequest(AUTH_INVITE_MEMBER, payload);
     return this.inviteMember.execute(payload);
   }
 
@@ -141,6 +150,7 @@ export class AuthRpcController {
   acceptInviteHandler(
     payload: AcceptInvitePayload,
   ): Promise<AcceptInviteRpcResponse> {
+    this.logRequest(AUTH_ACCEPT_INVITE, payload);
     return this.acceptInvite.execute(payload);
   }
 
@@ -148,6 +158,7 @@ export class AuthRpcController {
   rejectInviteHandler(
     payload: RejectInvitePayload,
   ): Promise<RejectInviteRpcResponse> {
+    this.logRequest(AUTH_REJECT_INVITE, payload);
     return this.rejectInvite.execute(payload);
   }
 
@@ -155,11 +166,18 @@ export class AuthRpcController {
   updateMemberRoleHandler(
     payload: UpdateMemberRolePayload,
   ): Promise<UpdateMemberRoleRpcResponse> {
+    this.logRequest(AUTH_UPDATE_MEMBER_ROLE, payload);
     return this.updateMemberRole.execute(payload);
   }
 
   @MessagePattern(AUTH_LEAVE_ORG)
   leaveOrgHandler(payload: LeaveOrgPayload): Promise<LeaveOrgRpcResponse> {
+    this.logRequest(AUTH_LEAVE_ORG, payload);
     return this.leaveOrg.execute(payload);
+  }
+
+  private logRequest(pattern: string, payload: { requestId?: string }) {
+    const suffix = payload.requestId ? ` requestId=${payload.requestId}` : "";
+    this.logger.log(`RPC ${pattern}${suffix}`);
   }
 }

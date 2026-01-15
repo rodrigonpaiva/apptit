@@ -21,6 +21,12 @@
     },
     {
       "path": "./packages/contracts"
+    },
+    {
+      "path": "./apps/gateway"
+    },
+    {
+      "path": "./gateway-e2e"
     }
   ]
 }

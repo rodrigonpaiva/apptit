@@ -11,6 +11,7 @@ export interface SessionContext {
 export interface ValidateSessionPayload {
   cookie?: string;
   authorization?: string;
+  requestId?: string;
 }
 
 export interface ValidateSessionResult {
@@ -27,6 +28,7 @@ export interface SetActiveOrgPayload {
   authorization?: string;
   organizationId?: string | null;
   organizationSlug?: string;
+  requestId?: string;
 }
 
 export interface SetActiveOrgResult {
@@ -57,6 +59,7 @@ export interface AuthInvitation {
 export interface ListOrgsPayload {
   cookie?: string;
   authorization?: string;
+  requestId?: string;
 }
 
 export interface ListOrgsResult {
@@ -66,6 +69,7 @@ export interface ListOrgsResult {
 export interface GetActiveOrgPayload {
   cookie?: string;
   authorization?: string;
+  requestId?: string;
 }
 
 export interface GetActiveOrgResult {
@@ -77,6 +81,7 @@ export interface ListMembersPayload {
   authorization?: string;
   organizationId?: string;
   organizationSlug?: string;
+  requestId?: string;
 }
 
 export interface ListMembersResult {
@@ -90,6 +95,7 @@ export interface InviteMemberPayload {
   organizationId?: string;
   email: string;
   role: string | string[];
+  requestId?: string;
 }
 
 export interface InviteMemberResult {
@@ -100,6 +106,7 @@ export interface AcceptInvitePayload {
   cookie?: string;
   authorization?: string;
   invitationId: string;
+  requestId?: string;
 }
 
 export interface AcceptInviteResult {
@@ -110,6 +117,7 @@ export interface RejectInvitePayload {
   cookie?: string;
   authorization?: string;
   invitationId: string;
+  requestId?: string;
 }
 
 export interface RejectInviteResult {
@@ -122,6 +130,7 @@ export interface UpdateMemberRolePayload {
   organizationId?: string;
   memberId: string;
   role: string | string[];
+  requestId?: string;
 }
 
 export interface UpdateMemberRoleResult {
@@ -132,6 +141,7 @@ export interface LeaveOrgPayload {
   cookie?: string;
   authorization?: string;
   organizationId: string;
+  requestId?: string;
 }
 
 export interface LeaveOrgResult {

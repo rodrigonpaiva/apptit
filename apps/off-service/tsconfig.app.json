@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": "../../",
     "ignoreDeprecations": "5.0",
-    "outDir": "../../dist/apps/gateway",
+    "outDir": "../../dist/apps/off-service",
     "types": ["node"],
     "target": "es2021",
     "module": "NodeNext",

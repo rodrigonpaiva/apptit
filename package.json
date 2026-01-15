@@ -2,12 +2,19 @@
   "name": "@apptit/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "off:rpc:example": "node scripts/off-rpc-example.mjs",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "all:build": "npx nx run-many --target=build --projects=@apptit/contracts,@apptit/prisma",
+    "all:dev": "npm run infra:up && npm run all:build && npx nx run-many --target=serve --projects=@apptit/auth,@apptit/gateway,@apptit/off-service --parallel=3"
+  },
   "private": true,
   "dependencies": {
     "@apollo/server": "^5.0.0",
     "@apptit/prisma": "file:packages",
     "@as-integrations/express5": "^1.1.2",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/apollo": "^13.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",

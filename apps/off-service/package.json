@@ -1,0 +1,21 @@
+{
+  "name": "@apptit/off-service",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "nx run @apptit/off-service:serve:development",
+    "build": "nx run @apptit/off-service:build"
+  },
+  "dependencies": {
+    "@apptit/contracts": "file:../packages",
+    "@nestjs/axios": "^4.0.0",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/microservices": "^11.1.10",
+    "axios": "^1.6.0",
+    "ioredis": "^5.9.2",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
+    "tslib": "^2.3.0"
+  }
+}

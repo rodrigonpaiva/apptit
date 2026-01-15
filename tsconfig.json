@@ -27,6 +27,9 @@
     },
     {
       "path": "./gateway-e2e"
+    },
+    {
+      "path": "./apps/off-service"
     }
   ]
 }

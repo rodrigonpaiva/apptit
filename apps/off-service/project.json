@@ -1,0 +1,44 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@apptit/off-service",
+  "projectType": "application",
+  "sourceRoot": "apps/off-service/src",
+  "targets": {
+    "build": {
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "webpack-cli build",
+        "args": ["--config", "webpack.config.js", "--node-env=production"],
+        "cwd": "apps/off-service"
+      },
+      "configurations": {
+        "development": {
+          "args": ["--config", "webpack.config.js", "--node-env=development"]
+        },
+        "production": {
+          "args": ["--config", "webpack.config.js", "--node-env=production"]
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["^build"],
+      "options": {
+        "buildTarget": "@apptit/off-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@apptit/off-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@apptit/off-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

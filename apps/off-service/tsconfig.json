@@ -3,16 +3,12 @@
   "compilerOptions": {
     "noEmit": true,
     "ignoreDeprecations": "5.0",
-
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["../../dist"],
   "references": [
-    {
-      "path": "../../packages/prisma"
-    },
     {
       "path": "../../packages/contracts"
     },

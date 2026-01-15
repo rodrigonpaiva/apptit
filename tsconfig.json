@@ -21,6 +21,9 @@
     },
     {
       "path": "./packages/contracts"
+    },
+    {
+      "path": "./apps/gateway"
     }
   ]
 }

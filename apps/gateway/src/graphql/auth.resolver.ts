@@ -1,12 +1,15 @@
 import { Resolver, Query, Context } from "@nestjs/graphql";
+import { UseGuards } from "@nestjs/common";
 import { SessionContextType } from "./auth.types";
 import type { GraphqlContext } from "../auth/auth.context";
 import { AuthClientService } from "../auth/auth.client";
+import { AuthGuard } from "../auth/auth.guard";
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authClient: AuthClientService) {}
 
+  @UseGuards(AuthGuard)
   @Query(() => SessionContextType, { nullable: true })
   async me(@Context() ctx: GraphqlContext): Promise<SessionContextType | null> {
     if (ctx.session) {
@@ -16,6 +19,7 @@ export class AuthResolver {
     const result = await this.authClient.me({
       cookie: headerValue(ctx.headers, "cookie"),
       authorization: headerValue(ctx.headers, "authorization"),
+      requestId: ctx.requestId,
     });
 
     if (!result.ok) {

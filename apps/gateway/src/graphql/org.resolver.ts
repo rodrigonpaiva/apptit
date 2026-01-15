@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from "@nestjs/graphql";
+import { Resolver, Query, Mutation, Args, Context, Directive } from "@nestjs/graphql";
 import type { GraphqlContext } from "../auth/auth.context";
 import { AuthClientService } from "../auth/auth.client";
 import {
@@ -68,6 +68,7 @@ export class OrgResolver {
       : { activeOrganizationId: null };
   }
 
+  @Directive('@roles(requires: ["OWNER","ADMIN","MANAGER"])')
   @Mutation(() => InvitationResultType)
   async inviteMember(
     @Context() ctx: GraphqlContext,
@@ -106,6 +107,7 @@ export class OrgResolver {
     return { status: result.ok ? result.data.status : "error" };
   }
 
+  @Directive('@roles(requires: ["OWNER","ADMIN","MANAGER"])')
   @Mutation(() => MemberUpdateResultType)
   async updateMemberRole(
     @Context() ctx: GraphqlContext,
@@ -136,10 +138,12 @@ export class OrgResolver {
 function sessionPayload(ctx: GraphqlContext): {
   cookie?: string;
   authorization?: string;
+  requestId?: string;
 } {
   return {
     cookie: headerValue(ctx.headers, "cookie"),
     authorization: headerValue(ctx.headers, "authorization"),
+    requestId: ctx.requestId,
   };
 }
 

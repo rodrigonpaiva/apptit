@@ -6,6 +6,7 @@ import { InvoiceConnectionType, InvoiceSummaryType } from "./billing.types";
 import { BillingGetInput, BillingListInput } from "./billing.inputs";
 import { TenantArg } from "../auth/tenant.decorator";
 import { TenantGuard } from "../auth/tenant.guard";
+import { Public } from "../auth/public.decorator";
 
 @Resolver()
 export class BillingResolver {
@@ -13,6 +14,7 @@ export class BillingResolver {
 
   @TenantArg("input.tenantId")
   @UseGuards(TenantGuard)
+  @Public()
   @Query(() => InvoiceConnectionType)
   async invoices(
     @Context() ctx: GraphqlContext,
@@ -37,6 +39,7 @@ export class BillingResolver {
 
   @TenantArg("input.tenantId")
   @UseGuards(TenantGuard)
+  @Public()
   @Query(() => InvoiceSummaryType, { nullable: true })
   async invoice(
     @Context() ctx: GraphqlContext,

@@ -26,6 +26,9 @@ export class TenantGuard implements CanActivate {
 
     const gqlContext = GqlExecutionContext.create(context);
     const ctx = gqlContext.getContext<GraphqlContext>();
+    if (!ctx?.session) {
+      return true;
+    }
     const args = gqlContext.getArgs<Record<string, unknown>>();
     const tenantId = getByPath(args, path);
 

@@ -6,6 +6,7 @@ import { OrderConnectionType, OrderSummaryType } from "./orders.types";
 import { OrderGetInput, OrdersListInput } from "./orders.inputs";
 import { TenantArg } from "../auth/tenant.decorator";
 import { TenantGuard } from "../auth/tenant.guard";
+import { Public } from "../auth/public.decorator";
 
 @Resolver()
 export class OrdersResolver {
@@ -13,6 +14,7 @@ export class OrdersResolver {
 
   @TenantArg("input.tenantId")
   @UseGuards(TenantGuard)
+  @Public()
   @Query(() => OrderConnectionType)
   async orders(
     @Context() ctx: GraphqlContext,
@@ -37,6 +39,7 @@ export class OrdersResolver {
 
   @TenantArg("input.tenantId")
   @UseGuards(TenantGuard)
+  @Public()
   @Query(() => OrderSummaryType, { nullable: true })
   async order(
     @Context() ctx: GraphqlContext,

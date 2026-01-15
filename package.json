@@ -2,7 +2,9 @@
   "name": "@apptit/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "off:rpc:example": "node scripts/off-rpc-example.mjs"
+  },
   "private": true,
   "dependencies": {
     "@apollo/server": "^5.0.0",

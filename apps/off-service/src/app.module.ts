@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { HttpModule } from "@nestjs/axios";
 import { GetByBarcodeUseCase } from "./application/get-by-barcode.usecase";
-import { SearchProductsUseCase } from "./application/search-products.usecase";
 import { OpenFoodFactsClient } from "./infrastructure/open-food-facts.client";
 import { RedisCacheService } from "./infrastructure/redis-cache.service";
 import { OffRpcController } from "./presentation/off.rpc.controller";
@@ -18,7 +17,6 @@ import { OffRpcController } from "./presentation/off.rpc.controller";
     OpenFoodFactsClient,
     RedisCacheService,
     GetByBarcodeUseCase,
-    SearchProductsUseCase,
   ],
 })
 export class AppModule {}

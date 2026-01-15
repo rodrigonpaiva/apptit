@@ -22,21 +22,4 @@ export interface OffGetByBarcodeResult {
   source: "open_food_facts";
 }
 
-export interface OffSearchPayload {
-  query: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface OffSearchResult {
-  items: NormalizedProduct[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total?: number;
-  };
-  source: "open_food_facts";
-}
-
 export type OffGetByBarcodeRpcResponse = RpcResponse<OffGetByBarcodeResult>;
-export type OffSearchRpcResponse = RpcResponse<OffSearchResult>;

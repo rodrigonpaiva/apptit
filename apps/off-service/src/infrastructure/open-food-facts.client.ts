@@ -22,12 +22,6 @@ export interface OffProductResponse {
   product?: OffProductRecord;
 }
 
-export interface OffSearchResponse {
-  products?: OffProductRecord[];
-  count?: number;
-  page?: number;
-  page_size?: number;
-}
 
 @Injectable()
 export class OpenFoodFactsClient {
@@ -38,24 +32,12 @@ export class OpenFoodFactsClient {
   async getByBarcode(barcode: string): Promise<OffProductResponse> {
     const url = `${BASE_URL}/api/v0/product/${barcode}.json`;
     this.logger.log(`Fetching OFF product for barcode=${barcode}`);
-    const { data } = await firstValueFrom(this.httpService.get<OffProductResponse>(url));
-    return data;
-  }
-
-  async search(query: string, page: number, pageSize: number): Promise<OffSearchResponse> {
-    const url = `${BASE_URL}/cgi/search.pl`;
-    this.logger.log(`Searching OFF products query="${query}" page=${page} pageSize=${pageSize}`);
     const { data } = await firstValueFrom(
-      this.httpService.get<OffSearchResponse>(url, {
-        params: {
-          search_terms: query,
-          search_simple: 1,
-          json: 1,
-          page,
-          page_size: pageSize,
-        },
+      this.httpService.get<OffProductResponse>(url, {
+        headers: { "User-Agent": "apptit-off-service/1.0" },
       }),
     );
     return data;
   }
+
 }

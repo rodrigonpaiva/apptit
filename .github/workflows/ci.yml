@@ -33,7 +33,9 @@ jobs:
           node-version: 20
           cache: 'npm'
        
-      - run: npm install --no-fund --no-audit
+      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
+      - run: git diff --exit-code package-lock.json
+      - run: npm ci
 
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud

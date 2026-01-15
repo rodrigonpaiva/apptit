@@ -14,9 +14,15 @@ export class AuthContextService {
   async create(
     headers: Record<string, string | string[] | undefined>,
   ): Promise<GraphqlContext> {
+    const cookie = headerValue(headers, "cookie");
+    const authorization = headerValue(headers, "authorization");
+    if (!cookie && !authorization) {
+      return { headers, session: null };
+    }
+
     const payload: ValidateSessionPayload = {
-      cookie: headerValue(headers, "cookie"),
-      authorization: headerValue(headers, "authorization"),
+      cookie,
+      authorization,
     };
 
     const result = await this.authClient.validateSession(payload);

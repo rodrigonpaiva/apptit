@@ -4,6 +4,7 @@ import { ApolloDriver, type ApolloDriverConfig } from "@nestjs/apollo";
 import { AuthModule } from "./auth/auth.module";
 import { AuthResolver } from "./graphql/auth.resolver";
 import { HealthResolver } from "./graphql/health.resolver";
+import { OrgResolver } from "./graphql/org.resolver";
 import { AuthContextService } from "./auth/auth.context";
 
 @Module({
@@ -19,6 +20,6 @@ import { AuthContextService } from "./auth/auth.context";
       }),
     }),
   ],
-  providers: [AuthResolver, HealthResolver],
+  providers: [AuthResolver, HealthResolver, OrgResolver],
 })
 export class AppModule {}

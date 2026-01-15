@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.nest.json",
+  "compilerOptions": {
+    "baseUrl": "../../",
+    "outDir": "../../dist/apps/off-service",
+    "types": ["node"],
+    "target": "es2021",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "eslint.config.js",
+    "eslint.config.cjs",
+    "eslint.config.mjs",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+  "references": [
+    { "path": "../../packages/contracts/tsconfig.lib.json" }
+  ]
+}

@@ -8,6 +8,7 @@
     "@apollo/server": "^5.0.0",
     "@apptit/prisma": "file:packages",
     "@as-integrations/express5": "^1.1.2",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/apollo": "^13.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",

@@ -4,11 +4,13 @@ import type {
   RpcResponse,
   ValidateSessionPayload,
 } from "@apptit/contracts";
+import type { MePort } from "../ports/me.port";
 import type { ValidateSessionPort } from "../ports/session.port";
 import { VALIDATE_SESSION_PORT } from "../ports/session.port";
+import { assertTenantIsolation } from "../security/tenant-isolation";
 
 @Injectable()
-export class MeUseCase {
+export class MeUseCase implements MePort {
   constructor(
     @Inject(VALIDATE_SESSION_PORT)
     private readonly validateSession: ValidateSessionPort,
@@ -24,9 +26,20 @@ export class MeUseCase {
       };
     }
 
+    const tenantIsolationError = assertTenantIsolation(input, result.context);
+    if (tenantIsolationError) {
+      return tenantIsolationError;
+    }
+
     return {
       ok: true,
-      data: { context: result.context },
+      data: {
+        context: {
+          userId: result.context.userId,
+          tenantId: result.context.tenantId,
+          role: result.context.role,
+        },
+      },
     };
   }
 }

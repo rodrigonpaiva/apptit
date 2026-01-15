@@ -1,0 +1,35 @@
+{
+  "name": "@apptit/contracts",
+  "projectType": "library",
+  "sourceRoot": "packages/contracts/src",
+  "targets": {
+    "tsc": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/packages/contracts/dist"],
+      "options": {
+        "main": "packages/contracts/src/index.ts",
+        "tsConfig": "packages/contracts/tsconfig.lib.json",
+        "outputPath": "packages/contracts/dist",
+        "assets": [
+          {
+            "input": "packages/contracts",
+            "glob": "package.dist.json",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/packages/contracts/dist"],
+      "options": {
+        "commands": [
+          "nx run @apptit/contracts:tsc",
+          "mv packages/contracts/dist/package.dist.json packages/contracts/dist/package.json"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": ["npm:private"]
+}

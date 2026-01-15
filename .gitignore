@@ -112,3 +112,7 @@ yarn-error.log
 
 
 vite.config.*.timestamp*
+
+# Agent files
+AGENTS.md
+

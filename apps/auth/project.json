@@ -1,0 +1,96 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@apptit/auth",
+  "projectType": "application",
+  "sourceRoot": "apps/auth/src",
+  "targets": {
+    "build": {
+      "dependsOn": [
+        "^build",
+        "@apptit/prisma:generate"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "webpack-cli build",
+        "args": [
+          "--config",
+          "webpack.config.js",
+          "--node-env=production"
+        ],
+        "cwd": "apps/auth"
+      },
+      "configurations": {
+        "development": {
+          "args": [
+            "--config",
+            "webpack.config.js",
+            "--node-env=development"
+          ]
+        },
+        "production": {
+          "args": [
+            "--config",
+            "webpack.config.js",
+            "--node-env=production"
+          ]
+        }
+      }
+    },
+    "prune-lockfile": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/auth/package.json",
+        "{workspaceRoot}/dist/apps/auth/package-lock.json"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/dist/apps/auth/workspace_modules"
+      ],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": [
+        "prune-lockfile",
+        "copy-workspace-modules"
+      ],
+      "executor": "nx:noop"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": [
+        "^build",
+        "@apptit/prisma:generate"
+      ],
+      "options": {
+        "buildTarget": "@apptit/auth:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@apptit/auth:build:development"
+        },
+        "production": {
+          "buildTarget": "@apptit/auth:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

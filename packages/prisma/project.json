@@ -15,8 +15,25 @@
             "input": "packages/prisma",
             "glob": "package.json",
             "output": "."
+          },
+          {
+            "input": "packages/prisma",
+            "glob": "prisma/**/*",
+            "output": "./prisma"
           }
         ]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/prisma/tsconfig.lib.json --noEmit"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma generate --schema=packages/prisma/schema.prisma"
       }
     }
   },

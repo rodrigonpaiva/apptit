@@ -1,9 +1,12 @@
 {
   "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
+    "baseUrl": "../../",
     "outDir": "../../dist/apps/auth",
     "types": ["node"],
-    "target": "es2021"
+    "target": "es2021",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   },
   "include": ["src/**/*.ts"],
   "exclude": [
@@ -14,8 +17,7 @@
     "**/*.test.ts"
   ],
   "references": [
-    {
-      "path": "../../packages/prisma/tsconfig.lib.json"
-    }
+    { "path": "../../packages/prisma/tsconfig.lib.json" },
+    { "path": "../../packages/contracts/tsconfig.lib.json" }
   ]
 }

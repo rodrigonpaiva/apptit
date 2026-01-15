@@ -11,6 +11,7 @@ import { OrdersResolver } from "./graphql/orders.resolver";
 import { BillingResolver } from "./graphql/billing.resolver";
 import { AuthGuard } from "./auth/auth.guard";
 import { APP_GUARD } from "@nestjs/core";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { DirectiveLocation, GraphQLDirective, GraphQLList, GraphQLString } from "graphql";
 import { rolesDirectiveTransformer } from "./graphql/roles.directive";
 import { RequestIdMiddleware } from "./auth/request-id.middleware";
@@ -29,6 +30,11 @@ import { AuthContextService } from "./auth/auth.context";
       useFactory: (authContext: AuthContextService) => ({
         autoSchemaFile: true,
         context: async ({ req }) => authContext.create(req?.headers ?? {}),
+        plugins: [
+          ApolloServerPluginLandingPageLocalDefault({
+            embed: true,
+          }),
+        ],
         transformSchema: (schema) =>
           rolesDirectiveTransformer(schema, "roles"),
         buildSchemaOptions: {

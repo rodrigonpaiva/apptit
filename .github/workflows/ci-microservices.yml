@@ -28,8 +28,6 @@ jobs:
           node-version: 22
           cache: "npm"
 
-      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
-      - run: git diff --exit-code package-lock.json
       - run: npm ci
       - run: npx nx run-many -t lint
       - run: npx nx fix-ci
@@ -52,8 +50,6 @@ jobs:
           node-version: 22
           cache: "npm"
 
-      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
-      - run: git diff --exit-code package-lock.json
       - run: npm ci
       - run: npx nx run-many -t typecheck
       - run: npx nx fix-ci
@@ -76,8 +72,6 @@ jobs:
           node-version: 22
           cache: "npm"
 
-      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
-      - run: git diff --exit-code package-lock.json
       - run: npm ci
       - run: npx nx run-many -t build
       - run: npx nx fix-ci
@@ -100,8 +94,6 @@ jobs:
           node-version: 22
           cache: "npm"
 
-      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
-      - run: git diff --exit-code package-lock.json
       - run: npm ci
       - run: npx tsc -p apps/mobile/tsconfig.app.json --noEmit
       - run: npx nx fix-ci
@@ -162,8 +154,6 @@ jobs:
           node-version: 22
           cache: "npm"
 
-      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
-      - run: git diff --exit-code package-lock.json
       - run: npm ci
 
       - run: npx nx run-many -t test

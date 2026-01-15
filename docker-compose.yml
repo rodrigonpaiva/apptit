@@ -1,4 +1,16 @@
 services:
+  deps:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "npm install --no-fund --no-audit"
+    env_file:
+      - .env
+    volumes:
+      - ./:/workspace
+      - apptit_node_modules:/workspace/node_modules
+      - apptit_npm_cache:/root/.npm
+    environment:
+      NX_DAEMON: "false"
   postgres:
     image: postgres:16-alpine
     environment:
@@ -9,13 +21,180 @@ services:
       - "5432:5432"
     volumes:
       - apptit_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apptit -d apptit_auth"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - apptit_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  auth:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "apt-get update -y && apt-get install -y openssl && npx nx build @apptit/auth && node dist/apps/auth/main.js"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: "4001"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      DATABASE_URL: postgresql://apptit:apptit@postgres:5432/apptit_auth
+      NX_DAEMON: "false"
+    ports:
+      - "4001:4001"
+    depends_on:
+      deps:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+      - apptit_node_modules:/workspace/node_modules
+      - apptit_npm_cache:/root/.npm
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://localhost:4001/api/health',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1))\"",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  gateway:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "apt-get update -y && apt-get install -y openssl && npx nx build @apptit/gateway && node dist/apps/gateway/main.js"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: "4000"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      AUTH_HOST: auth
+      AUTH_PORT: "4001"
+      NX_DAEMON: "false"
+    ports:
+      - "4000:4000"
+    depends_on:
+      deps:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+      - apptit_node_modules:/workspace/node_modules
+      - apptit_npm_cache:/root/.npm
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const http=require('http');const req=http.request({method:'POST',host:'localhost',port:4000,path:'/graphql',headers:{'content-type':'application/json'}},res=>process.exit(res.statusCode===200?0:1));req.on('error',()=>process.exit(1));req.write(JSON.stringify({query:'{ health }'}));req.end();\"",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  off-service:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "apt-get update -y && apt-get install -y openssl && npx nx build @apptit/off-service && node dist/apps/off-service/main.js"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      NX_DAEMON: "false"
+    depends_on:
+      deps:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+      - apptit_node_modules:/workspace/node_modules
+      - apptit_npm_cache:/root/.npm
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const net=require('net');const s=net.createConnection({host:'redis',port:6379},()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1));\"",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  auth-prod:
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "4001"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      DATABASE_URL: postgresql://apptit:apptit@postgres:5432/apptit_auth
+    ports:
+      - "4001:4001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: ["prod"]
+  gateway-prod:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      AUTH_HOST: auth-prod
+      AUTH_PORT: "4001"
+    ports:
+      - "4000:4000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      auth-prod:
+        condition: service_healthy
+    profiles: ["prod"]
+  off-service-prod:
+    build:
+      context: .
+      dockerfile: apps/off-service/Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      redis:
+        condition: service_healthy
+    profiles: ["prod"]
 
 volumes:
   apptit_pg:
   apptit_redis:
+  apptit_node_modules:
+  apptit_npm_cache:

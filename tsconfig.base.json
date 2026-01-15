@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "ignoreDeprecations": "6.0",
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,

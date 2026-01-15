@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
     "baseUrl": "../../",
+    "ignoreDeprecations": "6.0",
     "outDir": "../../dist/apps/auth",
     "types": ["node"],
     "target": "es2021",

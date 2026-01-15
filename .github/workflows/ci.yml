@@ -33,7 +33,7 @@ jobs:
           node-version: 20
           cache: 'npm'
        
-      - run: npm ci
+      - run: npm install --no-fund --no-audit
 
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud

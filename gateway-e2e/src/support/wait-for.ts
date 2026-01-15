@@ -1,4 +1,4 @@
-import net from "net";
+import * as net from "net";
 import axios from "axios";
 
 type WaitOptions = {

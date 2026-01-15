@@ -27,6 +27,6 @@ import { AuthContextService } from "./auth.context";
     ]),
   ],
   providers: [AuthClientService, AuthContextService],
-  exports: [AuthClientService, AuthContextService],
+  exports: [AuthClientService, AuthContextService, ClientsModule],
 })
 export class AuthModule {}

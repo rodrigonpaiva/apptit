@@ -54,11 +54,12 @@ export class AuthClientService {
   async validateSession(
     payload: ValidateSessionPayload,
   ): Promise<RpcResponse<ValidateSessionResult>> {
-    this.logRequest("AUTH_VALIDATE_SESSION", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<ValidateSessionResult>>(
-        AUTH_VALIDATE_SESSION,
-        payload,
+    return this.timed("AUTH_VALIDATE_SESSION", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<ValidateSessionResult>>(
+          AUTH_VALIDATE_SESSION,
+          payload,
+        ),
       ),
     );
   }
@@ -73,11 +74,12 @@ export class AuthClientService {
     if (cached) {
       return cached;
     }
-    this.logRequest("AUTH_ME", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<{ context: SessionContext }>>(
-        AUTH_ME,
-        payload,
+    return this.timed("AUTH_ME", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<{ context: SessionContext }>>(
+          AUTH_ME,
+          payload,
+        ),
       ),
     ).then((result) => this.setCache(cacheKey, result));
   }
@@ -90,20 +92,22 @@ export class AuthClientService {
     if (cached) {
       return cached;
     }
-    this.logRequest("AUTH_LIST_ORGS", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<ListOrgsResult>>(AUTH_LIST_ORGS, payload),
+    return this.timed("AUTH_LIST_ORGS", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<ListOrgsResult>>(AUTH_LIST_ORGS, payload),
+      ),
     ).then((result) => this.setCache(cacheKey, result));
   }
 
   async getActiveOrg(
     payload: GetActiveOrgPayload,
   ): Promise<RpcResponse<GetActiveOrgResult>> {
-    this.logRequest("AUTH_GET_ACTIVE_ORG", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<GetActiveOrgResult>>(
-        AUTH_GET_ACTIVE_ORG,
-        payload,
+    return this.timed("AUTH_GET_ACTIVE_ORG", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<GetActiveOrgResult>>(
+          AUTH_GET_ACTIVE_ORG,
+          payload,
+        ),
       ),
     );
   }
@@ -111,11 +115,12 @@ export class AuthClientService {
   async listMembers(
     payload: ListMembersPayload,
   ): Promise<RpcResponse<ListMembersResult>> {
-    this.logRequest("AUTH_LIST_MEMBERS", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<ListMembersResult>>(
-        AUTH_LIST_MEMBERS,
-        payload,
+    return this.timed("AUTH_LIST_MEMBERS", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<ListMembersResult>>(
+          AUTH_LIST_MEMBERS,
+          payload,
+        ),
       ),
     );
   }
@@ -123,11 +128,12 @@ export class AuthClientService {
   async setActiveOrg(
     payload: SetActiveOrgPayload,
   ): Promise<RpcResponse<SetActiveOrgResult>> {
-    this.logRequest("AUTH_SET_ACTIVE_ORG", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<SetActiveOrgResult>>(
-        AUTH_SET_ACTIVE_ORG,
-        payload,
+    return this.timed("AUTH_SET_ACTIVE_ORG", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<SetActiveOrgResult>>(
+          AUTH_SET_ACTIVE_ORG,
+          payload,
+        ),
       ),
     );
   }
@@ -135,11 +141,12 @@ export class AuthClientService {
   async inviteMember(
     payload: InviteMemberPayload,
   ): Promise<RpcResponse<InviteMemberResult>> {
-    this.logRequest("AUTH_INVITE_MEMBER", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<InviteMemberResult>>(
-        AUTH_INVITE_MEMBER,
-        payload,
+    return this.timed("AUTH_INVITE_MEMBER", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<InviteMemberResult>>(
+          AUTH_INVITE_MEMBER,
+          payload,
+        ),
       ),
     );
   }
@@ -147,11 +154,12 @@ export class AuthClientService {
   async acceptInvite(
     payload: AcceptInvitePayload,
   ): Promise<RpcResponse<AcceptInviteResult>> {
-    this.logRequest("AUTH_ACCEPT_INVITE", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<AcceptInviteResult>>(
-        AUTH_ACCEPT_INVITE,
-        payload,
+    return this.timed("AUTH_ACCEPT_INVITE", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<AcceptInviteResult>>(
+          AUTH_ACCEPT_INVITE,
+          payload,
+        ),
       ),
     );
   }
@@ -159,11 +167,12 @@ export class AuthClientService {
   async rejectInvite(
     payload: RejectInvitePayload,
   ): Promise<RpcResponse<RejectInviteResult>> {
-    this.logRequest("AUTH_REJECT_INVITE", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<RejectInviteResult>>(
-        AUTH_REJECT_INVITE,
-        payload,
+    return this.timed("AUTH_REJECT_INVITE", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<RejectInviteResult>>(
+          AUTH_REJECT_INVITE,
+          payload,
+        ),
       ),
     );
   }
@@ -171,11 +180,12 @@ export class AuthClientService {
   async updateMemberRole(
     payload: UpdateMemberRolePayload,
   ): Promise<RpcResponse<UpdateMemberRoleResult>> {
-    this.logRequest("AUTH_UPDATE_MEMBER_ROLE", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<UpdateMemberRoleResult>>(
-        AUTH_UPDATE_MEMBER_ROLE,
-        payload,
+    return this.timed("AUTH_UPDATE_MEMBER_ROLE", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<UpdateMemberRoleResult>>(
+          AUTH_UPDATE_MEMBER_ROLE,
+          payload,
+        ),
       ),
     );
   }
@@ -183,9 +193,10 @@ export class AuthClientService {
   async leaveOrg(
     payload: LeaveOrgPayload,
   ): Promise<RpcResponse<LeaveOrgResult>> {
-    this.logRequest("AUTH_LEAVE_ORG", payload.requestId);
-    return firstValueFrom(
-      this.client.send<RpcResponse<LeaveOrgResult>>(AUTH_LEAVE_ORG, payload),
+    return this.timed("AUTH_LEAVE_ORG", payload.requestId, () =>
+      firstValueFrom(
+        this.client.send<RpcResponse<LeaveOrgResult>>(AUTH_LEAVE_ORG, payload),
+      ),
     );
   }
 
@@ -216,8 +227,27 @@ export class AuthClientService {
     return value;
   }
 
-  private logRequest(pattern: string, requestId?: string) {
-    const suffix = requestId ? ` requestId=${requestId}` : "";
-    this.logger.log(`RPC ${pattern}${suffix}`);
+  private async timed<T>(
+    pattern: string,
+    requestId: string | undefined,
+    fn: () => Promise<T>,
+  ): Promise<T> {
+    const start = Date.now();
+    try {
+      const result = await fn();
+      this.logger.log(
+        `RPC ${pattern} ok in ${Date.now() - start}ms${
+          requestId ? ` requestId=${requestId}` : ""
+        }`,
+      );
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `RPC ${pattern} failed in ${Date.now() - start}ms${
+          requestId ? ` requestId=${requestId}` : ""
+        }`,
+      );
+      throw error;
+    }
   }
 }

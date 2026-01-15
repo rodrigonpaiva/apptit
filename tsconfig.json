@@ -24,6 +24,9 @@
     },
     {
       "path": "./apps/gateway"
+    },
+    {
+      "path": "./gateway-e2e"
     }
   ]
 }

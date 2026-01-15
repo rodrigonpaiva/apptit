@@ -118,3 +118,14 @@ mutation LeaveOrganization {
   }
 }
 ```
+
+## Roles directive usage
+
+The gateway uses a `@roles` directive to enforce role checks at the schema level.
+Example:
+
+```graphql
+type Mutation {
+  inviteMember(input: InviteMemberInput!): InvitationResult! @roles(requires: ["OWNER", "ADMIN", "MANAGER"])
+}
+```

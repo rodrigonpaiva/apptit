@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, type ApolloDriverConfig } from "@nestjs/apollo";
 import { AuthModule } from "./auth/auth.module";
@@ -9,6 +9,7 @@ import { AuthGuard } from "./auth/auth.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { DirectiveLocation, GraphQLDirective, GraphQLList, GraphQLString } from "graphql";
 import { rolesDirectiveTransformer } from "./graphql/roles.directive";
+import { RequestIdMiddleware } from "./auth/request-id.middleware";
 import { AuthContextService } from "./auth/auth.context";
 
 @Module({
@@ -49,4 +50,8 @@ import { AuthContextService } from "./auth/auth.context";
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes("*");
+  }
+}

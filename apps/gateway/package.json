@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@apptit/contracts": "file:../packages",
+    "@apptit/contracts": "file:../packages/contracts",
     "@apollo/server": "^5.0.0",
     "@nestjs/apollo": "^13.0.0",
     "@nestjs/common": "^11.1.12",

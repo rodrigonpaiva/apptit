@@ -24,6 +24,7 @@ export class ValidateSessionUseCase implements ValidateSessionPort {
     let sessionResult: unknown;
     try {
       sessionResult = await auth.api.getSession({ headers });
+      console.log("Better Auth session data:", JSON.stringify(sessionResult, null, 2));
     } catch {
       return { isValid: false };
     }
@@ -72,9 +73,13 @@ export class ValidateSessionUseCase implements ValidateSessionPort {
 }
 
 function normalizeRole(value: string | undefined): AuthRole {
-  if (value && AUTH_ROLES.includes(value as AuthRole)) {
-    return value as AuthRole;
+  if (!value) {
+    return "STAFF";
   }
-  // TODO: map org member role from Better Auth once active member data is wired.
+  // Better Auth returns lowercase roles, convert to uppercase
+  const upperValue = value.toUpperCase();
+  if (AUTH_ROLES.includes(upperValue as AuthRole)) {
+    return upperValue as AuthRole;
+  }
   return "STAFF";
 }

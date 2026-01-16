@@ -1,0 +1,5 @@
+mutation InviteMember($input: InviteMemberInput!) {
+  inviteMember(input: $input) {
+    invitationId
+  }
+}

@@ -1,7 +1,11 @@
 import { print } from "graphql";
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
-import { MeDocument } from "./generated/graphql";
-import type { MeQuery } from "./generated/graphql";
+import { MeDocument, InviteMemberDocument } from "./generated/graphql";
+import type {
+  MeQuery,
+  InviteMemberMutation,
+  InviteMemberInput,
+} from "./generated/graphql";
 
 type GraphqlResponse<T> = {
   data?: T;
@@ -59,5 +63,17 @@ export async function getMe(headers?: Record<string, string>) {
   }
 }
 
-export type { MeQuery };
-export { MeDocument };
+export async function inviteMember(
+  input: InviteMemberInput,
+  headers?: Record<string, string>
+) {
+  const data = await executeGraphql(
+    InviteMemberDocument,
+    { input },
+    { headers }
+  );
+  return data.inviteMember;
+}
+
+export type { MeQuery, InviteMemberMutation, InviteMemberInput };
+export { MeDocument, InviteMemberDocument };

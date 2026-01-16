@@ -18,6 +18,7 @@ module.exports = {
       optimization: false,
       outputHashing: "none",
       generatePackageJson: false,
+      externalDependencies: "all",
       sourceMap: true,
     }),
   ],

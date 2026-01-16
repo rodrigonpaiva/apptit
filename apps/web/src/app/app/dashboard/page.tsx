@@ -3,7 +3,7 @@ import { getMe } from "@apptit/api";
 import { Card, PageShell } from "@apptit/ui";
 
 export default async function DashboardPage() {
-  const cookieHeader = headers().get("cookie") ?? undefined;
+  const cookieHeader = (await headers()).get("cookie") ?? undefined;
   const me = await getMe(
     cookieHeader ? { cookie: cookieHeader } : undefined
   );

@@ -8,6 +8,8 @@ type ClientOptions = {
 const defaultEndpoint =
   process.env.GRAPHQL_ENDPOINT ?? process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
 
+const isServer = typeof globalThis === "undefined" || !("window" in globalThis);
+
 export function createApolloClient(options: ClientOptions = {}) {
   const endpoint = options.endpoint ?? defaultEndpoint;
 
@@ -16,7 +18,7 @@ export function createApolloClient(options: ClientOptions = {}) {
   }
 
   return new ApolloClient({
-    ssrMode: typeof window === "undefined",
+    ssrMode: isServer,
     link: new HttpLink({
       uri: endpoint,
       headers: options.cookie ? { cookie: options.cookie } : undefined

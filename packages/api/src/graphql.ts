@@ -51,8 +51,12 @@ export async function executeGraphql<TData, TVariables>(
 }
 
 export async function getMe(headers?: Record<string, string>) {
-  const data = await executeGraphql(MeDocument, undefined, { headers });
-  return data.me;
+  try {
+    const data = await executeGraphql(MeDocument, undefined, { headers });
+    return data.me;
+  } catch {
+    return null;
+  }
 }
 
 export type { MeQuery };

@@ -113,7 +113,7 @@ services:
   web:
     image: node:22-bookworm-slim
     working_dir: /workspace
-    command: sh -c "npx nx serve web --verbose"
+    command: sh -c "npx nx serve @apptit/web --verbose"
     env_file:
       - .env
     environment:

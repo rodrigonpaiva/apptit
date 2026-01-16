@@ -11,6 +11,21 @@ const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
+  webpack: (config) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@angular-devkit/architect": false,
+      "@angular-devkit/architect/node": false,
+      "@nx/key": false,
+      "@nx/powerpack-license": false,
+      "@swc/wasm": false,
+      prettier: false,
+      "ts-node": false,
+      "ts-node/esm": false
+    };
+    return config;
+  }
 };
 
 const plugins = [
@@ -19,4 +34,3 @@ const plugins = [
 ];
 
 module.exports = composePlugins(...plugins)(nextConfig);
-

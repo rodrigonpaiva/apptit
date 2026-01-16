@@ -6,9 +6,9 @@
     "off:rpc:example": "node scripts/off-rpc-example.mjs",
     "infra:up": "docker compose up -d deps postgres redis",
     "infra:down": "docker compose down",
-    "all:build": "npx nx run-many --target=build --projects=@apptit/contracts,@apptit/prisma",
-    "all:dev": "npm run infra:up && npm run all:build && npx nx run-many --target=serve --projects=@apptit/auth,@apptit/gateway,@apptit/off-service,web --parallel=4",
-    "ci:local": "npm ci && npx nx run-many -t lint test build typecheck"
+    "all:build": "npx nx run-many --target=build --projects=@apptit/contracts,@apptit/prisma,@apptit/api,@apptit/ui",
+    "all:dev": "npm run infra:up && npm run all:build && npx nx run-many --target=serve --projects=@apptit/auth,@apptit/gateway,@apptit/off-service,@apptit/web --parallel=4",
+    "ci:local": "npm ci && npx nx run-many -t lint test typecheck build"
   },
   "private": true,
   "dependencies": {

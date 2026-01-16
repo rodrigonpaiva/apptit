@@ -9,6 +9,11 @@ module.exports = {
       devtoolModuleFilenameTemplate: "[absolute-resource-path]",
     }),
   },
+  resolve: {
+    alias: {
+      "@apptit/contracts": join(__dirname, "../../packages/contracts/dist/src/index.js"),
+    },
+  },
   plugins: [
     new NxAppWebpackPlugin({
       target: "node",

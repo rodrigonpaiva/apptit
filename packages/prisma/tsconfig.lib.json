@@ -11,7 +11,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2022",
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "importHelpers": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]

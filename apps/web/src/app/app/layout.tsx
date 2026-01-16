@@ -9,7 +9,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieHeader = headers().get("cookie") ?? undefined;
+  const cookieHeader = (await headers()).get("cookie") ?? undefined;
   const me = await getMe(
     cookieHeader ? { cookie: cookieHeader } : undefined
   );

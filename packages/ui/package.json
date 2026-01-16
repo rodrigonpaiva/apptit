@@ -12,5 +12,11 @@
       "import": "./dist/src/index.js",
       "default": "./dist/src/index.js"
     }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }

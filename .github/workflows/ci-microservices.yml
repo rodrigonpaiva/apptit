@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ""
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ""
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ""
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ""
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +128,7 @@ jobs:
 
     env:
       NODE_ENV: test
-      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_ACCESS_TOKEN: ""
       NX_DAEMON: "false"
       DATABASE_URL: postgresql://apptit:apptit@localhost:5432/apptit_auth
       MONGODB_URI: mongodb://localhost:27017/apptit

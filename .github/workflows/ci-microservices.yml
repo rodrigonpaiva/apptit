@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD: "false"
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -25,19 +25,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
       - run: npm ci
       - run: npx nx run-many -t lint
-      - run: npx nx fix-ci
-        if: always()
 
   typecheck:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD: "false"
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -47,19 +45,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
       - run: npm ci
       - run: npx nx run-many -t typecheck
-      - run: npx nx fix-ci
-        if: always()
 
   build:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD: "false"
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -69,19 +65,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
       - run: npm ci
       - run: npx nx run-many -t build
-      - run: npx nx fix-ci
-        if: always()
 
   mobile:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      NX_CLOUD: "false"
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@v4
@@ -91,13 +85,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
       - run: npm ci
       - run: npx tsc -p apps/mobile/tsconfig.app.json --noEmit
-      - run: npx nx fix-ci
-        if: always()
 
   test:
     runs-on: ubuntu-latest
@@ -136,7 +128,7 @@ jobs:
 
     env:
       NODE_ENV: test
-      NX_CLOUD: "false"
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_DAEMON: "false"
       DATABASE_URL: postgresql://apptit:apptit@localhost:5432/apptit_auth
       MONGODB_URI: mongodb://localhost:27017/apptit
@@ -151,11 +143,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
       - run: npm ci
-
       - run: npx nx run-many -t test
-      - run: npx nx fix-ci
-        if: always()

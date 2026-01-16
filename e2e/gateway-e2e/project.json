@@ -1,0 +1,9 @@
+{
+  "name": "gateway-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "e2e/gateway-e2e/src",
+  "tags": ["type:e2e", "scope:gateway"],
+  "implicitDependencies": ["gateway", "auth"],
+  "targets": {}
+}

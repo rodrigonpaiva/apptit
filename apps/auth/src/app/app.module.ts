@@ -28,7 +28,7 @@ import { LeaveOrgUseCase } from "./use-cases/leave-org.use-case";
 import { LEAVE_ORG_PORT } from "./ports/leave-org.port";
 
 @Module({
-  imports: [AuthModule.forRoot({ auth })],
+  imports: [AuthModule.forRoot({ auth, disableBodyParser: true })],
   controllers: [HealthController, InternalController, AuthRpcController],
   providers: [
     AppService,

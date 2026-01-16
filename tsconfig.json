@@ -5,7 +5,7 @@
   "include": [],
   "references": [
     {
-      "path": "./auth-e2e"
+      "path": "./e2e/auth-e2e"
     },
     {
       "path": "./apps/mobile"
@@ -26,10 +26,22 @@
       "path": "./apps/gateway"
     },
     {
-      "path": "./gateway-e2e"
+      "path": "./e2e/gateway-e2e"
     },
     {
       "path": "./apps/off-service"
+    },
+    {
+      "path": "./e2e/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./packages/api"
+    },
+    {
+      "path": "./packages/ui"
     }
   ]
 }

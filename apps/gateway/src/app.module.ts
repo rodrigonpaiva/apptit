@@ -29,6 +29,7 @@ import { AuthContextService } from "./auth/auth.context";
       inject: [AuthContextService],
       useFactory: (authContext: AuthContextService) => ({
         autoSchemaFile: true,
+        playground: false,
         context: async ({ req }) => authContext.create(req?.headers ?? {}),
         plugins: [
           ApolloServerPluginLandingPageLocalDefault({

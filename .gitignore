@@ -146,3 +146,9 @@ vite.config.*.timestamp*
 # Agent files
 AGENTS.md
 .env
+
+# Next.js
+.next
+out
+
+test-output

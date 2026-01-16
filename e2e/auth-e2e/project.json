@@ -1,0 +1,9 @@
+{
+  "name": "auth-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "e2e/auth-e2e/src",
+  "tags": ["type:e2e", "scope:auth"],
+  "implicitDependencies": ["auth"],
+  "targets": {}
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@apptit/ui",
+  "projectType": "library",
+  "sourceRoot": "packages/ui/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/packages/ui/dist"],
+      "options": {
+        "main": "packages/ui/src/index.ts",
+        "tsConfig": "packages/ui/tsconfig.lib.json",
+        "outputPath": "packages/ui/dist",
+        "assets": [
+          {
+            "input": "packages/ui",
+            "glob": "package.json",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/ui/tsconfig.lib.json --noEmit"
+      }
+    }
+  },
+  "tags": ["npm:private"]
+}

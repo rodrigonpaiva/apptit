@@ -3,7 +3,7 @@
   "projectType": "library",
   "sourceRoot": "packages/prisma/src",
   "targets": {
-    "build": {
+    "tsc": {
       "executor": "@nx/js:tsc",
       "outputs": ["{workspaceRoot}/packages/prisma/dist"],
       "options": {
@@ -13,7 +13,7 @@
         "assets": [
           {
             "input": "packages/prisma",
-            "glob": "package.json",
+            "glob": "package.dist.json",
             "output": "."
           },
           {
@@ -22,6 +22,17 @@
             "output": "./prisma"
           }
         ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/packages/prisma/dist"],
+      "options": {
+        "commands": [
+          "nx run @apptit/prisma:tsc",
+          "if [ -f packages/prisma/dist/package.dist.json ]; then mv packages/prisma/dist/package.dist.json packages/prisma/dist/package.json; elif [ -f packages/prisma/package.dist.json ]; then cp packages/prisma/package.dist.json packages/prisma/dist/package.json; fi"
+        ],
+        "parallel": false
       }
     },
     "typecheck": {

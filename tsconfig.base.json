@@ -22,7 +22,9 @@
     "customConditions": ["@apptit/source"],
     "paths": {
       "@apptit/prisma": ["packages/prisma/dist/src/index.d.ts"],
-      "@apptit/contracts": ["packages/contracts/dist/src/index.d.ts"]
+      "@apptit/contracts": ["packages/contracts/dist/src/index.d.ts"],
+      "@apptit/ui": ["packages/ui/src/index.ts"],
+      "@apptit/api": ["packages/api/src/index.ts"]
     }
   }
 }

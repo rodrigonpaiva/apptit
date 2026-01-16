@@ -1,9 +1,10 @@
 {
-  "name": "@apptit/auth-e2e",
+  "name": "@apptit/gateway-e2e",
   "version": "0.0.1",
   "private": true,
   "nx": {
     "implicitDependencies": [
+      "@apptit/gateway",
       "@apptit/auth"
     ],
     "targets": {
@@ -13,10 +14,12 @@
           "{projectRoot}/test-output/jest/coverage"
         ],
         "options": {
-          "jestConfig": "auth-e2e/jest.config.cts",
+          "jestConfig": "e2e/gateway-e2e/jest.config.cts",
           "passWithNoTests": true
         },
         "dependsOn": [
+          "@apptit/gateway:build",
+          "@apptit/gateway:serve",
           "@apptit/auth:build",
           "@apptit/auth:serve"
         ]

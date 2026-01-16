@@ -1,0 +1,37 @@
+{
+  "name": "@apptit/api",
+  "projectType": "library",
+  "sourceRoot": "packages/api/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/packages/api/dist"],
+      "options": {
+        "main": "packages/api/src/index.ts",
+        "tsConfig": "packages/api/tsconfig.lib.json",
+        "outputPath": "packages/api/dist",
+        "assets": [
+          {
+            "input": "packages/api",
+            "glob": "package.json",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p packages/api/tsconfig.lib.json --noEmit"
+      }
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "graphql-codegen --config packages/api/codegen.ts",
+        "cwd": "."
+      }
+    }
+  },
+  "tags": ["npm:private"]
+}

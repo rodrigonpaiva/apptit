@@ -34,6 +34,36 @@ yarn-error.log
 testem.log
 /typings
 
+# env files and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+**/secrets.*
+**/*.secrets.*
+**/service-account*.json
+.npmrc
+.yarnrc
+.yarnrc.yml
+.pypirc
+.envrc
+**/.envrc
+**/aws-credentials*
+**/aws-config*
+**/gcloud-credentials*
+**/firebase-*.json
+**/google-credentials*.json
+**/client_secret*.json
+*.mobileprovision
+*.keystore
+.netrc
+
 # System Files
 .DS_Store
 Thumbs.db
@@ -115,4 +145,4 @@ vite.config.*.timestamp*
 
 # Agent files
 AGENTS.md
-
+.env

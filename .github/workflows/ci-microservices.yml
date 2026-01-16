@@ -1,0 +1,150 @@
+name: CI Microservices
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_DAEMON: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx nx run-many -t lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_DAEMON: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx nx run-many -t typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_DAEMON: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx nx run-many -t build
+
+  mobile:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_DAEMON: "false"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx tsc -p apps/mobile/tsconfig.app.json --noEmit
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: apptit
+          POSTGRES_PASSWORD: apptit
+          POSTGRES_DB: apptit_auth
+        options: >-
+          --health-cmd "pg_isready -U apptit -d apptit_auth"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      mongo:
+        image: mongo:7
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    env:
+      NODE_ENV: test
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_DAEMON: "false"
+      DATABASE_URL: postgresql://apptit:apptit@localhost:5432/apptit_auth
+      MONGODB_URI: mongodb://localhost:27017/apptit
+      REDIS_HOST: localhost
+      REDIS_PORT: "6379"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx nx run-many -t test

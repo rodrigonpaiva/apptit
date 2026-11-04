@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!postgres/
+!postgres/init.sh

@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/contracts"
+    },
+    {
+      "path": "packages/runtime"
+    },
+    {
+      "path": "apps/gateway-api"
+    },
+    {
+      "path": "services/identity"
+    },
+    {
+      "path": "services/kitchen"
+    }
+  ]
+}

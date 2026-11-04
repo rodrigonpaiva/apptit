@@ -1,0 +1,11 @@
+/** Runtime shell only; operational contracts are implemented in later packages. */
+export type ServiceName = 'gateway-api' | 'identity' | 'kitchen';
+export interface RuntimeStatus {
+  service: ServiceName;
+  mode: 'synthetic';
+  schemaVersion: 1;
+  operationalFeaturesEnabled: false;
+}
+export interface Readiness extends RuntimeStatus {
+  ready: boolean;
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "neverConnectToCloud": true,
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "!{projectRoot}/dist/**/*",
+      "!{projectRoot}/.next/**/*",
+      "!{projectRoot}/src/generated/**/*",
+      "!{projectRoot}/**/*.tsbuildinfo",
+      "sharedGlobals"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/package-lock.json",
+      "{workspaceRoot}/eslint.config.mjs",
+      "{workspaceRoot}/scripts/**/*.mjs"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    }
+  },
+  "analytics": false
+}

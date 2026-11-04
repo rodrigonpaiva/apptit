@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NX_DAEMON: 'false'
+      NX_ISOLATE_PLUGINS: 'false'
+      NX_NO_CLOUD: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: node scripts/setup-env.mjs
+      - run: npm ci
+      - run: npm run check
+      - run: npm run infra:up
+      - run: npm run db:migrate
+      - run: npm run db:seed
+      - run: npm run db:seed
+      - run: npm run smoke
+      - name: Stop synthetic infrastructure
+        if: always()
+        run: npm run infra:down

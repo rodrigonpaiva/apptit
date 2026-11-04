@@ -14,4 +14,20 @@ Restart baseline for a B2B foodservice planning, execution and inventory platfor
 - [Typed contract specification](docs/architecture/contracts/first-slice.md)
 - [SP1-01 acceptance evidence and SP1-02 handoff](docs/delivery/SP1-01.md)
 
-Current state: planning and first-slice engineering decisions. An executable workspace is the next package, SP1-02. No runtime feature, real restaurant approval or deployment is claimed.
+## Local development
+
+Requires Node 22.22.2, npm 10.9.7 and a running Docker daemon.
+
+```sh
+npm ci
+npm run local:env
+npm run dev
+```
+
+Open http://127.0.0.1:3000. This is a synthetic development shell; login and operational flows arrive in later packages.
+
+- [Setup, commands and troubleshooting](docs/development/local-development.md)
+- [Toolchain compatibility](docs/development/toolchain.md)
+- [SP1-02 acceptance evidence](docs/delivery/SP1-02.md)
+
+Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.

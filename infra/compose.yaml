@@ -1,0 +1,24 @@
+name: apptit-synthetic
+services:
+  postgres:
+    image: apptit-postgres-synthetic:18.6
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Run npm run local:env}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?Run npm run local:env}
+      KITCHEN_DB_PASSWORD: ${KITCHEN_DB_PASSWORD:?Run npm run local:env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:?Set POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: "no"
+volumes:
+  postgres_data:

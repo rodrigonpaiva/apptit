@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+  moduleFormat = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Synthetic setup marker only. Domain persistence belongs to SP1-03 onward.
+model RuntimeFixture {
+  id      String @id
+  payload Json
+}

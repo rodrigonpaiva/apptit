@@ -1,0 +1,60 @@
+{
+  "name": "kitchen",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "services/kitchen/src",
+  "projectType": "application",
+  "tags": [
+    "scope:kitchen",
+    "type:app"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -b",
+        "cwd": "services/kitchen"
+      },
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "services/kitchen"
+      },
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint src --max-warnings=0",
+        "cwd": "services/kitchen"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../scripts/database.mjs generate kitchen",
+        "cwd": "services/kitchen"
+      },
+      "cache": false
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../scripts/serve.mjs kitchen",
+        "cwd": "services/kitchen"
+      },
+      "cache": false
+    }
+  }
+}

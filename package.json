@@ -32,7 +32,8 @@
     "smoke": "node scripts/smoke.mjs",
     "check": "npm run db:validate && npm run lint && npm run typecheck && npm run contracts:check && npm run test && npm run build",
     "build:backend": "node scripts/nx.mjs run-many -t build --projects=contracts,runtime,gateway-api,identity,kitchen --outputStyle=static",
-    "pretest": "node scripts/nx.mjs run runtime:build --outputStyle=static"
+    "pretest": "node scripts/nx.mjs run runtime:build --outputStyle=static",
+    "git:setup": "node scripts/setup-git.mjs"
   },
   "devDependencies": {
     "nx": "24.0.4",

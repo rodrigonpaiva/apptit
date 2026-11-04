@@ -14,6 +14,10 @@ Restart baseline for a B2B foodservice planning, execution and inventory platfor
 - [Typed contract specification](docs/architecture/contracts/first-slice.md)
 - [SP1-01 acceptance evidence and SP1-02 handoff](docs/delivery/SP1-01.md)
 
+## Branch workflow
+
+Work on a feature branch from `dev`, open a PR into `dev`, wait for its complete CI, then promote `dev` to `main`. Run `npm run git:setup` in each checkout. [Workflow and current protection limitation](docs/development/branch-workflow.md).
+
 ## Local development
 
 Requires Node 22.22.2, npm 10.9.7 and a running Docker daemon.

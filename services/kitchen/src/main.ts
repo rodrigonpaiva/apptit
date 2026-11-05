@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import type { Request } from 'express';
+import { CatalogueRepository } from './infra/prisma/catalogue.repository.js';
+import type { CataloguePage } from '@apptit/contracts';
 import type { AuthorizedSiteContext } from '@apptit/contracts';
 import { AuthFailure, identityCall } from '@apptit/runtime';
 import { InputError, object, uuid } from '@apptit/domain-values';
@@ -36,6 +38,21 @@ async function bootstrap(): Promise<void> {
   }
   @Controller('internal/v1')
   class ScopedController {
+    constructor(private readonly database: Database) {}
+    @Post('catalogue') async catalogue(@Req() req: Request, @Body() input: unknown): Promise<CataloguePage> {
+      try {
+        if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
+        const value = object(input, ['scope'], 'query');
+        const secret = req.headers['x-session-secret'];
+        const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
+          { scope: value['scope'], capability: 'catalogue.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        return await new CatalogueRepository(this.database).list(context);
+      } catch (error) {
+        if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);
+        throw new ServiceUnavailableException({ code: 'DEPENDENCY_UNAVAILABLE' });
+      }
+    }
     @Post('site-context') async context(@Req() req: Request, @Body() input: unknown): Promise<AuthorizedSiteContext> {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);

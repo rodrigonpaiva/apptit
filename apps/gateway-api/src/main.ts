@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { catalogueResolver, catalogueSchema } from './catalogue.js';
 import { SessionController } from './session.controller.js';
 import { boundedQuery, siteResolver, siteSchema } from './site-context.js';
 import type { Request, Response } from 'express';
@@ -38,8 +39,8 @@ async function bootstrap(): Promise<void> {
   @Module({
     imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }' + quantityValidationSchema + siteSchema,
-      resolvers: { Query: { runtimeStatus: () => status, validateQuantityDraft: validateQuantityDraftInput, siteContext: siteResolver(config) } },
+      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }' + quantityValidationSchema + siteSchema + catalogueSchema,
+      resolvers: { Query: { runtimeStatus: () => status, validateQuantityDraft: validateQuantityDraftInput, siteContext: siteResolver(config), catalogue: catalogueResolver(config) } },
       context: ({ req }: { req: Request }) => ({ req }),
       validationRules: [boundedQuery],
       introspection: false,

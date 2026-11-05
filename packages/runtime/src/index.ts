@@ -18,6 +18,14 @@ export interface RuntimeConfig {
   kitchenOrigin: string;
   gatewayOrigin: string;
   internalTimeoutMs: number;
+  webOrigin: string;
+  sessionIdleSeconds: number;
+  sessionAbsoluteSeconds: number;
+  sessionHashKey: string;
+  csrfKey: string;
+  loginLimit: number;
+  loginWindowSeconds: number;
+  identityKitchenToken?: string;
 }
 const portKeys = { web: 'WEB_PORT', 'gateway-api': 'GATEWAY_PORT', identity: 'IDENTITY_PORT', kitchen: 'KITCHEN_PORT' } as const;
 function required(env: NodeJS.ProcessEnv, key: string): string {
@@ -47,10 +55,14 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
   if (idle > absolute) throw new ConfigurationError('SESSION_IDLE_SECONDS');
   token(env, 'SESSION_COOKIE_SECRET');
   token(env, 'CSRF_SECRET');
+  if (required(env, 'ALLOW_INSECURE_LOCAL_COOKIES') !== 'true') throw new ConfigurationError('ALLOW_INSECURE_LOCAL_COOKIES');
   const origin = required(env, 'WEB_ORIGIN');
   if (origin !== `http://127.0.0.1:${ports['web']}`) throw new ConfigurationError('WEB_ORIGIN');
   const config: RuntimeConfig = {
     service, host: '127.0.0.1', port: ports[service]!, mode: 'synthetic',
+    webOrigin: origin, sessionIdleSeconds: idle, sessionAbsoluteSeconds: absolute,
+    sessionHashKey: token(env, 'SESSION_COOKIE_SECRET'), csrfKey: token(env, 'CSRF_SECRET'),
+    loginLimit: positive(env, 'AUTH_LOGIN_LIMIT', 100), loginWindowSeconds: positive(env, 'AUTH_LOGIN_WINDOW_SECONDS', 3600),
     internalTimeoutMs: positive(env, 'INTERNAL_TIMEOUT_MS', 30000),
     identityOrigin: `http://127.0.0.1:${ports['identity']}`,
     kitchenOrigin: `http://127.0.0.1:${ports['kitchen']}`,
@@ -67,6 +79,7 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
     config.databaseUrl = url.toString();
     config.internalToken = token(env, `${service.toUpperCase()}_INTERNAL_TOKEN`);
   }
+  if (service === 'identity' || service === 'kitchen') config.identityKitchenToken = token(env, 'IDENTITY_KITCHEN_TOKEN');
   if (service === 'gateway-api') {
     config.identityToken = token(env, 'IDENTITY_INTERNAL_TOKEN');
     config.kitchenToken = token(env, 'KITCHEN_INTERNAL_TOKEN');
@@ -87,3 +100,6 @@ export function reportStartupFailure(service: string, error: unknown): void {
   console.error(JSON.stringify({ service, code: error instanceof ConfigurationError ? 'INVALID_CONFIGURATION' : 'STARTUP_FAILED',
     message: error instanceof ConfigurationError ? error.message : 'Startup failed; verify local configuration and dependencies.' }));
 }
+
+export * from './access/security.js';
+export * from './access/identity-client.js';

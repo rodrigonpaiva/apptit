@@ -14,3 +14,74 @@ model RuntimeFixture {
   id      String @id
   payload Json
 }
+
+// Scoped reference/presentation. No batch, receipt, quantity or availability.
+model CatalogueProduct {
+  id           String @id @db.Uuid
+  tenantId     String @db.Uuid
+  siteId       String @db.Uuid
+  name         String @db.VarChar(200)
+  presentation String @db.VarChar(200)
+  barcode      String? @db.VarChar(64)
+
+  @@index([tenantId, siteId, name, id])
+}
+
+// Reference draft only: no receipt, availability, reservation or stock effect.
+model QuantityDraft {
+  id                 String   @id @db.Uuid
+  tenantId           String   @db.Uuid
+  siteId             String   @db.Uuid
+  siteTimeZone       String   @db.VarChar(100)
+  version            Int
+  label              String   @db.VarChar(200)
+  quantityState      String   @db.VarChar(10)
+  quantityReason     String?  @db.VarChar(500)
+  amount             Decimal? @db.Decimal(24, 9)
+  unit               String?  @db.VarChar(10)
+  basis              String?  @db.VarChar(20)
+  resolution         Decimal? @db.Decimal(24, 9)
+  quantityQuality    String?  @db.VarChar(10)
+  quantitySourceRef  String?  @db.VarChar(500)
+  expiryState        String   @db.VarChar(10)
+  expiryReason       String?  @db.VarChar(500)
+  expiryKind         String?  @db.VarChar(20)
+  expiryDate         DateTime? @db.Date
+  expirySourceRef    String?  @db.VarChar(500)
+  expiryQuality      String?  @db.VarChar(10)
+  expiryDatumSource  String?  @db.VarChar(500)
+  procedureVersion   String?  @db.VarChar(500)
+  observedState      String   @db.VarChar(10)
+  observedReason     String?  @db.VarChar(500)
+  observedAt         DateTime? @db.Timestamptz(3)
+  observedQuality    String?  @db.VarChar(10)
+  observedSourceRef  String?  @db.VarChar(500)
+  createdById        String   @db.Uuid
+  createdByName      String   @db.VarChar(200)
+  updatedById        String   @db.Uuid
+  updatedByName      String   @db.VarChar(200)
+  createdAt          DateTime @db.Timestamptz(3)
+  updatedAt          DateTime @db.Timestamptz(3)
+  revisions          QuantityDraftRevision[]
+
+  @@unique([id, tenantId, siteId])
+  @@index([tenantId, siteId])
+}
+
+model QuantityDraftRevision {
+  draftId       String   @db.Uuid
+  tenantId      String   @db.Uuid
+  siteId        String   @db.Uuid
+  version       Int
+  actorId       String   @db.Uuid
+  actorName     String   @db.VarChar(200)
+  sessionId     String   @db.Uuid
+  correlationId String   @db.Uuid
+  recordedAt    DateTime @db.Timestamptz(3)
+  before        Json?
+  after         Json
+  draft         QuantityDraft @relation(fields: [draftId, tenantId, siteId], references: [id, tenantId, siteId], onDelete: Restrict)
+
+  @@id([draftId, version])
+  @@index([tenantId, siteId, draftId])
+}

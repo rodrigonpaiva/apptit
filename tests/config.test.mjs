@@ -14,7 +14,7 @@ test('synthetic configuration rejects live mode, missing secrets and arbitrary d
     ['APP_MODE', 'live'], ['SEED_MODE', 'live'], ['SESSION_COOKIE_SECRET', ''],
     ['CSRF_SECRET', 'REPLACE_ME'], ['IDENTITY_INTERNAL_TOKEN', 'short'],
     ['IDENTITY_DATABASE_URL', 'postgresql://postgres:do-not-disclose@external.example/production'],
-    ['BIND_HOST', '0.0.0.0'], ['WEB_ORIGIN', '*'], ['OFF_MODE', 'live'], ['OFFLINE_MODE', 'fixture'],
+    ['ALLOW_INSECURE_LOCAL_COOKIES', 'false'], ['IDENTITY_KITCHEN_TOKEN', ''], ['BIND_HOST', '0.0.0.0'], ['WEB_ORIGIN', '*'], ['OFF_MODE', 'live'], ['OFFLINE_MODE', 'fixture'],
   ]) {
     const env = { ...fixture(), [key]: value };
     assert.throws(() => readConfig('identity', env), error => error instanceof ConfigurationError && !error.message.includes('do-not-disclose'));

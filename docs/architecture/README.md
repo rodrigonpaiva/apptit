@@ -30,6 +30,12 @@ flowchart TD
 
 Services communicate through authenticated internal HTTP/JSON contracts. Domain code imports neither GraphQL nor Prisma nor provider SDKs. Gateway composes responses and owns no business database. Operational records always carry tenant and site. Lunch/cafeteria are contexts within a site, not duplicate physical inventories.
 
+[SP1-03 runtime value and persistence contracts](contracts/quantity-draft.md) document the implemented primitive/reference-draft slice.
+
+[SP1-04 individual-access contracts](contracts/individual-access.md) document the implemented session and authorization boundary.
+
+[SP1-05 catalogue contracts](contracts/catalogue.md) document the scoped product-reference read and visible workspace list.
+
 ## Implementation sequence
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.

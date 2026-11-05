@@ -1,14 +1,31 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
+    branches: [main, dev]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  branch-policy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - run: node scripts/check-branch-policy.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
   foundation:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -30,6 +47,7 @@ jobs:
       - run: npm run db:migrate
       - run: npm run db:seed
       - run: npm run db:seed
+      - run: npm run test:integration
       - run: npm run smoke
       - name: Stop synthetic infrastructure
         if: always()

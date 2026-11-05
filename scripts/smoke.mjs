@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { setTimeout as pause } from 'node:timers/promises';
 import { loadLocalEnv, root, serviceEnv } from './lib.mjs';
+import { accessSmoke } from './access-smoke.mjs';
 import { readConfig } from '../packages/runtime/dist/index.js';
 const require = createRequire(new URL('../services/identity/package.json', import.meta.url));
 const { Pool } = require('pg');
@@ -65,6 +66,27 @@ try {
   });
   const result = await graphql.json();
   assert.deepEqual(result.data.runtimeStatus, { mode: 'synthetic', schemaVersion: 1, operationalFeaturesEnabled: false });
+  const validationQuery = 'query Validate($input: QuantityDraftValidationInput!) { validateQuantityDraft(input: $input) { ok issues { field code message } } }';
+  const validateDraft = async input => {
+    const response = await fetch(`http://127.0.0.1:${web.port}/api/graphql`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: validationQuery, variables: { input } }),
+    });
+    assert.equal(response.status, 200);
+    return (await response.json()).data.validateQuantityDraft;
+  };
+  const unknown = { state: 'unknown', reason: 'Not observed' };
+  const validationInput = { label: 'Synthetic draft', quantity: { state: 'known', quality: 'measured', sourceRef: 'fixture/manual', value: { amount: '0', unit: 'g', basis: 'raw_net', resolution: '1' } }, expiry: unknown, observedAt: unknown };
+  assert.deepEqual(await validateDraft(validationInput), { ok: true, issues: [] });
+  const invalid = structuredClone(validationInput);
+  invalid.quantity.value.unit = 'litre';
+  const rejected = await validateDraft(invalid);
+  assert.equal(rejected.ok, false);
+  assert.equal(rejected.issues[0].field, 'quantity.value.unit');
+  assert.equal(rejected.issues[0].code, 'INVALID_UNIT');
+  const noMutation = await fetch(`${gateway.gatewayOrigin}/graphql`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: 'mutation { saveQuantityDraft { id } }' }),
+  });
+  assert.ok((await noMutation.json()).errors?.length, 'No unauthenticated persistence mutation exists.');
   for (const service of ['identity', 'kitchen']) {
     const config = readConfig(service);
     const response = await fetch(`http://127.0.0.1:${config.port}/health/ready`);
@@ -86,12 +108,14 @@ try {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: '{ __schema { types { name } } }' }),
   });
   assert.ok((await introspection.json()).errors?.length);
+  const verifyUnavailable = await accessSmoke(gateway, web);
   // Demonstrate actual dependency failure instead of a permanently-green health response.
   children[0].kill('SIGTERM');
   await pause(700);
   const degraded = await fetch(`${gateway.gatewayOrigin}/health/ready`);
   assert.equal(degraded.status, 503);
-  console.log('PASS: web shell, same-origin GraphQL, synthetic seeds, internal authentication, database isolation and degraded readiness.');
+  await verifyUnavailable();
+  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue, synthetic seeds, internal authentication, database isolation and degraded readiness.');
 } catch (error) {
   console.error(redact(`${error.message}\n${output}`));
   process.exitCode = 1;

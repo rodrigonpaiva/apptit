@@ -15,6 +15,9 @@
     },
     {
       "path": "services/kitchen"
+    },
+    {
+      "path": "packages/domain-values"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Local synthetic development
 
-SP1-02 provides an executable shell, infrastructure and CI. Login, catalogue business APIs, receipt/evidence, stock commands and offline capture are not implemented. Fixture account identifiers are data, not usable credentials.
+SP1-02 provides an executable shell, infrastructure and CI. SP1-03 adds shared value validation and internal versioned reference-draft persistence. Login, catalogue business APIs, receipt/evidence, stock commands and offline capture are not implemented. Fixture account identifiers are data, not usable credentials.
 
 ## Prerequisites and fresh checkout
 
@@ -30,7 +30,7 @@ Open **http://127.0.0.1:3000**. The page is a development shell with an explicit
 | Kitchen | http://127.0.0.1:4002 | Liveness and credential-protected DB/seed readiness only |
 | PostgreSQL | 127.0.0.1:55432 | Separate `apptit_identity_synthetic` and `apptit_kitchen_synthetic` databases and login roles |
 
-The sole public GraphQL query exposes synthetic runtime metadata; it exposes no users, products, credentials or stock. Introspection/playground are disabled; no GraphQL mutation exists. Internal health requires a per-service token and checks its actual database/seed. Gateway readiness becomes 503 if a dependency fails. Liveness alone does not claim readiness.
+Public GraphQL queries expose synthetic runtime metadata and read-only validation of submitted quantity-draft values; they expose no stored drafts, users, products, credentials or stock. Introspection/playground are disabled; no GraphQL mutation exists. Internal health requires a per-service token and checks its actual database/seed. Gateway readiness becomes 503 if a dependency fails. Liveness alone does not claim readiness.
 
 App child processes do not receive the PostgreSQL admin password or another service's database URL/password. This is local process hygiene, not an OS security sandbox. The trusted developer/Compose admin can access both databases. Each service generates its own Prisma client under its own ignored `src/generated/prisma`, with migrations/seed/client imports owned locally. No shared Prisma package or direct service imports.
 
@@ -42,12 +42,15 @@ npm run infra:up
 npm run db:migrate
 npm run db:seed
 npm run db:seed
+npm run test:integration
 npm run smoke
 ```
 
-`check` validates Prisma schemas, ESLint/module boundaries and tooling, all six project type checks, SP1-01 design contract types, configuration/security tests and production builds. It does not need a running DB; it does require the generated `.env`. Next route types are generated before standalone typechecking, so a clean `.next` is supported. Backend compilation remains `tsc` for Nest decorator metadata; ESM is used across the runtime packages.
+`check` validates Prisma schemas, ESLint/module boundaries and tooling, all seven project type checks, SP1-01 design contract types, configuration/security tests and production builds. It does not need a running DB; it does require the generated `.env`. Next route types are generated before standalone typechecking, so a clean `.next` is supported. Backend compilation remains `tsc` for Nest decorator metadata; ESM is used across the runtime packages.
 
-`smoke` requires the built apps and running migrated/seeded PostgreSQL. Stop `dev` first: it rejects occupied service ports, starts its own production app processes, then stops those processes. It checks web→same-origin GraphQL, synthetic fixture markers, missing internal credentials, cross-database access denial, disabled GraphQL introspection and dependency failure readiness. The second seed followed by one marker row per database establishes setup idempotence; this is not stock-command idempotence. No runtime authentication/tenant business-isolation acceptance is claimed yet.
+`test:integration` requires a built backend and migrated PostgreSQL. It runs six real database tests for quantity-draft versions, attribution, scope isolation, audit rollback and schema evolution. It fails rather than skipping if PostgreSQL is unavailable. Test actors are synthetic server contexts, not a substitute for login. Append-only test records use unique synthetic tenant/site IDs; the schema-chain test removes only its own disposable schema.
+
+`smoke` requires the built apps and running migrated/seeded PostgreSQL. Stop `dev` first: it rejects occupied service ports, starts its own production app processes, then stops those processes. It checks web→same-origin GraphQL, recoverable submitted-value validation and absence of persistence mutations, synthetic fixture markers, missing internal credentials, cross-database access denial, disabled GraphQL introspection and dependency failure readiness. The second seed followed by one marker row per database establishes setup idempotence; this is not stock-command idempotence. No runtime authentication/tenant business-isolation acceptance is claimed yet.
 
 Other commands:
 
@@ -84,10 +87,12 @@ This reset removes this Compose project's named volume and all synthetic DB cont
 
 ## CI and troubleshooting
 
-[GitHub Actions](../../.github/workflows/ci.yml) uses pinned Node, `npm ci`, generated synthetic secrets, all checks/builds, Docker migrations/repeated seed and smoke. Cleanup runs even on failure. No `continue-on-error`, fake pass, provider credential, cloud activation, deployment or Nx Cloud connection is configured. Local evidence is recorded in [SP1-02](../delivery/SP1-02.md); a remote workflow result is only known after a GitHub run.
+[GitHub Actions](../../.github/workflows/ci.yml) uses pinned Node, `npm ci`, generated synthetic secrets, all checks/builds, Docker migrations/repeated seed, integration tests and smoke. Cleanup runs even on failure. No `continue-on-error`, fake pass, provider credential, cloud activation, deployment or Nx Cloud connection is configured. Local evidence is recorded in [SP1-02](../delivery/SP1-02.md); a remote workflow result is only known after a GitHub run.
 
 - Docker unavailable: start the Docker daemon, retry `infra:up`; do not change app auth or provider mode.
 - Existing volume/password mismatch: recover the original ignored `.env` or explicitly reset disposable synthetic data.
 - Missing configuration: error identifies its key and redacts its value. A dependency startup failure reports a safe generic error; inspect local dependency state without posting connection strings.
 - Nx uses in-process plugins with analytics/daemon/cloud disabled, avoiding Unix worker socket restrictions in controlled environments. Exact versions are in the lockfile; do not replace CLI paths with historical Nx paths.
 - Node version mismatch: `engine-strict` fails installation; use the declared runtime, not a forced install.
+
+See the [SP1-03 value/storage/API contract](../architecture/contracts/quantity-draft.md) and [delivery evidence](../delivery/SP1-03.md). Authentication and catalogue UI remain later packages.

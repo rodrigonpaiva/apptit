@@ -33,5 +33,6 @@ Open http://127.0.0.1:3000. This is a synthetic development shell; login and ope
 - [Setup, commands and troubleshooting](docs/development/local-development.md)
 - [Toolchain compatibility](docs/development/toolchain.md)
 - [SP1-02 acceptance evidence](docs/delivery/SP1-02.md)
+- [SP1-03 quantities and versioned persistence](docs/delivery/SP1-03.md)
 
-Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
+Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.

@@ -1,0 +1,36 @@
+{
+  "name": "domain-values",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/domain-values/src",
+  "projectType": "library",
+  "tags": [
+    "scope:shared",
+    "type:domain-values"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -b",
+        "cwd": "packages/domain-values"
+      },
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "packages/domain-values"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint src --max-warnings=0",
+        "cwd": "packages/domain-values"
+      }
+    }
+  }
+}

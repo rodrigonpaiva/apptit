@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { quantityValidationSchema, validateQuantityDraftInput } from './quantity-validation.js';
 import { Controller, Get, Module, ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';
@@ -34,8 +35,8 @@ async function bootstrap(): Promise<void> {
   @Module({
     imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }',
-      resolvers: { Query: { runtimeStatus: () => status } },
+      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }' + quantityValidationSchema,
+      resolvers: { Query: { runtimeStatus: () => status, validateQuantityDraft: validateQuantityDraftInput } },
       introspection: false,
       playground: false,
       csrfPrevention: true,

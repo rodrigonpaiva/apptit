@@ -27,7 +27,7 @@
     "build": "node scripts/nx.mjs run-many -t build --outputStyle=static",
     "typecheck": "node scripts/nx.mjs run-many -t typecheck --outputStyle=static",
     "lint": "node scripts/nx.mjs run-many -t lint --outputStyle=static && eslint scripts tests eslint.config.mjs apps/web/next.config.mjs services/*/prisma.config.ts --max-warnings=0",
-    "contracts:check": "tsc --strict --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext docs/architecture/contracts/first-slice.ts",
+    "contracts:check": "tsc --strict --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext docs/architecture/contracts/first-slice.ts docs/architecture/contracts/receiving-contracts.ts",
     "test": "node --test tests/*.test.mjs",
     "smoke": "node scripts/smoke.mjs",
     "verify:foundation": "node scripts/verify-foundation.mjs",

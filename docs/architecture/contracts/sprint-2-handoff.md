@@ -22,6 +22,10 @@ Date: 2026-11-05. Review against the implemented Sprint 1 slice; this is not an 
 5. Define evidence metadata ownership and states, generated storage keys, author/time/digest/media size, scope and receipt/batch references. ADR-0004 selects a private filesystem boundary for future synthetic work; upload, authorized streaming, orphan recovery and lifecycle are not implemented. `EVIDENCE_MODE` stays disabled until then.
 6. Define receiving capabilities rather than treating catalogue.read as write authority. Current minimal role map is not complete per-product permission or organization administration.
 
+## SP2-01 implementation update
+
+[SP2-01](receiving.md) now supplies typed receiving/evidence/future-posting ports, pure draft/confirmation-intent parsing, checked pack previews, exact reconciliation and canonical intent comparison. It does not implement the receiving repository, operation registry, effectful transaction, online receiving grants, file lifecycle or live provider adapters identified above.
+
 ## Continuing boundaries
 
 OFF/AI/OCR/offline/evidence remain disabled in the runtime. No received batch, stock ledger, supplier offer, provider lookup, camera integration, food eligibility decision, director workflow, restore drill or live restaurant onboarding exists. The foundation's named volume is not a backup. Production HTTPS/session settings and deployment/recovery policies remain unresolved for live use.

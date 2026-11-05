@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. Receiving, stock operations, offline capture and live external integrations remain outside the enabled slice.
+The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. Receiving forms/persistence, stock operations, file uploads, offline capture and live external integrations remain outside the enabled slice.
 
 ## Run locally
 
@@ -70,6 +70,7 @@ feature/sp1-06-foundation-verification
 - [SP1-05 private product list](docs/delivery/SP1-05.md)
 - [Sprint 1 demonstration and verification](docs/development/foundation-demo.md)
 - [SP1-06 delivery evidence](docs/delivery/SP1-06.md)
+- [SP2-01 receiving/operation/evidence contracts](docs/delivery/SP2-01.md)
 
 Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 =======
@@ -90,7 +91,6 @@ Identity and Kitchen own separate databases and generated clients. The gateway h
 ```text
 feature/* → PR → dev → successful dev push CI → promotion PR → main
 ```
-dev
 
 Native GitHub rulesets are active on [main](https://github.com/rodrigonpaiva/apptit/rules/26610391) and [dev](https://github.com/rodrigonpaiva/apptit/rules/26610401). Both require PRs, `branch-policy` and `foundation` from GitHub Actions, an up-to-date base and resolved review conversations. Force pushes/deletion are blocked, with no configured bypass actors. Main promotions use merge commits only.
 

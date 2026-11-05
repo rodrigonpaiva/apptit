@@ -1,0 +1,26 @@
+{
+  "packCount": "10",
+  "product": {
+    "productId": "50000000-0000-4000-8000-000000000001",
+    "presentationId": "50000000-0000-4000-8000-000000000002",
+    "presentationVersion": 2
+  },
+  "conversion": {
+    "id": "50000000-0000-4000-8000-000000000010",
+    "version": 3,
+    "product": {
+      "productId": "50000000-0000-4000-8000-000000000001",
+      "presentationId": "50000000-0000-4000-8000-000000000002",
+      "presentationVersion": 2
+    },
+    "factor": "5000",
+    "toUnit": "g",
+    "basis": "as_received",
+    "sourceRef": "synthetic/checked-pack-5kg",
+    "reviewedBy": {
+      "userId": "50000000-0000-4000-8000-000000000011",
+      "nameAtAction": "Synthetic reviewer"
+    },
+    "reviewedAt": "2026-11-05T10:00:00Z"
+  }
+}

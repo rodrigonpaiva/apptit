@@ -6,7 +6,7 @@ export default {
   poweredByHeader: false,
   outputFileTracingRoot: resolve(import.meta.dirname, '../..'),
   async rewrites() {
-    return [{ source: '/api/graphql', destination: `http://127.0.0.1:${gatewayPort}/graphql` }];
+    return [{ source: '/api/graphql', destination: `http://127.0.0.1:${gatewayPort}/graphql` }, { source: '/api/session/:path*', destination: `http://127.0.0.1:${gatewayPort}/session/:path*` }];
   },
   async headers() {
     return [{ source: '/:path*', headers: [{ key: 'Cache-Control', value: 'no-store' }, { key: 'X-Content-Type-Options', value: 'nosniff' }] }];

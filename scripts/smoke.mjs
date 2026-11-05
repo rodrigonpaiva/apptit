@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { setTimeout as pause } from 'node:timers/promises';
 import { loadLocalEnv, root, serviceEnv } from './lib.mjs';
+import { accessSmoke } from './access-smoke.mjs';
 import { readConfig } from '../packages/runtime/dist/index.js';
 const require = createRequire(new URL('../services/identity/package.json', import.meta.url));
 const { Pool } = require('pg');
@@ -107,12 +108,14 @@ try {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: '{ __schema { types { name } } }' }),
   });
   assert.ok((await introspection.json()).errors?.length);
+  const verifyUnavailable = await accessSmoke(gateway, web);
   // Demonstrate actual dependency failure instead of a permanently-green health response.
   children[0].kill('SIGTERM');
   await pause(700);
   const degraded = await fetch(`${gateway.gatewayOrigin}/health/ready`);
   assert.equal(degraded.status, 503);
-  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, synthetic seeds, internal authentication, database isolation and degraded readiness.');
+  await verifyUnavailable();
+  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, synthetic seeds, internal authentication, database isolation and degraded readiness.');
 } catch (error) {
   console.error(redact(`${error.message}\n${output}`));
   process.exitCode = 1;

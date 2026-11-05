@@ -35,3 +35,7 @@ GitHub Actions uses `actions/checkout@v7` and `actions/setup-node@v7`, following
 Do not blindly install registry `latest`: at selection time it included a Prisma release candidate and incompatible TypeScript/GraphQL majors. Revisit exact versions through a separately validated dependency update.
 
 - [actions/checkout](https://github.com/actions/checkout) and [actions/setup-node](https://github.com/actions/setup-node).
+
+## SP1-04 additions
+
+`argon2@0.45.2` (Node ≥16.17; tested on selected Node 22) implements password hashes; `@types/express@5.0.6` types the HTTP controllers. Exact versions are fixed in the manifests/lockfile. No auth/cloud provider or native mobile framework is selected.

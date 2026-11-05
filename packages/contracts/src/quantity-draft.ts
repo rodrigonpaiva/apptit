@@ -1,3 +1,4 @@
+import type { AccessCapability } from './access.js';
 export type Decimal = string;
 export type LocalDate = string;
 export type Instant = string;
@@ -29,7 +30,7 @@ export interface TrustedActorContext {
   scope: Scope;
   siteTimeZone: string;
   sessionId: string;
-  capabilities: readonly ('quantity-draft.read' | 'quantity-draft.write')[];
+  capabilities: readonly AccessCapability[];
   correlationId: string;
 }
 export interface VersionedQuantityDraft {

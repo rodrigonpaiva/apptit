@@ -20,9 +20,13 @@ export function safeFailure() {
   console.error('Local command failed. Check the named configuration and dependency status; secrets are redacted.');
   process.exitCode = 1;
 }
-export function serviceEnv(service) {
+export function serviceEnv(service, seed = false) {
   const env = { ...process.env };
   for (const key of ['POSTGRES_ADMIN_PASSWORD', 'IDENTITY_DB_PASSWORD', 'KITCHEN_DB_PASSWORD', 'IDENTITY_DATABASE_URL', 'KITCHEN_DATABASE_URL', 'IDENTITY_INTERNAL_TOKEN', 'KITCHEN_INTERNAL_TOKEN']) delete env[key];
+  delete env.IDENTITY_KITCHEN_TOKEN;
+  for (const key of Object.keys(env)) if (/^FIXTURE_.*_PASSWORD$/.test(key)) delete env[key];
+  if (service === 'identity' || service === 'kitchen') env.IDENTITY_KITCHEN_TOKEN = process.env.IDENTITY_KITCHEN_TOKEN;
+  if (seed && service === 'identity') for (const [key, value] of Object.entries(process.env)) if (/^FIXTURE_.*_PASSWORD$/.test(key)) env[key] = value;
   if (service === 'identity' || service === 'kitchen') {
     env[`${service.toUpperCase()}_DATABASE_URL`] = process.env[`${service.toUpperCase()}_DATABASE_URL`];
     env[`${service.toUpperCase()}_INTERNAL_TOKEN`] = process.env[`${service.toUpperCase()}_INTERNAL_TOKEN`];

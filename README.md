@@ -61,6 +61,18 @@ npm run smoke
 
 ## Architecture
 
+feature/sp1-06-foundation-verification
+- [Setup, commands and troubleshooting](docs/development/local-development.md)
+- [Toolchain compatibility](docs/development/toolchain.md)
+- [SP1-02 acceptance evidence](docs/delivery/SP1-02.md)
+- [SP1-03 quantities and versioned persistence](docs/delivery/SP1-03.md)
+- [SP1-04 individual access](docs/delivery/SP1-04.md)
+- [SP1-05 private product list](docs/delivery/SP1-05.md)
+- [Sprint 1 demonstration and verification](docs/development/foundation-demo.md)
+- [SP1-06 delivery evidence](docs/delivery/SP1-06.md)
+
+Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
+=======
 TypeScript, Nx/npm workspaces, Next.js/React, NestJS/Apollo GraphQL, Prisma and PostgreSQL. Exact versions are recorded in the lockfile and [toolchain matrix](docs/development/toolchain.md).
 
 | Location | Responsibility |
@@ -78,6 +90,7 @@ Identity and Kitchen own separate databases and generated clients. The gateway h
 ```text
 feature/* → PR → dev → successful dev push CI → promotion PR → main
 ```
+dev
 
 Native GitHub rulesets are active on [main](https://github.com/rodrigonpaiva/apptit/rules/26610391) and [dev](https://github.com/rodrigonpaiva/apptit/rules/26610401). Both require PRs, `branch-policy` and `foundation` from GitHub Actions, an up-to-date base and resolved review conversations. Force pushes/deletion are blocked, with no configured bypass actors. Main promotions use merge commits only.
 

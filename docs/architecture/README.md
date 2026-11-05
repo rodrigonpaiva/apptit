@@ -36,6 +36,8 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP1-05 catalogue contracts](contracts/catalogue.md) document the scoped product-reference read and visible workspace list.
 
+[Sprint 2 handoff](contracts/sprint-2-handoff.md) distinguishes verified primitives from receiving/stock/evidence contracts still to implement in SP2-01.
+
 ## Implementation sequence
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.

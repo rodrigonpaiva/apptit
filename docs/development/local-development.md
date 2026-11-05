@@ -36,6 +36,8 @@ App child processes do not receive the PostgreSQL admin password or another serv
 
 ## Verification
 
+For the complete sequence with a private timestamped outcome report, stop your app runtimes and run `npm run verify:foundation` after `npm ci` and `npm run local:env`. It refuses occupied app ports, stops on the first failure and records unrun steps explicitly in `.local/verification/foundation-*.json`. It preserves the database volume and leaves infrastructure running. See the [repeatable Sprint 1 demo](foundation-demo.md) for the user A/site B denial and revocation demonstration, isolated fresh-database procedure and limitations.
+
 ```sh
 npm run check
 npm run infra:up

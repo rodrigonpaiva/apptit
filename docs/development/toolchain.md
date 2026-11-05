@@ -22,7 +22,7 @@ Recorded 2026-11-04 (Europe/Paris). Exact direct versions and all transitive res
 
 ESM `NodeNext` and `.js` relative imports are used for compiled backend code; Prisma generator emits ESM with service-local output. A common shared generated client is prohibited. Next uses Bundler module resolution. Workspace package exports/TypeScript references provide library boundaries; applications expose no importable package API.
 
-GitHub Actions uses `actions/checkout@v7` and `actions/setup-node@v7`, following their current official examples; remote execution remains unverified.
+GitHub Actions uses `actions/checkout@v7` and `actions/setup-node@v7`, following their current official examples; the integrated SP1-05 dev head passed the complete remote foundation workflow on 2026-11-05 ([run 42015585388](https://github.com/rodrigonpaiva/apptit/actions/runs/42015585388)). This evidence does not claim CI on later unpushed work.
 
 ## Primary references
 

@@ -36,7 +36,9 @@ Open http://127.0.0.1:3000. This synthetic environment now supports individual l
 - [SP1-03 quantities and versioned persistence](docs/delivery/SP1-03.md)
 - [SP1-04 individual access](docs/delivery/SP1-04.md)
 - [SP1-05 private product list](docs/delivery/SP1-05.md)
+- [Sprint 1 demonstration and verification](docs/development/foundation-demo.md)
+- [SP1-06 delivery evidence](docs/delivery/SP1-06.md)
 
-Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
+Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 
 Individual fixture credentials are generated privately in `.local/fixture-credentials.json` by `npm run local:env`. Open `/login` after starting the environment.

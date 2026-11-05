@@ -6,7 +6,7 @@ try {
   const services = selected ? [selected] : ['identity', 'kitchen'];
   if (!['generate', 'validate', 'migrate', 'seed'].includes(action) || services.some(s => !['identity', 'kitchen'].includes(s))) throw new Error('Unsupported database action.');
   for (const service of services) {
-    const env = serviceEnv(service);
+    const env = serviceEnv(service, action === 'seed');
     if (action === 'seed') {
       await run(process.execPath, [`services/${service}/dist/seed.js`], { env });
     } else {

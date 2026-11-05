@@ -15,6 +15,18 @@ model RuntimeFixture {
   payload Json
 }
 
+// Scoped reference/presentation. No batch, receipt, quantity or availability.
+model CatalogueProduct {
+  id           String @id @db.Uuid
+  tenantId     String @db.Uuid
+  siteId       String @db.Uuid
+  name         String @db.VarChar(200)
+  presentation String @db.VarChar(200)
+  barcode      String? @db.VarChar(64)
+
+  @@index([tenantId, siteId, name, id])
+}
+
 // Reference draft only: no receipt, availability, reservation or stock effect.
 model QuantityDraft {
   id                 String   @id @db.Uuid

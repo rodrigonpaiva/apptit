@@ -115,7 +115,7 @@ try {
   const degraded = await fetch(`${gateway.gatewayOrigin}/health/ready`);
   assert.equal(degraded.status, 503);
   await verifyUnavailable();
-  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, synthetic seeds, internal authentication, database isolation and degraded readiness.');
+  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue, synthetic seeds, internal authentication, database isolation and degraded readiness.');
 } catch (error) {
   console.error(redact(`${error.message}\n${output}`));
   process.exitCode = 1;

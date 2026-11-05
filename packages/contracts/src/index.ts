@@ -11,3 +11,4 @@ export interface Readiness extends RuntimeStatus {
 }
 export * from './quantity-draft.js';
 export * from './access.js';
+export * from './catalogue.js';

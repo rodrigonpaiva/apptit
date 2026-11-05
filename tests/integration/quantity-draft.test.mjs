@@ -154,8 +154,11 @@ test('versioned migration chain builds the same storage from empty schema withou
       const sql = readFileSync(new URL(`../../services/kitchen/prisma/migrations/${directory}/migration.sql`, import.meta.url), 'utf8');
       await connection.query(sql);
     }
+    await connection.query("INSERT INTO \"RuntimeFixture\" (id, payload) VALUES ('migration-preservation', '{\"preserved\":true}')");
+    await connection.query(readFileSync(new URL('../../services/kitchen/prisma/migrations/202611050003_catalogue_reference/migration.sql', import.meta.url), 'utf8'));
+    assert.deepEqual((await connection.query("SELECT payload FROM \"RuntimeFixture\" WHERE id='migration-preservation'")).rows[0].payload, { preserved: true });
     const tables = await connection.query('SELECT tablename FROM pg_tables WHERE schemaname=$1 ORDER BY tablename', [schema]);
-    assert.deepEqual(tables.rows.map(row => row.tablename), ['QuantityDraft', 'QuantityDraftRevision', 'RuntimeFixture']);
+    assert.deepEqual(tables.rows.map(row => row.tablename), ['CatalogueProduct', 'QuantityDraft', 'QuantityDraftRevision', 'RuntimeFixture']);
     const decimalType = await connection.query("SELECT numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema=$1 AND table_name='QuantityDraft' AND column_name='amount'", [schema]);
     assert.equal(decimalType.rows[0].numeric_precision, 24);
     assert.equal(decimalType.rows[0].numeric_scale, 9);

@@ -28,13 +28,14 @@ npm run local:env
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. This synthetic environment now supports individual login and authorized restaurant access. The private product list and operational flows arrive in later packages.
+Open http://127.0.0.1:3000. This synthetic environment now supports individual login and authorized restaurant access. The private product-reference list is available in the workspace; operational stock flows remain unavailable.
 
 - [Setup, commands and troubleshooting](docs/development/local-development.md)
 - [Toolchain compatibility](docs/development/toolchain.md)
 - [SP1-02 acceptance evidence](docs/delivery/SP1-02.md)
 - [SP1-03 quantities and versioned persistence](docs/delivery/SP1-03.md)
 - [SP1-04 individual access](docs/delivery/SP1-04.md)
+- [SP1-05 private product list](docs/delivery/SP1-05.md)
 
 Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 

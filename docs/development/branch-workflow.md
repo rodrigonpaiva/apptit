@@ -26,19 +26,23 @@ After merge, **wait for push CI on the exact new dev head to pass**. Only then o
 
 Promotions use a regular **merge commit**, preserving dev ancestry. Do not squash/rebase dev into main, delete dev or rewrite its history. Merge main back into dev through a bounded sync topic PR when needed to keep the integration line current. Features may use squash when that is appropriate to their individual PR history.
 
-## Available safeguards and actual limitation
+## Active native rulesets
 
-The latest SP1-02 main push CI passed: [run 41868318492](https://github.com/rodrigonpaiva/apptit/actions/runs/41868318492). This is a passing scaffold baseline, not a guarantee that every future defect is detected.
+On 2026-11-05 the owner changed the repository to public. GitHub then accepted both rulesets as active, and their configuration plus effective branch rules were read back and compared to the prepared payloads:
 
-On 2026-11-04 the GitHub branch-protection API returned **403: Upgrade to GitHub Pro or make this repository public** for this private repository. Its visibility has not been changed, no subscription has been purchased, and native branch protections are **not enabled**. See [GitHub availability](https://docs.github.com/en/rest/branches/branch-protection).
+- [Main ruleset 26610391](https://github.com/rodrigonpaiva/apptit/rules/26610391)
+- [Dev ruleset 26610401](https://github.com/rodrigonpaiva/apptit/rules/26610401)
 
-`npm run git:setup` installs `.githooks/pre-push` in this checkout and blocks local direct updates/deletions of main/dev. It does not block GitHub PR merges. Each clone must install the hook; hooks can be bypassed and do not govern other clients/API calls. Actions produce pass/fail evidence, but without server protection they cannot prevent an administrator from ignoring failure or pushing directly. Do not describe this as fully protected branches.
+Both require PRs, `foundation` and `branch-policy` from GitHub Actions app 15368, an up-to-date base and resolved review conversations. Deletion and force pushes are blocked. There are no bypass actors, including administrator roles/apps. Main permits merge commits only; dev permits merge commits or squash. No linear-history requirement conflicts with promotion ancestry.
 
-When native protections become available, apply to **both main and dev**:
+The repository has one human maintainer, so no additional approval is mandatory yet; PR and CI requirements remain enforced. Add an independent-review requirement when an actual second reviewer is available. Repository administrators can still edit ruleset configuration; an empty bypass list does not remove their settings authority.
 
-- Require pull requests; require `foundation` and `branch-policy` checks from GitHub Actions, with branches up to date.
-- Enforce for administrators; block force pushes/deletions and require resolved review conversations.
-- Do not require an invented second approver in a single-maintainer project; configure reviewer count when actual reviewers are assigned.
-- Keep merge commits available for dev-to-main promotion. Do not require linear history on the long-lived integration/promotion branches.
+[Payloads, rationale and safe update/readback procedure](github-rulesets.md) are stored in this repository. Do not create duplicate rulesets or replace active rules blindly. Feature-to-main denial and exact-dev-push-CI gating rely on the required branch-policy workflow, not a source-branch selector in the ruleset itself.
 
-Repository root `AGENTS.md` records this workflow for future work. The initial policy change itself is made on `chore/branch-workflow`, with a PR into dev; main is unchanged until the reviewed integration/promotion flow completes.
+## Local guard and historical limitation
+
+`npm run git:setup` installs `.githooks/pre-push` and blocks local direct updates/deletions of main/dev. Each clone must install it. Native rulesets now add server-side enforcement independently of the hook.
+
+Before the owner's visibility change, GitHub returned 403 for rulesets/branch protection on this private repository's plan. That limitation was observed on 2026-11-04 and 2026-11-05; it is historical, not the current public-repository state. No subscription was purchased by the assistant. Existing delivery records describing that prior state remain historical evidence.
+
+The SP1-02 main baseline had a passing [push CI run 41868318492](https://github.com/rodrigonpaiva/apptit/actions/runs/41868318492); enabling rulesets does not change main's code or promote dev. Root AGENTS.md records the current workflow. These local configuration/documentation changes remain on chore/github-branch-rulesets until committed/reviewed.

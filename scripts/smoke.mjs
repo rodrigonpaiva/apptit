@@ -40,6 +40,7 @@ async function stop() {
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => { void stop().then(() => process.exit(1)); });
 try {
   loadLocalEnv();
+  if (process.env.OFF_MODE !== 'fixture') throw new Error('Smoke requires OFF_MODE=fixture; live provider traffic is not a test dependency.');
   for (const service of ['identity', 'kitchen', 'gateway-api', 'web']) {
     const config = readConfig(service, serviceEnv(service));
     // Fail before spawning if another process already owns a smoke port.

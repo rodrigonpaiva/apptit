@@ -133,3 +133,4 @@ export function toBaseQuantity(input: { amount: string; unit: 'kg' | 'l'; basis:
   return { quantity: converted, provenance: { original, factor: '1000', method: 'exact_metric_scaling' as const } };
 }
 export * from './receiving.js';
+export * from './barcode.js';

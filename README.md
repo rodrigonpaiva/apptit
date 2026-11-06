@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. Receiving forms/persistence, stock operations, file uploads, offline capture and live external integrations remain outside the enabled slice.
+The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. Receiving forms/persistence, stock operations, file uploads, offline capture and live external integrations remain outside the enabled slice.
 
 ## Run locally
 
@@ -35,7 +35,7 @@ Use the passwords generated in your own `.local/fixture-credentials.json`:
 - `stock.a@apptit.test` / `cook.a@apptit.test`: individual storekeeper/cook accounts for A.
 - `chef.multi@apptit.test`: select either explicitly authorized restaurant.
 
-In `/workspace`, search by product name, presentation or textual barcode, for example `0012345678905`. Leaving the page hides private content; returning revalidates access and reloads the list. Logout revokes the server session. Navigation/search requires no camera permission.
+In `/workspace`, search by product name, presentation or textual barcode, for example `0012345678905`. Leaving the page hides private content; returning revalidates access and reloads the list. Logout revokes the server session. Typed navigation/search requires no camera permission. The “Identifier un produit” section optionally scans with the camera and always supports manual identification. OFF defaults to deterministic examples; explicit OFF_MODE=live enables read-only public lookup. Restart dev after configuration changes.
 
 Ctrl+C stops the app processes. `npm run infra:down` stops the local infrastructure while preserving its database volume. A volume is not a backup.
 
@@ -71,6 +71,7 @@ feature/sp1-06-foundation-verification
 - [Sprint 1 demonstration and verification](docs/development/foundation-demo.md)
 - [SP1-06 delivery evidence](docs/delivery/SP1-06.md)
 - [SP2-01 receiving/operation/evidence contracts](docs/delivery/SP2-01.md)
+- [SP2-02 product identification and OFF/manual fallback](docs/delivery/SP2-02.md)
 
 Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 =======

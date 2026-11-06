@@ -39,3 +39,7 @@ Do not blindly install registry `latest`: at selection time it included a Prisma
 ## SP1-04 additions
 
 `argon2@0.45.2` (Node ≥16.17; tested on selected Node 22) implements password hashes; `@types/express@5.0.6` types the HTTP controllers. Exact versions are fixed in the manifests/lockfile. No auth/cloud provider or native mobile framework is selected.
+
+## SP2-02 scanner
+
+`zxing-wasm@3.1.6` is pinned in the web workspace. Only its reader is lazily imported; the matching WASM is served from the app's fixed same-origin route, with explicit Next file tracing. No CDN or scanner cloud service is used. Controlled Chromium video decoding passed; physical-device/lighting/Safari coverage remains pending. Public MIT and ZXing-C++ Apache-2.0 notices ship in apps/web/public/licenses.

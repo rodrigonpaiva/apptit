@@ -1,10 +1,12 @@
 import 'reflect-metadata';
+import { OffLookup } from './infra/lookup/off.js';
 import type { Request } from 'express';
 import { CatalogueRepository } from './infra/prisma/catalogue.repository.js';
+import type { ScopedProductLookup } from '@apptit/contracts';
 import type { CataloguePage } from '@apptit/contracts';
 import type { AuthorizedSiteContext } from '@apptit/contracts';
 import { AuthFailure, identityCall } from '@apptit/runtime';
-import { InputError, object, uuid } from '@apptit/domain-values';
+import { InputError, object, uuid, productBarcode } from '@apptit/domain-values';
 import { Controller, Get, Injectable, Module, ServiceUnavailableException, UnauthorizedException, Headers, Body, HttpException, Post, Req } from '@nestjs/common';
 import type { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -16,6 +18,7 @@ import type { Readiness, RuntimeStatus } from '@apptit/contracts';
 
 async function bootstrap(): Promise<void> {
   const config = readConfig('kitchen');
+  const lookup = new OffLookup(config);
   const status: RuntimeStatus = { service: 'kitchen', mode: 'synthetic', schemaVersion: 1, operationalFeaturesEnabled: false };
   @Injectable()
   class Database extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -39,6 +42,22 @@ async function bootstrap(): Promise<void> {
   @Controller('internal/v1')
   class ScopedController {
     constructor(private readonly database: Database) {}
+    @Post('product-lookup') async productLookup(@Req() req: Request, @Body() input: unknown): Promise<ScopedProductLookup> {
+      try {
+        if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
+        const value = object(input, ['scope', 'barcode'], 'query');
+        const secret = req.headers['x-session-secret'];
+        const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
+          { scope: value['scope'], capability: 'catalogue.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        const barcode = productBarcode(value['barcode']);
+        const localCandidates = await this.database.catalogueProduct.findMany({ where: { ...context.scope, barcode }, select: { id: true, name: true, presentation: true, barcode: true }, take: 10, orderBy: { id: 'asc' } });
+        return { ...await lookup.lookup(barcode), localCandidates };
+      } catch (error) {
+        if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);
+        throw new ServiceUnavailableException({ code: 'DEPENDENCY_UNAVAILABLE' });
+      }
+    }
     @Post('catalogue') async catalogue(@Req() req: Request, @Body() input: unknown): Promise<CataloguePage> {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);

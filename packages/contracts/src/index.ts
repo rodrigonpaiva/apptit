@@ -14,3 +14,4 @@ export * from './access.js';
 export * from './catalogue.js';
 export * from './receiving.js';
 export * from './evidence.js';
+export * from './product-lookup.js';

@@ -137,3 +137,141 @@ button:disabled { opacity: .6; cursor: wait; }
 @media (max-width: 1250px) { .workspace-shell { grid-template-columns: 212px minmax(0, 1fr); } .workspace-topbar { padding-inline: 32px; } .workspace-main { padding-inline: 32px; } .product-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .catalogue-toolbar { align-items: flex-start; flex-direction: column; gap: 18px; } .catalogue-search { width: 100%; max-width: 480px; } .catalogue-emblem { width: 110px; height: 110px; } }
 @media (max-width: 850px) { .workspace-shell { grid-template-columns: 1fr; } .workspace-sidebar { position: static; height: auto; display: grid; grid-template-columns: 1fr auto; padding: 16px 28px; gap: 12px 20px; } .workspace-sidebar .brand { padding: 0; font-size: 34px; } .sidebar-intro, .sidebar-note, .account-summary, .account-login { display: none; } .sidebar-bottom { margin: 0; padding: 0; grid-column: 2; grid-row: 1; align-self: center; } .workspace-account { border: 0; padding: 0; } .workspace-logout { padding: 10px; } .workspace-nav { grid-column: 1 / -1; gap: 0; } .workspace-nav > .sidebar-overline { display: none; } .workspace-nav a { width: fit-content; font-size: 12px; padding: 12px 15px; min-height: 44px; }  .workspace-topbar { padding: 14px 28px; min-height: 84px; } .workspace-main { padding: 26px 28px 20px; min-height: calc(100svh - 220px); } .workspace-welcome { margin-bottom: 30px; } .catalogue-heading h1 { font-size: 38px; } .catalogue-toolbar { flex-direction: row; align-items: center; } .catalogue-search { max-width: 330px; } .catalogue-notice { margin: 24px 0 28px; } }
 @media (max-width: 600px) { .workspace-sidebar { padding: 12px 20px; gap: 8px; } .workspace-logout { width: 48px; justify-content: center; } .workspace-logout > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .workspace-nav a { min-height: 44px; } .workspace-topbar { padding: 12px 20px; gap: 10px; flex-wrap: wrap; } .workspace-location { flex: 1 1 100%; } .workspace-location label { flex: 1; } .workspace-location select { max-width: 100%; font-size: 12px; } .location-icon { width: 34px; height: 34px; } .workspace-demo { font-size: 9px; } .workspace-main { padding: 24px 20px 18px; } .workspace-welcome { gap: 9px; margin-bottom: 30px; } .workspace-welcome p { font-size: 11px; line-height: 1.6; } .workspace-welcome > span { font-size: 9px; } .catalogue-emblem { display: none; } .catalogue-heading h1 { font-size: 35px; letter-spacing: -1.2px; } .catalogue-description { font-size: 12px; } .catalogue-heading .eyebrow { font-size: 9px; letter-spacing: 1px; } .catalogue-notice { align-items: flex-start; padding: 14px; gap: 10px; } .catalogue-notice p { font-size: 11px; } .catalogue-notice > span { display: none; } .catalogue-toolbar { flex-direction: column; align-items: stretch; gap: 16px; } .catalogue-search { max-width: none; } .catalogue-section-title h2 { font-size: 20px; } .catalogue-results-meta { margin: 16px 0 12px; } .product-list { grid-template-columns: minmax(0, 1fr); gap: 16px; } .product-card { padding: 22px; } .product-card h3 { font-size: 20px; } .product-presentation { font-size: 13px; } .product-code dt { font-size: 10px; } .product-footnote { font-size: 10px; } .product-kind { font-size: 9px; } .catalogue-status { padding: 24px; } .catalogue-status .secondary-link { margin-left: 0; display: flex; } .workspace-footer { flex-direction: column; gap: 8px; font-size: 10px; } .workspace-locked { padding: 40px 0; } }
+
+.identification { margin: 36px 0; padding: 28px; border: 1px solid #d8dfce; background: #fffefa; border-radius: 14px; scroll-margin-top: 24px; }
+.identify-title, .lookup-result-heading, .scanner-heading { display: flex; align-items: center; gap: 14px; justify-content: space-between; flex-wrap: wrap; }
+.identify-title > div { margin-right: auto; }
+.identify-title .eyebrow { margin: 0 0 6px; font-size: 10px; letter-spacing: 1.4px; }
+.identify-title h2 { font-size: 24px; font-weight: 500; letter-spacing: -.5px; }
+.lookup-intro { color: #637268; font-size: 14px; line-height: 1.7; }
+.identify-form { display: flex; align-items: end; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+.identify-form label { flex: 1 1 230px; font-size: 12px; }
+.identify-form button { font-size: 12px; padding-inline: 16px; }
+.lookup-secondary { background: #edf0e5; color: #274836; border: 1px solid #cfdbc3; font-size: 12px; }
+.lookup-help { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+.lookup-help > span, .lookup-small { font-size: 11px; line-height: 1.7; color: #637268; }
+.lookup-help button { color: #244b36; background: transparent; font-size: 12px; padding: 12px 0; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
+.lookup-status, .lookup-result, .manual-reference { margin-top: 22px; padding: 22px; border: 1px solid #dce2d2; border-radius: 10px; background: #f7f8f1; font-size: 13px; line-height: 1.7; }
+.lookup-status > a { display: block; color: #244b36; margin-top: 12px; }
+.lookup-result-heading h3 { font-size: 19px; margin: 0; font-weight: 500; }
+.lookup-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.lookup-fields > div { padding: 15px 0; border-bottom: 1px solid #dce2d2; }
+.lookup-fields dt { font-size: 11px; color: #637268; margin-bottom: 6px; }
+.lookup-fields dd { margin: 0; overflow-wrap: anywhere; }
+.lookup-warning { padding: 12px 14px; color: #705522; background: #f5edd8; border-radius: 7px; font-size: 12px; }
+.lookup-source { font-size: 11px; color: #637268; line-height: 1.8; }
+.lookup-source a { color: #244b36; }
+.lookup-local { display: grid; gap: 8px; margin: 18px 0; }
+.lookup-local button { color: #244b36; background: #e5ecda; font-size: 12px; text-align: left; }
+.manual-reference { display: grid; gap: 16px; }
+.manual-reference h3, .manual-reference p { margin: 0; }
+.manual-reference label { font-size: 12px; }
+.manual-reference > button { justify-self: start; font-size: 12px; }
+.physical-match { display: flex; align-items: flex-start; gap: 12px; font-weight: 400; line-height: 1.7; }
+.physical-match input { width: 20px; min-height: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; accent-color: #244b36; }
+.lookup-preview { padding: 18px; background: white; border-radius: 8px; border: 1px solid #d5dfca; }
+.lookup-preview p { margin: 8px 0 0; }
+.scanner-panel { margin-top: 18px; border: 1px solid #d5dfca; border-radius: 10px; padding: 18px; }
+.scanner-panel p { font-size: 12px; line-height: 1.7; }
+.scanner-heading button { font-size: 12px; padding: 12px 14px; }
+.scanner-video { position: relative; max-width: 640px; margin: 12px auto; background: #152d24; border-radius: 10px; overflow: hidden; }
+.scanner-video video { display: block; width: 100%; max-height: 360px; object-fit: contain; }
+.scanner-video > span { position: absolute; inset: 25% 10%; border: 2px solid #eef4da; border-radius: 8px; pointer-events: none; }
+@media (max-width: 600px) { .identification { padding: 20px; } .identify-title h2 { font-size: 21px; } .identify-title > .badge { display: none; } .identify-form { align-items: stretch; } .identify-form label { flex-basis: 100%; } .identify-form button { flex: 1 1 100%; } .lookup-fields { grid-template-columns: 1fr; } .lookup-result, .manual-reference { padding: 16px; } .workspace-nav { grid-template-columns: 1fr 1fr; gap: 8px; } .workspace-nav a { width: 100%; padding-inline: 10px; font-size: 11px; } .workspace-nav a > svg { width: 16px; } }
+
+.lookup-photo { margin: 18px 0; }
+.lookup-photo img { width: 200px; height: 200px; max-width: 100%; object-fit: contain; background: white; border-radius: 12px; }
+.lookup-photo figcaption { font-size: 11px; color: #637268; margin-top: 8px; }
+.lookup-photo-empty { padding: 24px; border: 1px dashed #b7c2b4; border-radius: 10px; color: #637268; text-align: center; }
+.lookup-fields > .lookup-allergens { grid-column: 1 / -1; padding: 16px; background: #fff3db; border: 1px solid #e4c993; border-radius: 10px; margin-top: 12px; }
+.lookup-allergens dd { font-weight: 600; }
+.lookup-allergens .lookup-small { font-weight: 400; }
+
+/* Product lookup: identity first, safety declaration second, provenance on demand. */
+.lookup-result { background: #fffefa; padding: 28px; border-radius: 16px; box-shadow: 0 5px 22px #203f2b06; }
+.lookup-result-heading { padding-bottom: 16px; border-bottom: 1px solid #e5e8dd; gap: 12px; }
+.lookup-result-heading h3 { font-size: 15px; font-weight: 600; color: #355640; }
+.lookup-result > .lookup-small { margin: 14px 0 0; font-size: 11px; }
+.lookup-product-overview { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 28px; align-items: center; margin: 24px 0 28px; }
+.lookup-product-overview .lookup-photo { margin: 0; min-width: 0; }
+.lookup-product-overview .lookup-photo img { display: block; width: 100%; height: 180px; padding: 12px; border: 1px solid #e8eadd; border-radius: 12px; }
+.lookup-photo figcaption { font-size: 9px; line-height: 1.6; margin-top: 8px; }
+.lookup-photo figcaption a { color: #637268; text-underline-offset: 2px; }
+.lookup-photo-empty { min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #f4f5ef; font-size: 11px; }
+.lookup-photo-empty svg { width: 28px; height: 28px; opacity: .6; }
+.lookup-product-summary { min-width: 0; overflow-wrap: anywhere; }
+.lookup-product-summary .eyebrow { font-size: 10px; letter-spacing: 1.5px; color: #637268; margin: 0 0 8px; }
+.lookup-product-summary h4 { font-size: clamp(24px, 3vw, 34px); font-weight: 500; line-height: 1.2; letter-spacing: -.8px; margin: 0; color: #203f2b; }
+.lookup-presentation { margin: 12px 0 0; font-size: 14px; color: #4c6152; }
+.lookup-match-note { font-size: 11px; color: #637268; margin: 18px 0 0; line-height: 1.7; }
+.lookup-allergen-panel { background: #fcf5e6; border: 1px solid #e9d9b4; border-radius: 12px; padding: 18px 20px; }
+.lookup-section-heading { display: flex; align-items: center; gap: 9px; color: #745324; flex-wrap: wrap; }
+.lookup-section-heading svg { width: 17px; height: 17px; flex-shrink: 0; }
+.lookup-section-heading h4, .lookup-nutrition h4 { margin: 0; font-size: 12px; font-weight: 600; }
+.lookup-section-heading > span { margin-left: auto; font-size: 10px; }
+.lookup-allergen-tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 14px 0 12px; }
+.lookup-allergen-tags li { border: 1px solid #e4cf9f; border-radius: 6px; padding: 5px 12px; background: #fffaf0; font-size: 12px; font-weight: 600; color: #684a21; }
+.lookup-allergen-panel .lookup-small { margin: 0; color: #77664b; font-size: 10px; }
+.lookup-unknown { font-size: 13px; color: #745324; }
+.lookup-nutrition { padding: 20px 0; border-bottom: 1px solid #e5e8dd; }
+.lookup-nutrition h4 { color: #526957; }
+.lookup-nutrition p { font-size: 12px; color: #637268; margin: 8px 0 0; overflow-wrap: anywhere; }
+.lookup-provenance { padding: 16px 0; }
+.lookup-provenance summary { cursor: pointer; font-size: 11px; color: #526957; padding: 4px 0; }
+.lookup-provenance summary span { margin-left: 10px; color: #6c776b; }
+.lookup-provenance summary:focus-visible { outline: 2px solid #355640; outline-offset: 4px; border-radius: 2px; }
+.lookup-result-action { margin-top: 8px; padding-top: 20px; border-top: 1px solid #e5e8dd; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.lookup-result-action p { margin: 0; color: #637268; font-size: 11px; }
+.lookup-result-action button { font-size: 12px; }
+@media (max-width: 600px) {
+ .lookup-result { padding: 18px; }
+ .lookup-result-heading .badge { font-size: 9px; }
+ .lookup-product-overview { grid-template-columns: 100px minmax(0, 1fr); gap: 16px; margin: 20px 0; align-items: start; }
+ .lookup-product-overview .lookup-photo img { height: 120px; padding: 8px; }
+ .lookup-photo-empty { min-height: 120px; padding: 12px 6px; font-size: 10px; }
+ .lookup-product-summary h4 { font-size: 23px; }
+ .lookup-product-summary .eyebrow { font-size: 9px; letter-spacing: .8px; }
+ .lookup-presentation { font-size: 12px; margin-top: 8px; }
+ .lookup-match-note { margin-top: 10px; font-size: 10px; }
+ .lookup-allergen-panel { padding: 15px; }
+ .lookup-result-action button { width: 100%; }
+}
+@media (max-width: 360px) { .lookup-product-overview { grid-template-columns: minmax(0, 1fr); } .lookup-product-overview .lookup-photo { max-width: 140px; } }
+
+/* Compact spacing while retaining readable groups and touch targets. */
+.lookup-result { padding: 22px; }
+.lookup-result-heading { padding-bottom: 12px; }
+.lookup-result > .lookup-small { margin-top: 10px; }
+.lookup-product-overview { grid-template-columns: 140px minmax(0, 1fr); gap: 20px; margin: 16px 0 18px; }
+.lookup-product-overview .lookup-photo img { height: 140px; padding: 8px; }
+.lookup-photo-empty { min-height: 140px; }
+.lookup-photo figcaption { margin-top: 5px; }
+.lookup-product-summary .eyebrow { margin-bottom: 6px; }
+.lookup-presentation { margin-top: 8px; }
+.lookup-match-note { margin-top: 10px; }
+.lookup-result .lookup-allergen-panel { max-width: none; padding: 14px 16px; }
+.lookup-allergen-tags { gap: 6px; margin: 10px 0 8px; }
+.lookup-allergen-tags li { padding: 4px 10px; }
+.lookup-result .lookup-nutrition { max-width: none; padding: 14px 0; }
+.lookup-nutrition p { margin-top: 6px; }
+.lookup-provenance { padding: 10px 0; }
+.lookup-result-action { margin-top: 4px; padding-top: 14px; gap: 12px; }
+@media (min-width: 1100px) {
+ .lookup-result { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: 24px; }
+ .lookup-result > * { grid-column: 1 / -1; min-width: 0; }
+ .lookup-result > .lookup-product-overview { grid-column: 1; }
+ .lookup-result > .lookup-allergen-panel { grid-column: 2; align-self: center; margin: 16px 0 18px; }
+}
+@media (max-width: 600px) {
+ .lookup-result { padding: 16px; }
+ .lookup-product-overview { grid-template-columns: 90px minmax(0, 1fr); gap: 14px; margin: 14px 0; }
+ .lookup-product-overview .lookup-photo img { height: 110px; }
+ .lookup-photo-empty { min-height: 110px; }
+ .lookup-result .lookup-allergen-panel { padding: 12px; }
+ .lookup-nutrition { padding: 12px 0; }
+ .lookup-result-action { padding-top: 12px; gap: 10px; }
+}
+@media (max-width: 360px) {
+ .lookup-product-overview { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+ .lookup-product-overview .lookup-photo { max-width: 120px; }
+}

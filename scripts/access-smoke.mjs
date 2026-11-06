@@ -31,6 +31,10 @@ class Browser {
     assert.ok(!('sessionSecret' in profile) && !('passwordHash' in profile.user));
     return profile;
   }
+  async identify(scope, barcode) {
+    const response = await this.request('/api/graphql', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: 'query Identify($input: ProductLookupInput!) { productLookup(input: $input) { state barcode reason source { synthetic reviewState } product { name { state value } allergens { state } nutrition { state } } localCandidates { id name } } }', variables: { input: { scope, barcode } } }) });
+    return response.json();
+  }
   async catalogue(scope, headers = {}) {
     const response = await this.request('/api/graphql', { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ query: 'query Catalogue($input: SiteScopeInput!) { catalogue(input: $input) { items { id name presentation barcode } hasMore } }', variables: { input: scope } }) });
     return response.json();
@@ -62,6 +66,16 @@ export async function accessSmoke(config, web) {
   assert.ok(productsA.data.catalogue.items.some(item => item.barcode === null));
   assert.equal(productsA.data.catalogue.hasMore, false);
   assert.ok(!('quantity' in productsA.data.catalogue.items[0]));
+  const identified = await browser.identify(scopeA, '0012345678905');
+  assert.equal(identified.data.productLookup.state, 'found');
+  assert.equal(identified.data.productLookup.source.synthetic, true);
+  assert.equal(identified.data.productLookup.source.reviewState, 'unreviewed');
+  assert.equal(identified.data.productLookup.localCandidates.length, 1);
+  assert.equal((await browser.identify(scopeA, '0000000000123')).data.productLookup.state, 'incomplete');
+  assert.equal((await browser.identify(scopeA, '12345678')).data.productLookup.state, 'absent');
+  assert.equal((await browser.identify(scopeA, '9999999999999')).data.productLookup.state, 'unavailable');
+  assert.equal((await browser.identify(scopeA, 'https://private.example')).errors[0].extensions.code, 'INVALID_INPUT');
+  assert.equal((await new Browser(origin).identify(scopeA, '0012345678905')).errors[0].extensions.code, 'UNAUTHENTICATED');
   assert.equal((await new Browser(origin).catalogue(scopeA)).errors[0].extensions.code, 'UNAUTHENTICATED');
   const b = new Browser(origin);
   const chefB = await b.login('chef.b@apptit.test', process.env.FIXTURE_CHEF_B_PASSWORD);
@@ -70,13 +84,17 @@ export async function accessSmoke(config, web) {
     const denied = await browser.site(badScope, { 'x-user-id': chefB.user.id, 'x-role': 'chef' });
     assert.equal(denied.errors[0].extensions.code, 'FORBIDDEN');
     assert.equal((await browser.catalogue(badScope, { 'x-role': 'chef' })).errors[0].extensions.code, 'FORBIDDEN');
+    assert.equal((await browser.identify(badScope, '0012345678905')).errors[0].extensions.code, 'FORBIDDEN');
   }
   assert.equal((await b.site(scopeA)).errors[0].extensions.code, 'FORBIDDEN');
   assert.equal((await b.catalogue(scopeA)).errors[0].extensions.code, 'FORBIDDEN');
   assert.equal((await b.catalogue(scopeB)).data.catalogue.items.length, 1);
+  assert.equal((await b.identify(scopeB, '0012345678905')).data.productLookup.localCandidates.length, 0);
   for (const headers of [{}, { 'x-internal-token': config.kitchenToken, 'x-correlation-id': randomUUID() }]) {
     const denied = await fetch(`${config.kitchenOrigin}/internal/v1/catalogue`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA }) });
     assert.equal(denied.status, 401, 'Catalogue cannot be read with only service credentials.');
+    const lookupDenied = await fetch(`${config.kitchenOrigin}/internal/v1/product-lookup`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, barcode: '0012345678905' }) });
+    assert.equal(lookupDenied.status, 401, 'Lookup requires service identity plus an authorized individual.');
   }
   const direct = await fetch(`${config.kitchenOrigin}/internal/v1/site-context`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ scope: scopeA }) });
   assert.equal(direct.status, 401);
@@ -105,6 +123,7 @@ export async function accessSmoke(config, web) {
     await stored.query('UPDATE "AccessSession" SET "revokedAt"=now() WHERE "tokenHash"=$1', [sessionHash(browser.cookies.get(SESSION_COOKIE), config.sessionHashKey)]);
     assert.equal((await browser.site(scopeA)).errors[0].extensions.code, 'SESSION_REVOKED');
     assert.equal((await browser.catalogue(scopeA)).errors[0].extensions.code, 'SESSION_REVOKED');
+    assert.equal((await browser.identify(scopeA, '0012345678905')).errors[0].extensions.code, 'SESSION_REVOKED');
     assert.equal((await browser.request('/workspace')).status, 307);
     for (const kind of ['absolute', 'idle']) {
       const expired = await loginFor('chef.b@apptit.test', 'FIXTURE_CHEF_B_PASSWORD');
@@ -134,6 +153,7 @@ export async function accessSmoke(config, web) {
   return async function unavailable() {
     assert.equal((await b.request('/api/session/current')).status, 503);
     assert.equal((await b.catalogue(scopeB)).errors[0].extensions.code, 'DEPENDENCY_UNAVAILABLE');
+    assert.equal((await b.identify(scopeB, '0012345678905')).errors[0].extensions.code, 'DEPENDENCY_UNAVAILABLE');
     assert.equal((await b.site(scopeB)).errors[0].extensions.code, 'DEPENDENCY_UNAVAILABLE');
     const failedLogout = await b.command('logout', {});
     assert.equal(failedLogout.status, 503);

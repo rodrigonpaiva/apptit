@@ -26,6 +26,10 @@ export interface RuntimeConfig {
   loginLimit: number;
   loginWindowSeconds: number;
   identityKitchenToken?: string;
+  offMode: 'disabled' | 'fixture' | 'live';
+  offUserAgent?: string;
+  offTimeoutMs: number;
+  offCacheSeconds: number;
 }
 const portKeys = { web: 'WEB_PORT', 'gateway-api': 'GATEWAY_PORT', identity: 'IDENTITY_PORT', kitchen: 'KITCHEN_PORT' } as const;
 function required(env: NodeJS.ProcessEnv, key: string): string {
@@ -58,7 +62,15 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
   if (required(env, 'ALLOW_INSECURE_LOCAL_COOKIES') !== 'true') throw new ConfigurationError('ALLOW_INSECURE_LOCAL_COOKIES');
   const origin = required(env, 'WEB_ORIGIN');
   if (origin !== `http://127.0.0.1:${ports['web']}`) throw new ConfigurationError('WEB_ORIGIN');
+  const offMode = required(env, 'OFF_MODE');
+  if (!['disabled', 'fixture', 'live'].includes(offMode)) throw new ConfigurationError('OFF_MODE');
+  let offUserAgent: string | undefined;
+  if (offMode === 'live') {
+    offUserAgent = required(env, 'OFF_USER_AGENT');
+    if (!/^Apptit\/[0-9.]+ \(https:\/\/github\.com\/rodrigonpaiva\/apptit\)$/.test(offUserAgent)) throw new ConfigurationError('OFF_USER_AGENT');
+  }
   const config: RuntimeConfig = {
+    offMode: offMode as RuntimeConfig['offMode'], offUserAgent, offTimeoutMs: positive(env, 'OFF_TIMEOUT_MS', 10000), offCacheSeconds: positive(env, 'OFF_CACHE_SECONDS', 86400),
     service, host: '127.0.0.1', port: ports[service]!, mode: 'synthetic',
     webOrigin: origin, sessionIdleSeconds: idle, sessionAbsoluteSeconds: absolute,
     sessionHashKey: token(env, 'SESSION_COOKIE_SECRET'), csrfKey: token(env, 'CSRF_SECRET'),
@@ -84,7 +96,7 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
     config.identityToken = token(env, 'IDENTITY_INTERNAL_TOKEN');
     config.kitchenToken = token(env, 'KITCHEN_INTERNAL_TOKEN');
   }
-  for (const key of ['OFF_MODE', 'AI_MODE', 'OCR_MODE', 'OFFLINE_MODE', 'EVIDENCE_MODE']) {
+  for (const key of ['AI_MODE', 'OCR_MODE', 'OFFLINE_MODE', 'EVIDENCE_MODE']) {
     if (required(env, key) !== 'disabled') throw new ConfigurationError(key);
   }
   return Object.freeze(config);

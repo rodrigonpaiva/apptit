@@ -5,6 +5,7 @@ if (!/^\d+$/.test(gatewayPort) || Number(gatewayPort) < 1 || Number(gatewayPort)
 export default {
   poweredByHeader: false,
   outputFileTracingRoot: resolve(import.meta.dirname, '../..'),
+  outputFileTracingIncludes: { '/api/scanner': ['../../node_modules/zxing-wasm/dist/reader/zxing_reader.wasm'] },
   async rewrites() {
     return [{ source: '/api/graphql', destination: `http://127.0.0.1:${gatewayPort}/graphql` }, { source: '/api/session/:path*', destination: `http://127.0.0.1:${gatewayPort}/session/:path*` }];
   },

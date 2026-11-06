@@ -40,6 +40,8 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP2-01 receiving/operation/evidence contracts](contracts/receiving.md) define the implemented pure validation slice and the still-disabled future persistence/posting/file ports.
 
+[SP2-02 product identification](contracts/product-identification.md) documents the protected OFF/manual read path, on-device decoder and explicit source modes.
+
 ## Implementation sequence
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.

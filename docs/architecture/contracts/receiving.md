@@ -91,3 +91,8 @@ The interface never increments quantity on scan. Same-code batches require an ex
 ## SP2-04 implementation update
 
 The evidence section above records the SP2-01 contract boundary. SP2-04 now implements the synthetic private-byte/metadata path described in [private evidence](private-evidence.md), retaining explicit pending/failed/available/readability states and server-owned attribution. Default evidence mode remains disabled; fixture mode is explicitly configured. OCR, full lifecycle/retention/restore and stock confirmation remain future work. Receipt evidence membership is queried from its scoped association index rather than automatically rewriting the receipt snapshot.
+
+
+## SP2-05 implementation update
+
+Procedure-bound actual temperature/condition observations and immutable correction history are implemented separately from receipt disposition in [receiving observations](receiving-observations.md). Explicit synthetic profile selection, missing/stale/estimated context and original rule snapshots do not establish goods eligibility. Default capture remains disabled; real PMS/chef disposition/stock activation is outside this slice.

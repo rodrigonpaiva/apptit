@@ -308,3 +308,12 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-evidence input[type=file] { width: 100%; min-width: 0; white-space: normal; }
 .receipt-evidence button { margin: 6px 6px 6px 0; max-width: 100%; white-space: normal; }
 .evidence-card { border: 1px solid #d8dfce; padding: 12px; margin: 12px 0; border-radius: 8px; }
+
+.receipt-observations { margin-top: 24px; padding-top: 16px; border-top: 1px solid #d8dfce; overflow-wrap: anywhere; }
+.receipt-observations h4, .receipt-observations h5 { margin: 0 0 10px; }
+.observation-warning { border: 1px solid #9b7840; border-radius: 8px; padding: 12px; color: #674821; background: #fcf6e8; font-size: 13px; line-height: 1.7; }
+.observation-fields, .observation-fields fieldset { min-width: 0; border: 1px solid #d8dfce; border-radius: 8px; padding: 16px; margin: 16px 0; }
+.observation-fields label { margin-block: 10px; }
+.observation-result, .observation-history article { border: 1px solid #d8dfce; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 13px; line-height: 1.7; }
+.receipt-observations .button-row button { max-width: 100%; white-space: normal; }
+@media (max-width: 600px) { .observation-fields, .observation-fields fieldset { padding: 10px; } .receipt-observations .button-row > button { width: 100%; } }

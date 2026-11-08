@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { evidenceSmoke } from './evidence-smoke.mjs';
+import { observationSmoke } from './observation-smoke.mjs';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { SESSION_COOKIE, sessionHash } from '../packages/runtime/dist/index.js';
@@ -40,6 +41,10 @@ class Browser {
     const bootstrap = await this.request('/api/session/csrf'); const { csrfToken } = await bootstrap.json();
     return this.request('/api/evidence/' + action, { method: 'POST', headers: { 'content-type': 'application/json', origin: this.origin, 'x-csrf-token': csrfToken, ...overrides }, body: JSON.stringify(input) });
   }
+  async observation(action, input, overrides = {}) {
+    const bootstrap = await this.request('/api/session/csrf'); const { csrfToken } = await bootstrap.json();
+    return this.request('/api/observations/' + action, { method: 'POST', headers: { 'content-type': 'application/json', origin: this.origin, 'x-csrf-token': csrfToken, ...overrides }, body: JSON.stringify(input) });
+  }
   async identify(scope, barcode) {
     const response = await this.request('/api/graphql', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query: 'query Identify($input: ProductLookupInput!) { productLookup(input: $input) { state barcode reason source { synthetic reviewState } product { name { state value } allergens { state } nutrition { state } } localCandidates { id name } } }', variables: { input: { scope, barcode } } }) });
     return response.json();
@@ -73,6 +78,7 @@ export async function accessSmoke(config, web) {
   assert.equal((await browser.receipt('list', { scope: scopeA }, { origin: 'https://untrusted.example' })).status, 403);
   assert.equal((await browser.request('/api/receipts/list', { method: 'POST', headers: { 'content-type': 'application/json', origin }, body: JSON.stringify({ scope: scopeA }) })).status, 403);
   const photo = await evidenceSmoke(browser, scopeA, chef.user);
+  const observations = await observationSmoke(browser, scopeA, chef.user);
   const productsA = await browser.catalogue(scopeA);
   assert.equal(productsA.data.catalogue.items.length, 3);
   assert.ok(productsA.data.catalogue.items.some(item => item.barcode === '0012345678905'));
@@ -94,6 +100,8 @@ export async function accessSmoke(config, web) {
   const chefB = await b.login('chef.b@apptit.test', process.env.FIXTURE_CHEF_B_PASSWORD);
   const scopeB = { tenantId: chefB.selectedSite.tenantId, siteId: chefB.selectedSite.siteId };
   assert.equal((await b.evidence('read', { scope: scopeB, id: photo.id })).status, 404);
+  assert.equal((await b.observation('history', { scope: scopeB, id: observations.id })).status, 404);
+  assert.equal((await b.observation('history', { scope: scopeA, id: observations.id })).status, 403);
   assert.equal((await b.evidence('read', { scope: scopeA, id: photo.id })).status, 403);
   for (const badScope of [scopeB, { ...scopeA, tenantId: scopeB.tenantId }, { ...scopeA, siteId: scopeB.siteId }]) {
     const denied = await browser.site(badScope, { 'x-user-id': chefB.user.id, 'x-role': 'chef' });
@@ -112,6 +120,8 @@ export async function accessSmoke(config, web) {
     assert.equal(receiptDenied.status, 401);
     const evidenceDenied = await fetch(`${config.kitchenOrigin}/internal/v1/evidence/list`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, receiptId: photo.receiptId }) });
     assert.equal(evidenceDenied.status, 401);
+    const observationDenied = await fetch(`${config.kitchenOrigin}/internal/v1/observations/list`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, receiptId: observations.receiptId }) });
+    assert.equal(observationDenied.status, 401);
     const lookupDenied = await fetch(`${config.kitchenOrigin}/internal/v1/product-lookup`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, barcode: '0012345678905' }) });
     assert.equal(lookupDenied.status, 401, 'Lookup requires service identity plus an authorized individual.');
   }
@@ -131,11 +141,15 @@ export async function accessSmoke(config, web) {
     const stock = await loginFor('stock.a@apptit.test', 'FIXTURE_STOREKEEPER_A_PASSWORD');
     assert.equal(stock.profile.selectedSite.role, 'storekeeper');
     assert.ok(!stock.profile.selectedSite.capabilities.includes('quantity-draft.write'));
+    assert.ok(stock.profile.selectedSite.capabilities.includes('observation.capture'));
+    assert.ok(!stock.profile.selectedSite.capabilities.includes('receipt.disposition'));
+    await observationSmoke(stock.instance, scopeA, stock.profile.user);
     const old = browser.clone();
     const cook = await browser.login('cook.a@apptit.test', process.env.FIXTURE_COOK_A_PASSWORD);
     assert.equal(cook.selectedSite.role, 'cook');
     assert.equal((await browser.receipt('list', { scope: scopeA })).status, 403);
     assert.equal((await browser.evidence('read', { scope: scopeA, id: photo.id })).status, 403);
+    assert.equal((await browser.observation('history', { scope: scopeA, id: observations.id })).status, 403);
     assert.equal((await stock.instance.receipt('locations', { scope: scopeA })).status, 201);
     assert.ok(!cook.selectedSite.capabilities.includes('quantity-draft.write'));
     assert.equal((await old.site(scopeA)).errors[0].extensions.code, 'SESSION_REVOKED');
@@ -148,6 +162,7 @@ export async function accessSmoke(config, web) {
     assert.equal((await browser.identify(scopeA, '0012345678905')).errors[0].extensions.code, 'SESSION_REVOKED');
     assert.equal((await browser.receipt('list', { scope: scopeA })).status, 401);
     assert.equal((await browser.evidence('read', { scope: scopeA, id: photo.id })).status, 401);
+    assert.equal((await browser.observation('history', { scope: scopeA, id: observations.id })).status, 401);
     assert.equal((await browser.request('/workspace')).status, 307);
     for (const kind of ['absolute', 'idle']) {
       const expired = await loginFor('chef.b@apptit.test', 'FIXTURE_CHEF_B_PASSWORD');

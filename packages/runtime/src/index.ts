@@ -27,6 +27,7 @@ export interface RuntimeConfig {
   loginLimit: number;
   loginWindowSeconds: number;
   identityKitchenToken?: string;
+  observationMode: 'disabled' | 'fixture';
   evidenceMode: 'disabled' | 'fixture';
   evidenceRoot?: string;
   evidenceMaxBytes: number;
@@ -73,10 +74,13 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
     offUserAgent = required(env, 'OFF_USER_AGENT');
     if (!/^Apptit\/[0-9.]+ \(https:\/\/github\.com\/rodrigonpaiva\/apptit\)$/.test(offUserAgent)) throw new ConfigurationError('OFF_USER_AGENT');
   }
+  const observationMode = required(env, 'OBSERVATION_MODE');
+  if (!['disabled', 'fixture'].includes(observationMode)) throw new ConfigurationError('OBSERVATION_MODE');
   const evidenceMode = required(env, 'EVIDENCE_MODE');
   if (!['disabled', 'fixture'].includes(evidenceMode)) throw new ConfigurationError('EVIDENCE_MODE');
   const evidenceMaxBytes = evidenceMode === 'fixture' ? positive(env, 'EVIDENCE_MAX_BYTES', 2_097_152) : 0;
   const config: RuntimeConfig = {
+    observationMode: observationMode as RuntimeConfig['observationMode'],
     evidenceMode: evidenceMode as RuntimeConfig['evidenceMode'], evidenceMaxBytes,
     offMode: offMode as RuntimeConfig['offMode'], offUserAgent, offTimeoutMs: positive(env, 'OFF_TIMEOUT_MS', 10000), offCacheSeconds: positive(env, 'OFF_CACHE_SECONDS', 86400),
     service, host: '127.0.0.1', port: ports[service]!, mode: 'synthetic',

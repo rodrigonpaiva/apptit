@@ -17,3 +17,4 @@ export * from './evidence.js';
 export * from './product-lookup.js';
 export * from './receipt-workspace.js';
 export * from './evidence-workspace.js';
+export * from './observations.js';

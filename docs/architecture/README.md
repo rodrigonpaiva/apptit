@@ -44,6 +44,8 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP2-03 receipt drafts](../delivery/SP2-03.md) implement scoped save/reload and durable draft retry. [SP2-04 private evidence](contracts/private-evidence.md) adds opt-in synthetic label bytes, metadata and failure states.
 
+[SP2-05 receiving observations](contracts/receiving-observations.md) define actual capture, synthetic versioned profiles, assessment and correction history without chef disposition or stock authority.
+
 ## Implementation sequence
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.

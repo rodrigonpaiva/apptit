@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ReceivingObservations } from './application/receiving-observations.js';
 import { EvidenceWorkspace } from './application/evidence-workspace.js';
 import { boundedBytes, EvidenceStorageFailure } from './infra/private-evidence-store.js';
 import { ReceiptWorkspace, ReceiptFailure } from './application/receipt-workspace.js';
@@ -45,6 +46,21 @@ async function bootstrap(): Promise<void> {
   @Controller('internal/v1')
   class ScopedController {
     constructor(private readonly database: Database) {}
+    private async observation(req: Request, input: unknown, action: 'save' | 'list' | 'history') {
+      try {
+        if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
+        const secret = req.headers['x-session-secret']; const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
+          { scope: (input as { scope?: unknown })?.scope, capability: action === 'save' ? 'observation.capture' : 'observation.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        return await new ReceivingObservations(this.database, config)[action](input, context);
+      } catch (error) {
+        if (error instanceof AuthFailure || error instanceof ReceiptFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);
+        throw new ServiceUnavailableException({ code: 'OUTCOME_UNCERTAIN' });
+      }
+    }
+    @Post('observations/save') saveObservation(@Req() req: Request, @Body() input: unknown) { return this.observation(req, input, 'save'); }
+    @Post('observations/list') listObservations(@Req() req: Request, @Body() input: unknown) { return this.observation(req, input, 'list'); }
+    @Post('observations/history') observationHistory(@Req() req: Request, @Body() input: unknown) { return this.observation(req, input, 'history'); }
     private async evidence(req: Request, input: unknown, action: 'begin' | 'list' | 'review' | 'read' | 'upload', response?: Response) {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);

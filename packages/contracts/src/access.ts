@@ -1,5 +1,5 @@
 import type { Scope, TrustedActorContext } from './quantity-draft.js';
-export type AccessCapability = 'site.read' | 'catalogue.read' | 'quantity-draft.read' | 'quantity-draft.write' | 'receipt.draft.read' | 'receipt.draft.write' | 'evidence.read' | 'evidence.write';
+export type AccessCapability = 'site.read' | 'catalogue.read' | 'quantity-draft.read' | 'quantity-draft.write' | 'receipt.draft.read' | 'receipt.draft.write' | 'evidence.read' | 'evidence.write' | 'observation.read' | 'observation.capture';
 export type SiteRole = 'chef' | 'storekeeper' | 'cook';
 export interface SiteAccess extends Scope {
   name: string;

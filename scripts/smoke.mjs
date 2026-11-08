@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { setTimeout as pause } from 'node:timers/promises';
@@ -10,6 +13,7 @@ const { Pool } = require('pg');
 const children = [];
 let output = '';
 let stopping = false;
+let evidenceRoot;
 function redact(value) {
   for (const [key, secret] of Object.entries(process.env)) {
     if (/PASSWORD|TOKEN|SECRET|DATABASE_URL/.test(key) && secret) value = value.replaceAll(secret, '[redacted]');
@@ -40,6 +44,8 @@ async function stop() {
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => { void stop().then(() => process.exit(1)); });
 try {
   loadLocalEnv();
+  evidenceRoot = await mkdtemp(path.join(tmpdir(), 'apptit-smoke-evidence-'));
+  process.env.EVIDENCE_MODE = 'fixture'; process.env.EVIDENCE_ROOT = evidenceRoot; process.env.EVIDENCE_MAX_BYTES = '2097152';
   if (process.env.OFF_MODE !== 'fixture') throw new Error('Smoke requires OFF_MODE=fixture; live provider traffic is not a test dependency.');
   for (const service of ['identity', 'kitchen', 'gateway-api', 'web']) {
     const config = readConfig(service, serviceEnv(service));
@@ -116,8 +122,8 @@ try {
   const degraded = await fetch(`${gateway.gatewayOrigin}/health/ready`);
   assert.equal(degraded.status, 503);
   await verifyUnavailable();
-  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue, synthetic seeds, internal authentication, database isolation and degraded readiness.');
+  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue and receipt images, synthetic seeds, internal authentication, database isolation and degraded readiness.');
 } catch (error) {
   console.error(redact(`${error.message}\n${output}`));
   process.exitCode = 1;
-} finally { await stop(); }
+} finally { await stop(); if (evidenceRoot) await rm(evidenceRoot, { recursive: true, force: true }); }

@@ -1,7 +1,7 @@
 import type { AuthCode, SiteAccess, SiteRole } from '@apptit/contracts';
 export interface IdentityUser { id: string; login: string; name: string; passwordHash: string; isActive: boolean }
 export interface StoredSession { id: string; tokenHash: string; userId: string; selectedSiteId: string; expiresAt: Date; lastSeenAt: Date; revokedAt: Date | null; user: IdentityUser }
-export const roleCapabilities = (role: SiteRole): SiteAccess['capabilities'] => role === 'chef' ? ['site.read', 'catalogue.read', 'quantity-draft.read', 'quantity-draft.write', 'receipt.draft.read', 'receipt.draft.write'] : role === 'storekeeper' ? ['site.read', 'catalogue.read', 'quantity-draft.read', 'receipt.draft.read', 'receipt.draft.write'] : role === 'cook' ? ['site.read', 'catalogue.read'] : [];
+export const roleCapabilities = (role: SiteRole): SiteAccess['capabilities'] => role === 'chef' ? ['site.read', 'catalogue.read', 'quantity-draft.read', 'quantity-draft.write', 'receipt.draft.read', 'receipt.draft.write', 'evidence.read', 'evidence.write'] : role === 'storekeeper' ? ['site.read', 'catalogue.read', 'quantity-draft.read', 'receipt.draft.read', 'receipt.draft.write', 'evidence.read', 'evidence.write'] : role === 'cook' ? ['site.read', 'catalogue.read'] : [];
 export interface SessionRepository {
   user(login: string): Promise<IdentityUser | null>;
   memberships(userId: string): Promise<SiteAccess[]>;

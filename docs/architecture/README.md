@@ -36,11 +36,13 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP1-05 catalogue contracts](contracts/catalogue.md) document the scoped product-reference read and visible workspace list.
 
-[Sprint 2 handoff](contracts/sprint-2-handoff.md) distinguishes verified primitives from receiving/stock/evidence contracts still to implement in SP2-01.
+[Sprint 2 handoff](contracts/sprint-2-handoff.md) records the historical foundation boundary and the current Sprint 2 continuation.
 
-[SP2-01 receiving/operation/evidence contracts](contracts/receiving.md) define the implemented pure validation slice and the still-disabled future persistence/posting/file ports.
+[SP2-01 receiving/operation/evidence contracts](contracts/receiving.md) define receiving validation and the subsequent draft/evidence implementation boundaries; stock posting remains future work.
 
 [SP2-02 product identification](contracts/product-identification.md) documents the protected OFF/manual read path, on-device decoder and explicit source modes.
+
+[SP2-03 receipt drafts](../delivery/SP2-03.md) implement scoped save/reload and durable draft retry. [SP2-04 private evidence](contracts/private-evidence.md) adds opt-in synthetic label bytes, metadata and failure states.
 
 ## Implementation sequence
 

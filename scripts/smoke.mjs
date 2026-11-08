@@ -45,6 +45,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => { void st
 try {
   loadLocalEnv();
   evidenceRoot = await mkdtemp(path.join(tmpdir(), 'apptit-smoke-evidence-'));
+  process.env.OBSERVATION_MODE = 'fixture';
   process.env.EVIDENCE_MODE = 'fixture'; process.env.EVIDENCE_ROOT = evidenceRoot; process.env.EVIDENCE_MAX_BYTES = '2097152';
   if (process.env.OFF_MODE !== 'fixture') throw new Error('Smoke requires OFF_MODE=fixture; live provider traffic is not a test dependency.');
   for (const service of ['identity', 'kitchen', 'gateway-api', 'web']) {
@@ -122,7 +123,7 @@ try {
   const degraded = await fetch(`${gateway.gatewayOrigin}/health/ready`);
   assert.equal(degraded.status, 503);
   await verifyUnavailable();
-  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue and receipt images, synthetic seeds, internal authentication, database isolation and degraded readiness.');
+  console.log('PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue, receipt images and synthetic observations, synthetic seeds, internal authentication, database isolation and degraded readiness.');
 } catch (error) {
   console.error(redact(`${error.message}\n${output}`));
   process.exitCode = 1;

@@ -1,0 +1,29 @@
+
+> apptit@0.0.0 db:migrate
+> node scripts/database.mjs migrate
+
+Loaded Prisma config from services/identity/prisma.config.ts.
+
+Prisma schema loaded from services/identity/prisma/schema.prisma.
+Datasource "db": PostgreSQL database "apptit_identity_synthetic", schema "public" at "127.0.0.1:55432"
+
+2 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Loaded Prisma config from services/kitchen/prisma.config.ts.
+
+Prisma schema loaded from services/kitchen/prisma/schema.prisma.
+Datasource "db": PostgreSQL database "apptit_kitchen_synthetic", schema "public" at "127.0.0.1:55432"
+
+6 migrations found in prisma/migrations
+
+Applying migration `202611080002_receiving_observations`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 202611080002_receiving_observations/
+    └─ migration.sql
+
+All migrations have been successfully applied.

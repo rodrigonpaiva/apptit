@@ -36,8 +36,8 @@ GraphQL `siteContext` returns only the verified actor/site/role/capabilities, no
 
 | Role | Explicit test capabilities |
 | --- | --- |
-| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write |
-| Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write, evidence.read/write |
+| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write, observation.read/capture |
+| Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write, evidence.read/write, observation.read/capture |
 | Cook | site.read, catalogue.read |
 
 No stock withdrawal, product grant, safety disposition, menu publication, director substitution or platform-administrator bypass is enabled. Quantity-draft methods remain internal pending an actual business command adapter. Existing SP1-03 attribution contexts can now be constructed by Identity, without accepting client identity claims.
@@ -57,3 +57,5 @@ No local durable draft/observation queue is enabled. SP2-03 receipt editing is m
 - [OWASP CSRF prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html).
 
 These sources informed implementation choices; no external security certification or live deployment readiness is claimed.
+
+SP2-05 observation capture is separate from receipt disposition. No disposition or stock grant is activated; see the [observation contract](receiving-observations.md).

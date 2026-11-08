@@ -58,6 +58,12 @@ export class ReceiptWorkspace {
           const line = command.payload.lines.find(line => line.id === links.lineId);
           if (!line || line.product.productId !== links.productId || line.product.presentationId !== links.presentationId || line.batch.id !== links.batchId) throw new ReceiptFailure('EVIDENCE_LINK_CONFLICT', 409);
         }
+        const observations = await tx.receiptObservation.findMany({ where: { ...command.scope, receiptId: command.receiptId } });
+        for (const row of observations) {
+          const target = (row.snapshot as unknown as { target: { lineId: string; productId: string; presentationId: string; batchId: string } }).target;
+          const line = command.payload.lines.find(line => line.id === target.lineId);
+          if (!line || line.product.productId !== target.productId || line.product.presentationId !== target.presentationId || line.batch.id !== target.batchId) throw new ReceiptFailure('OBSERVATION_LINK_CONFLICT', 409);
+        }
         const where = { id: command.receiptId, ...command.scope };
         const before = await tx.receiptDraft.findFirst({ where });
         if (!before && command.expectedVersion !== 0) throw new ReceiptFailure('NOT_FOUND', 404);

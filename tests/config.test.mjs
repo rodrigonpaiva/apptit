@@ -51,3 +51,9 @@ test('private evidence mode requires explicit bounded configuration and rejects 
   assert.equal(readConfig('kitchen', env).evidenceMode, 'fixture');
   for (const override of [{ EVIDENCE_ROOT: '' }, { EVIDENCE_ROOT: './public' }, { EVIDENCE_ROOT: '/tmp/public/photos' }, { EVIDENCE_MAX_BYTES: '0' }, { EVIDENCE_MAX_BYTES: '2097153' }, { EVIDENCE_MODE: 'live' }]) assert.throws(() => readConfig('kitchen', { ...env, ...override }), ConfigurationError);
 });
+
+test('receiving observation mode is explicitly synthetic and cannot activate live PMS rules', () => {
+  assert.equal(readConfig('kitchen', { ...fixture(), OBSERVATION_MODE: 'fixture' }).observationMode, 'fixture');
+  assert.equal(readConfig('kitchen', fixture()).observationMode, 'disabled');
+  for (const mode of ['', 'live', 'automatic']) assert.throws(() => readConfig('kitchen', { ...fixture(), OBSERVATION_MODE: mode }), ConfigurationError);
+});

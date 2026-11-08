@@ -155,3 +155,40 @@ model ReceiptEvidenceEvent {
   snapshot Json
   @@index([tenantId, siteId, evidenceId])
 }
+
+model ReceiptObservation {
+  id String @id @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  receiptId String @db.Uuid
+  lineId String @db.Uuid
+  version Int
+  snapshot Json
+  recordedAt DateTime @db.Timestamptz(3)
+  @@unique([tenantId, siteId, receiptId, lineId])
+  @@unique([id, tenantId, siteId])
+  @@index([tenantId, siteId, receiptId])
+}
+model ReceiptObservationRevision {
+  observationId String @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  version Int
+  actorId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  snapshot Json
+  @@id([observationId, version])
+  @@index([tenantId, siteId, observationId])
+}
+model ReceiptObservationOperation {
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  actorId String @db.Uuid
+  operationId String @db.Uuid
+  intentHash String @db.Char(64)
+  snapshot Json
+  recordedAt DateTime @db.Timestamptz(3)
+  @@id([tenantId, siteId, actorId, operationId])
+}

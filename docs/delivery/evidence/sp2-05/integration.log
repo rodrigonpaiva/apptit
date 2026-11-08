@@ -1,0 +1,264 @@
+
+> apptit@0.0.0 test:integration
+> node scripts/integration.mjs
+
+TAP version 13
+# Subtest: catalogue read keeps both scope IDs, textual leading zeros and a real empty state; missing capability is denied
+ok 1 - catalogue read keeps both scope IDs, textual leading zeros and a real empty state; missing capability is denied
+  ---
+  duration_ms: 110.951417
+  type: 'test'
+  ...
+# Subtest: catalogue read is bounded, deterministic and reports truncation rather than claiming completeness
+ok 2 - catalogue read is bounded, deterministic and reports truncation rather than claiming completeness
+  ---
+  duration_ms: 35.924083
+  type: 'test'
+  ...
+# Subtest: private evidence preserves original links/author/times; concurrent retries and reload create one immutable image
+ok 3 - private evidence preserves original links/author/times; concurrent retries and reload create one immutable image
+  ---
+  duration_ms: 341.958875
+  type: 'test'
+  ...
+# Subtest: evidence authorization, foreign links, forged metadata and changed upload intent are rejected without disclosing bytes
+ok 4 - evidence authorization, foreign links, forged metadata and changed upload intent are rejected without disclosing bytes
+  ---
+  duration_ms: 164.090334
+  type: 'test'
+  ...
+# Subtest: failed/incomplete/tampered images never become available; same upload can recover without overwriting originals
+ok 5 - failed/incomplete/tampered images never become available; same upload can recover without overwriting originals
+  ---
+  duration_ms: 135.559417
+  type: 'test'
+  ...
+# Subtest: evidence metadata/audit rollback leaves no false availability and recovers durable bytes after lost DB commit
+ok 6 - evidence metadata/audit rollback leaves no false availability and recovers durable bytes after lost DB commit
+  ---
+  duration_ms: 65.015292
+  type: 'test'
+  ...
+# Subtest: private file adapter rejects public roots, symlinks, excessive bytes and unsafe directory permissions
+ok 7 - private file adapter rejects public roots, symlinks, excessive bytes and unsafe directory permissions
+  ---
+  duration_ms: 36.336917
+  type: 'test'
+  ...
+# Subtest: disabled evidence is explicit and cannot upload even with draft/evidence rights
+ok 8 - disabled evidence is explicit and cannot upload even with draft/evidence rights
+  ---
+  duration_ms: 15.977792
+  type: 'test'
+  ...
+# Subtest: receiving observation stores server-owned profile/author, independent observed/recorded times and immutable reasoned corrections
+ok 9 - receiving observation stores server-owned profile/author, independent observed/recorded times and immutable reasoned corrections
+  ---
+  duration_ms: 228.398209
+  type: 'test'
+  ...
+# Subtest: profile changes do not rewrite historical assessments or silently replace the original rule on correction
+ok 10 - profile changes do not rewrite historical assessments or silently replace the original rule on correction
+  ---
+  duration_ms: 138.109625
+  type: 'test'
+  ...
+# Subtest: missing/stale/estimated context stays pending or inconclusive; wrong unit cannot create an observation
+ok 11 - missing/stale/estimated context stays pending or inconclusive; wrong unit cannot create an observation
+  ---
+  duration_ms: 118.636708
+  type: 'test'
+  ...
+# Subtest: duplicate saves replay once and competing corrections have one winner without altering originals
+ok 12 - duplicate saves replay once and competing corrections have one winner without altering originals
+  ---
+  duration_ms: 110.698459
+  type: 'test'
+  ...
+# Subtest: scope, capability, actual receipt version and original target bindings are checked before writes
+ok 13 - scope, capability, actual receipt version and original target bindings are checked before writes
+  ---
+  duration_ms: 48.255416
+  type: 'test'
+  ...
+# Subtest: failed observation audit or operation commits roll back all draft/revision changes
+ok 14 - failed observation audit or operation commits roll back all draft/revision changes
+  ---
+  duration_ms: 55.823125
+  type: 'test'
+  ...
+# Subtest: retry rechecks committed operation after acquiring the receipt lock, even when receipt context changes meanwhile
+ok 15 - retry rechecks committed operation after acquiring the receipt lock, even when receipt context changes meanwhile
+  ---
+  duration_ms: 41.47675
+  type: 'test'
+  ...
+# Subtest: history is scoped and paginated; disabling new capture preserves reads and committed retry outcomes
+ok 16 - history is scoped and paginated; disabling new capture preserves reads and committed retry outcomes
+  ---
+  duration_ms: 117.600042
+  type: 'test'
+  ...
+# Subtest: lookup maps complete/incomplete/absent/malformed states without guessing allergens, nutrition, batch or stock
+ok 17 - lookup maps complete/incomplete/absent/malformed states without guessing allergens, nutrition, batch or stock
+  ---
+  duration_ms: 6.040708
+  type: 'test'
+  ...
+# Subtest: disabled/fixture paths never contact the network; deterministic examples retain unknown states
+ok 18 - disabled/fixture paths never contact the network; deterministic examples retain unknown states
+  ---
+  duration_ms: 0.309292
+  type: 'test'
+  ...
+# Subtest: live transport is fixed-host read-only, sends no actor/site/session and coalesces/caches only public snapshots
+ok 19 - live transport is fixed-host read-only, sends no actor/site/session and coalesces/caches only public snapshots
+  ---
+  duration_ms: 28.838083
+  type: 'test'
+  ...
+# Subtest: HTTP errors, malformed/oversized bodies and expired-cache outages never become absence or stale success
+ok 20 - HTTP errors, malformed/oversized bodies and expired-cache outages never become absence or stale success
+  ---
+  duration_ms: 1.992875
+  type: 'test'
+  ...
+# Subtest: provider Retry-After seconds/date and local request budget fail explicitly without automatic retry
+ok 21 - provider Retry-After seconds/date and local request budget fail explicitly without automatic retry
+  ---
+  duration_ms: 2.146375
+  type: 'test'
+  ...
+# Subtest: deadline failures are unavailable and invalid identifiers never trigger a public request
+ok 22 - deadline failures are unavailable and invalid identifiers never trigger a public request
+  ---
+  duration_ms: 0.359041
+  type: 'test'
+  ...
+# Subtest: product photos accept only fixed public OFF image paths and remain optional
+ok 23 - product photos accept only fixed public OFF image paths and remain optional
+  ---
+  duration_ms: 0.369666
+  type: 'test'
+  ...
+# Subtest: round-trip exact maximum/zero/unknown data, immutable author snapshots and read from a fresh connection
+ok 24 - round-trip exact maximum/zero/unknown data, immutable author snapshots and read from a fresh connection
+  ---
+  duration_ms: 263.247958
+  type: 'test'
+  ...
+# Subtest: missing trusted principal, wrong capability/scope, forged metadata and foreign resource IDs cannot write/read another site
+ok 25 - missing trusted principal, wrong capability/scope, forged metadata and foreign resource IDs cannot write/read another site
+  ---
+  duration_ms: 77.330084
+  type: 'test'
+  ...
+# Subtest: two simultaneous updates of one version produce one winner and one conflict, with no extra revision
+ok 26 - two simultaneous updates of one version produce one winner and one conflict, with no extra revision
+  ---
+  duration_ms: 102.156459
+  type: 'test'
+  ...
+# Subtest: audit-write failure rolls back a real draft update and returns no fabricated save
+ok 27 - audit-write failure rolls back a real draft update and returns no fabricated save
+  ---
+  duration_ms: 69.219667
+  type: 'test'
+  ...
+# Subtest: invalid unit/precision/date/state returns recoverable issues before writing
+ok 28 - invalid unit/precision/date/state returns recoverable issues before writing
+  ---
+  duration_ms: 24.214416
+  type: 'test'
+  ...
+# Subtest: versioned migration chain builds the same storage from empty schema without changing existing records
+ok 29 - versioned migration chain builds the same storage from empty schema without changing existing records
+  ---
+  duration_ms: 54.811458
+  type: 'test'
+  ...
+# Subtest: receipt save/reopen keeps two same-code batches, exact checked conversion, pending data and authoritative actor without catalogue or stock effects
+ok 30 - receipt save/reopen keeps two same-code batches, exact checked conversion, pending data and authoritative actor without catalogue or stock effects
+  ---
+  duration_ms: 199.217166
+  type: 'test'
+  ...
+# Subtest: receipt operations replay once across concurrent retries and reject changed payloads without new revisions
+ok 31 - receipt operations replay once across concurrent retries and reject changed payloads without new revisions
+  ---
+  duration_ms: 123.255417
+  type: 'test'
+  ...
+# Subtest: competing receipt versions produce one winner and transactional audit; stale revisions cannot overwrite
+ok 32 - competing receipt versions produce one winner and transactional audit; stale revisions cannot overwrite
+  ---
+  duration_ms: 84.555375
+  type: 'test'
+  ...
+# Subtest: receipt scope/capability/destination checks prevent foreign reads and writes and leave no partial draft
+ok 33 - receipt scope/capability/destination checks prevent foreign reads and writes and leave no partial draft
+  ---
+  duration_ms: 88.576959
+  type: 'test'
+  ...
+# Subtest: invalid conversion, forged metadata, unsupported evidence and duplicate lines cannot be persisted
+ok 34 - invalid conversion, forged metadata, unsupported evidence and duplicate lines cannot be persisted
+  ---
+  duration_ms: 0.815875
+  type: 'test'
+  ...
+# Subtest: receipt audit or outcome failure rolls back the draft, revision and operation together
+ok 35 - receipt audit or outcome failure rolls back the draft, revision and operation together
+  ---
+  duration_ms: 108.76725
+  type: 'test'
+  ...
+# Subtest: full Kitchen migration chain adds receipt drafts while preserving populated foundation data
+ok 36 - full Kitchen migration chain adds receipt drafts while preserving populated foundation data
+  ---
+  duration_ms: 70.03875
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 991.441875
+TAP version 13
+# Subtest: individual login stores only hashes, constructs author context and blocks revoked sessions immediately
+ok 1 - individual login stores only hashes, constructs author context and blocks revoked sessions immediately
+  ---
+  duration_ms: 385.424291
+  type: 'test'
+  ...
+# Subtest: idle and absolute expiry cannot be revived by a new protected request
+ok 2 - idle and absolute expiry cannot be revived by a new protected request
+  ---
+  duration_ms: 365.77125
+  type: 'test'
+  ...
+# Subtest: membership/role/account changes are checked afresh and a wrong tenant/site is denied
+ok 3 - membership/role/account changes are checked afresh and a wrong tenant/site is denied
+  ---
+  duration_ms: 281.935083
+  type: 'test'
+  ...
+# Subtest: re-login rotates the secret and revokes the old session atomically; password failures remain generic and throttled
+ok 4 - re-login rotates the secret and revokes the old session atomically; password failures remain generic and throttled
+  ---
+  duration_ms: 587.309458
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1718.481583

@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. SP2-03 adds scoped receipt draft save/reload without stock effects. The SP2-04 feature adds opt-in synthetic private label photos with original attribution, failure/retry states and manual fallback. Stock operations, OCR, offline capture and live operational deployment remain outside the enabled slice.
+The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. SP2-03 adds scoped receipt draft save/reload without stock effects. SP2-04 adds opt-in synthetic private label photos with original attribution, failure/retry states and manual fallback. The SP2-05 feature adds explicit synthetic procedure-bound temperature/condition capture, versioned assessments and preserved corrections. Stock operations, OCR, offline capture and live operational deployment remain outside the enabled slice.
 
 ## Run locally
 
@@ -107,3 +107,5 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 
 - [SP2-03 receipt drafts](docs/delivery/SP2-03.md)
 - [SP2-04 private label evidence](docs/delivery/SP2-04.md)
+
+- [SP2-05 procedure-bound receiving observations](docs/delivery/SP2-05.md)

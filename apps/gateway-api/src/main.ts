@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ReceiptController } from './receipt.controller.js';
 import { productLookupResolver, productLookupSchema } from './product-lookup.js';
 import { catalogueResolver, catalogueSchema } from './catalogue.js';
 import { SessionController } from './session.controller.js';
@@ -50,7 +51,7 @@ async function bootstrap(): Promise<void> {
       includeStacktraceInErrorResponses: false,
       formatError: error => ({ message: 'GraphQL request rejected', extensions: { code: error.extensions?.['code'] ?? 'INTERNAL_ERROR' } }),
     })],
-    controllers: [HealthController, SessionController],
+    controllers: [HealthController, SessionController, ReceiptController],
   })
   class GatewayModule {}
   const app = await NestFactory.create<NestExpressApplication>(GatewayModule, { logger: ['error', 'warn'], abortOnError: false });

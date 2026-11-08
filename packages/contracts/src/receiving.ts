@@ -1,6 +1,6 @@
 import type { ActorSnapshot, ApplicationError, Datum, Decimal, Expiry, Instant, Quantity, Scope } from './quantity-draft.js';
 
-/** SP2-01 contract/validation only. No receiving grants, routes, tables or stock posting are enabled. */
+/** SP2-01 receiving types; SP2-03 adds draft-only persistence. Stock/evidence ports remain future contracts. */
 export interface ReceiptProductIdentity {
   productId: string;
   presentationId: string;

@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "role": "synthetic storekeeper",
+  "widths": [
+    320,
+    375,
+    768,
+    1440
+  ],
+  "repeatScanNoIncrement": true,
+  "twoBatches": true,
+  "checkedTenFiveKgBags": "50 kg",
+  "saveReload": true,
+  "lostResponseSameOperationReplay": true,
+  "lockClearsPrivateFields": true,
+  "pageErrors": []
+}

@@ -75,3 +75,14 @@ CapturedAt never substitutes for server recordedAt. Hold and synthetic classific
 - [Compile-only outcomes/immutability examples](receiving-contracts.ts).
 
 The nine receiving test groups exercise these exact JSON examples, identity separation, unknown/zero/quality, exact allocations, bounds, conversion provenance/failures, canonical operation comparison, confirmation syntax and evidence declarations. No test claims that stock or private file lifecycle exists. The SP1-01 design document remains historical; these narrow runtime types/parsers are the SP2-01 receiving contract.
+
+
+## SP2-03 implementation boundary
+
+SP2-03 now implements receipt-private drafts through same-origin `POST /api/receipts/{save,read,list,locations}` (gateway `/receipts/*`). All four routes require the session-bound CSRF token, exact web Origin and JSON; both gateway and Kitchen obtain current scoped Identity authorization. Chef/storekeeper receive draft read/write only; cook has neither. No confirmation, disposition, evidence or stock authority is granted.
+
+`SaveReceiptWorkspace` adds one private name/presentation/barcode/physical-match snapshot per line to the versioned SP2-01 command. These identities are not approved catalogue references. Pack count/factor are explicit operator-checked draft estimates, independently validated against the base-unit quantity; they do not activate the future reviewed-conversion/stock port. Destination IDs must exist in the same tenant/site. Disposition remains unknown and evidence IDs must be empty in this slice.
+
+Kitchen saves aggregate, append-only attributable revision and durable save outcome in one transaction. The operation key is tenant/site/actor/operationId in a draft-save-only table. Identical retries return the original snapshot; changed intent returns IDEMPOTENCY_MISMATCH. Fresh updates need exact expectedVersion; competing writes produce one winner. Other-scope IDs disclose no content. Listing is bounded to the latest 30 drafts; locations to 50. Both are explicit engineering limits.
+
+The interface never increments quantity on scan. Same-code batches require an explicit new line. Empty dates, quantity, batch and destination remain pending. A lost response keeps the original operation and disables edits until retry or authoritative reload; it never reports saved without an acknowledged result. Unsaved fields are memory-only and visibly discarded on workspace lock/navigation. Offline capture, photos, safety review, stock posting and real-site readiness remain unavailable. See [delivery/review](../../delivery/SP2-03.md).

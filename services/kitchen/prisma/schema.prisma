@@ -127,3 +127,31 @@ model ReceiptDraftOperation {
   recordedAt DateTime @db.Timestamptz(3)
   @@id([tenantId, siteId, actorId, operationId])
 }
+
+model ReceiptEvidence {
+  id String @id @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  receiptId String @db.Uuid
+  lineId String @db.Uuid
+  actorId String @db.Uuid
+  uploadId String @db.Uuid
+  intentHash String @db.Char(64)
+  snapshot Json
+  recordedAt DateTime @db.Timestamptz(3)
+  @@unique([tenantId, siteId, actorId, uploadId])
+  @@unique([id, tenantId, siteId])
+  @@index([tenantId, siteId, receiptId, lineId])
+}
+model ReceiptEvidenceEvent {
+  id String @id @db.Uuid
+  evidenceId String @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  actorId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  snapshot Json
+  @@index([tenantId, siteId, evidenceId])
+}

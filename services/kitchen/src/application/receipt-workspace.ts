@@ -51,6 +51,13 @@ export class ReceiptWorkspace {
     if (existing) { if (existing.intentHash !== intentHash) throw new ReceiptFailure('IDEMPOTENCY_MISMATCH', 409); return snapshot(existing.snapshot); }
     try {
       return await this.db.$transaction(async tx => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${command.receiptId}, 0))`;
+        const linked = await tx.receiptEvidence.findMany({ where: { ...command.scope, receiptId: command.receiptId } });
+        for (const record of linked) {
+          const links = (record.snapshot as unknown as { links: { lineId: string; productId: string; presentationId: string; batchId: string } }).links;
+          const line = command.payload.lines.find(line => line.id === links.lineId);
+          if (!line || line.product.productId !== links.productId || line.product.presentationId !== links.presentationId || line.batch.id !== links.batchId) throw new ReceiptFailure('EVIDENCE_LINK_CONFLICT', 409);
+        }
         const where = { id: command.receiptId, ...command.scope };
         const before = await tx.receiptDraft.findFirst({ where });
         if (!before && command.expectedVersion !== 0) throw new ReceiptFailure('NOT_FOUND', 404);

@@ -45,3 +45,9 @@ test('startup reporting does not serialize dependency errors or connection crede
   assert.equal(records[0].includes('do-not-disclose'), false);
   assert.equal(JSON.parse(records[0]).code, 'STARTUP_FAILED');
 });
+
+test('private evidence mode requires explicit bounded configuration and rejects public paths or live activation', () => {
+  const env = { ...fixture(), EVIDENCE_MODE: 'fixture', EVIDENCE_ROOT: '/tmp/apptit-private-evidence', EVIDENCE_MAX_BYTES: '2097152' };
+  assert.equal(readConfig('kitchen', env).evidenceMode, 'fixture');
+  for (const override of [{ EVIDENCE_ROOT: '' }, { EVIDENCE_ROOT: './public' }, { EVIDENCE_ROOT: '/tmp/public/photos' }, { EVIDENCE_MAX_BYTES: '0' }, { EVIDENCE_MAX_BYTES: '2097153' }, { EVIDENCE_MODE: 'live' }]) assert.throws(() => readConfig('kitchen', { ...env, ...override }), ConfigurationError);
+});

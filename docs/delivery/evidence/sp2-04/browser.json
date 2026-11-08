@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "syntheticImagesOnly": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "noPhotoAndLocalPreviewDistinct": true,
+  "initialListFailureRecovery": true,
+  "privateUploadRead": true,
+  "unreadableAndManualFieldsPreserved": true,
+  "reopenKeepsPhotoAndReview": true,
+  "editingReopenedDraftPreservesPresentationAndEvidenceLinks": true,
+  "retakeKeepsOriginal": true,
+  "lostResponseSameUploadRetryNoDuplicate": true,
+  "typeRejectedState": true,
+  "lockClearsPrivateImages": true,
+  "pageErrors": []
+}

@@ -61,16 +61,18 @@ test('receipt audit or outcome failure rolls back the draft, revision and operat
  }finally{await db.$disconnect();}
 });
 test('full Kitchen migration chain adds receipt drafts while preserving populated foundation data', async () => {
- const {Pool}=require('pg');const pool=new Pool({connectionString:readConfig('kitchen').databaseUrl,connectionTimeoutMillis:3000});const connection=await pool.connect();const schema='receipt_review_'+randomUUID().replaceAll('-','');
+ const {Pool}=require('pg');const pool=new Pool({connectionString:readConfig('kitchen').databaseUrl,connectionTimeoutMillis:3000});const connection=await pool.connect();const schema='receipt_review_'+randomUUID().replaceAll('-','');const preservedReceipt=randomUUID(),preservedScope={tenantId:randomUUID(),siteId:randomUUID()};
  try {
   await connection.query(`CREATE SCHEMA "${schema}"`);await connection.query(`SET search_path TO "${schema}"`);
   const root=new URL('../../services/kitchen/prisma/migrations/',import.meta.url);
   for(const name of readdirSync(root).filter(name=>/^\d/.test(name)).sort()) {
    await connection.query(readFileSync(new URL(name+'/migration.sql',root),'utf8'));
+   if(name==='202611060001_receipt_drafts') await connection.query('INSERT INTO "ReceiptDraft" (id,"tenantId","siteId",version,snapshot,"recordedAt") VALUES ($1,$2,$3,1,$4,now())',[preservedReceipt,preservedScope.tenantId,preservedScope.siteId,{preserved:true}]);
    if(name==='202611040001_runtime_fixture') await connection.query(`INSERT INTO "RuntimeFixture" (id, payload) VALUES ('receipt-preservation', '{"preserved":true}')`);
   }
   const tables=(await connection.query('SELECT tablename FROM pg_tables WHERE schemaname=$1',[schema])).rows.map(row=>row.tablename);
-  for(const name of ['ReceiptDraft','ReceiptDraftRevision','ReceiptDraftOperation','ReceiptLocation'])assert.ok(tables.includes(name));
+  for(const name of ['ReceiptDraft','ReceiptDraftRevision','ReceiptDraftOperation','ReceiptLocation','ReceiptEvidence','ReceiptEvidenceEvent'])assert.ok(tables.includes(name));
+  assert.deepEqual((await connection.query('SELECT snapshot FROM "ReceiptDraft" WHERE id=$1',[preservedReceipt])).rows[0].snapshot,{preserved:true});
   assert.deepEqual((await connection.query(`SELECT payload FROM "RuntimeFixture" WHERE id='receipt-preservation'`)).rows[0].payload,{preserved:true});
  }finally{await connection.query('ROLLBACK');await connection.query('SET search_path TO public');await connection.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);connection.release();await pool.end();}
 });

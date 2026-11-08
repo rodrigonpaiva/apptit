@@ -13,7 +13,7 @@ export class ReceiptController {
       const result = await fetch(`${config.kitchenOrigin}/internal/v1/receipt-drafts/${action}`, { method: 'POST', redirect: 'error', headers: { 'content-type': 'application/json', 'x-internal-token': config.kitchenToken!, 'x-correlation-id': correlationId, ...(secret ? { 'x-session-secret': secret } : {}) }, body: JSON.stringify(input), signal: AbortSignal.timeout(config.internalTimeoutMs * 3 + 6000) });
       if (!result.ok) {
         const failure = await result.json() as { code?: string };
-        const code = failure.code && ['INVALID_INPUT', 'INVALID_DESTINATION', 'UNAUTHENTICATED', 'SESSION_EXPIRED', 'SESSION_REVOKED', 'FORBIDDEN', 'NOT_FOUND', 'VERSION_CONFLICT', 'IDEMPOTENCY_MISMATCH'].includes(failure.code) ? failure.code : 'OUTCOME_UNCERTAIN';
+        const code = failure.code && ['EVIDENCE_LINK_CONFLICT', 'INVALID_INPUT', 'INVALID_DESTINATION', 'UNAUTHENTICATED', 'SESSION_EXPIRED', 'SESSION_REVOKED', 'FORBIDDEN', 'NOT_FOUND', 'VERSION_CONFLICT', 'IDEMPOTENCY_MISMATCH'].includes(failure.code) ? failure.code : 'OUTCOME_UNCERTAIN';
         throw new HttpException({ code }, code === 'OUTCOME_UNCERTAIN' ? 503 : result.status);
       }
       return await result.json() as unknown;

@@ -86,3 +86,8 @@ SP2-03 now implements receipt-private drafts through same-origin `POST /api/rece
 Kitchen saves aggregate, append-only attributable revision and durable save outcome in one transaction. The operation key is tenant/site/actor/operationId in a draft-save-only table. Identical retries return the original snapshot; changed intent returns IDEMPOTENCY_MISMATCH. Fresh updates need exact expectedVersion; competing writes produce one winner. Other-scope IDs disclose no content. Listing is bounded to the latest 30 drafts; locations to 50. Both are explicit engineering limits.
 
 The interface never increments quantity on scan. Same-code batches require an explicit new line. Empty dates, quantity, batch and destination remain pending. A lost response keeps the original operation and disables edits until retry or authoritative reload; it never reports saved without an acknowledged result. Unsaved fields are memory-only and visibly discarded on workspace lock/navigation. Offline capture, photos, safety review, stock posting and real-site readiness remain unavailable. See [delivery/review](../../delivery/SP2-03.md).
+
+
+## SP2-04 implementation update
+
+The evidence section above records the SP2-01 contract boundary. SP2-04 now implements the synthetic private-byte/metadata path described in [private evidence](private-evidence.md), retaining explicit pending/failed/available/readability states and server-owned attribution. Default evidence mode remains disabled; fixture mode is explicitly configured. OCR, full lifecycle/retention/restore and stock confirmation remain future work. Receipt evidence membership is queried from its scoped association index rather than automatically rewriting the receipt snapshot.

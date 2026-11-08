@@ -1,0 +1,563 @@
+
+> apptit@0.0.0 check
+> npm run db:validate && npm run lint && npm run typecheck && npm run contracts:check && npm run test && npm run build
+
+
+> apptit@0.0.0 db:validate
+> node scripts/database.mjs validate
+
+Loaded Prisma config from services/identity/prisma.config.ts.
+
+Prisma schema loaded from services/identity/prisma/schema.prisma.
+The schema at services/identity/prisma/schema.prisma is valid 🚀
+Loaded Prisma config from services/kitchen/prisma.config.ts.
+
+Prisma schema loaded from services/kitchen/prisma/schema.prisma.
+The schema at services/kitchen/prisma/schema.prisma is valid 🚀
+
+> apptit@0.0.0 lint
+> node scripts/nx.mjs run-many -t lint --outputStyle=static && eslint scripts tests eslint.config.mjs apps/web/next.config.mjs services/*/prisma.config.ts --max-warnings=0
+
+
+ NX   Running target lint for 7 projects:
+
+- domain-values
+- contracts
+- identity
+- gateway-api
+- kitchen
+- runtime
+- web
+
+
+
+> nx run contracts:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:11772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run domain-values:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:13119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run runtime:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:13120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run web:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:16293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run kitchen:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:14965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run identity:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:13125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run gateway-api:lint  [existing outputs match the cache, left as is]
+
+> eslint src --max-warnings=0
+
+(node:13129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+
+ NX   Successfully ran target lint for 7 projects
+
+Nx read the output from the cache instead of running the command for 7 out of 7 tasks.
+
+  Run duration:      14ms
+  Cache:             7/7 hit (100%)
+  Critical path:     <1ms (1 task)
+  Recoverable time:  <1ms
+
+> apptit@0.0.0 typecheck
+> node scripts/nx.mjs run-many -t typecheck --outputStyle=static
+
+
+ NX   Running target typecheck for 7 projects and 5 tasks they depend on:
+
+- domain-values
+- contracts
+- identity
+- gateway-api
+- kitchen
+- runtime
+- web
+
+
+
+> nx run contracts:build  [local cache]
+
+> tsc -b
+
+
+> nx run contracts:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run domain-values:build  [local cache]
+
+> tsc -b
+
+
+> nx run runtime:build  [local cache]
+
+> tsc -b
+
+
+> nx run domain-values:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run runtime:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run gateway-api:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run kitchen:generate
+
+> node ../../scripts/database.mjs generate kitchen
+
+Loaded Prisma config from services/kitchen/prisma.config.ts.
+
+Prisma schema loaded from services/kitchen/prisma/schema.prisma.
+
+✔ Generated Prisma Client (7.10.1) to ./services/kitchen/src/generated/prisma in 73ms
+
+
+> nx run kitchen:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run identity:generate
+
+> node ../../scripts/database.mjs generate identity
+
+Loaded Prisma config from services/identity/prisma.config.ts.
+
+Prisma schema loaded from services/identity/prisma/schema.prisma.
+
+✔ Generated Prisma Client (7.10.1) to ./services/identity/src/generated/prisma in 75ms
+
+
+> nx run identity:typecheck  [existing outputs match the cache, left as is]
+
+> tsc --noEmit
+
+
+> nx run web:typecheck
+
+> next typegen && tsc --noEmit
+
+(node:16526) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Generating route types...
+✓ Types generated successfully
+
+
+
+ NX   Successfully ran target typecheck for 7 projects and 5 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 9 out of 12 tasks.
+
+  Run duration:      1.8s
+  Cache:             9/12 hit (75%)
+  Critical path:     1.8s (2 tasks)
+  Recoverable time:  3ms (0% of the run)
+
+> apptit@0.0.0 contracts:check
+> tsc --strict --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext docs/architecture/contracts/first-slice.ts docs/architecture/contracts/receiving-contracts.ts
+
+
+> apptit@0.0.0 pretest
+> node scripts/nx.mjs run-many -t build --projects=runtime,domain-values --outputStyle=static
+
+
+ NX   Running target build for 2 projects and 1 task they depend on:
+
+- runtime
+- domain-values
+
+
+
+> nx run contracts:build  [local cache]
+
+> tsc -b
+
+
+> nx run domain-values:build  [local cache]
+
+> tsc -b
+
+
+> nx run runtime:build  [local cache]
+
+> tsc -b
+
+
+
+
+ NX   Successfully ran target build for 2 projects and 1 task they depend on
+
+Nx read the output from the cache instead of running the command for 3 out of 3 tasks.
+
+  Run duration:      19ms
+  Cache:             3/3 hit (100%)
+  Critical path:     8ms (2 tasks)
+  Recoverable time:  <1ms
+
+> apptit@0.0.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: feature PR targets dev; direct feature/main, forks named dev and arbitrary source branches are denied
+ok 1 - feature PR targets dev; direct feature/main, forks named dev and arbitrary source branches are denied
+  ---
+  duration_ms: 0.688625
+  type: 'test'
+  ...
+# Subtest: promotion requires completed green push CI on the exact dev SHA and rejects missing, stale, failed or running evidence
+ok 2 - promotion requires completed green push CI on the exact dev SHA and rejects missing, stale, failed or running evidence
+  ---
+  duration_ms: 0.482292
+  type: 'test'
+  ...
+# Subtest: pre-push protocol blocks protected-branch updates/deletions, including multi-ref pushes
+ok 3 - pre-push protocol blocks protected-branch updates/deletions, including multi-ref pushes
+  ---
+  duration_ms: 212.776416
+  type: 'test'
+  ...
+# Subtest: synthetic configuration rejects live mode, missing secrets and arbitrary database targets
+ok 4 - synthetic configuration rejects live mode, missing secrets and arbitrary database targets
+  ---
+  duration_ms: 1.978292
+  type: 'test'
+  ...
+# Subtest: session limits, timeouts and service ports reject ambiguous or conflicting values
+ok 5 - session limits, timeouts and service ports reject ambiguous or conflicting values
+  ---
+  duration_ms: 0.342042
+  type: 'test'
+  ...
+# Subtest: internal secret verification rejects missing, array, unequal and wrong-length credentials
+ok 6 - internal secret verification rejects missing, array, unequal and wrong-length credentials
+  ---
+  duration_ms: 0.073458
+  type: 'test'
+  ...
+# Subtest: startup reporting does not serialize dependency errors or connection credentials
+ok 7 - startup reporting does not serialize dependency errors or connection credentials
+  ---
+  duration_ms: 0.113292
+  type: 'test'
+  ...
+# Subtest: private evidence mode requires explicit bounded configuration and rejects public paths or live activation
+ok 8 - private evidence mode requires explicit bounded configuration and rejects public paths or live activation
+  ---
+  duration_ms: 0.1785
+  type: 'test'
+  ...
+# Subtest: exact decimals round-trip maximum precision, sum without binary float loss and reject silent rounding/coercion
+ok 9 - exact decimals round-trip maximum precision, sum without binary float loss and reject silent rounding/coercion
+  ---
+  duration_ms: 0.810875
+  type: 'test'
+  ...
+# Subtest: quantity validates units/bases/counts and observation resolution without treating estimates as weighed facts
+ok 10 - quantity validates units/bases/counts and observation resolution without treating estimates as weighed facts
+  ---
+  duration_ms: 1.064875
+  type: 'test'
+  ...
+# Subtest: unknown, measured zero, estimated and imported survive serialization with their distinct meaning
+ok 11 - unknown, measured zero, estimated and imported survive serialization with their distinct meaning
+  ---
+  duration_ms: 0.227375
+  type: 'test'
+  ...
+# Subtest: date-only labels reject impossible dates and never become UTC instants
+ok 12 - date-only labels reject impossible dates and never become UTC instants
+  ---
+  duration_ms: 1.2855
+  type: 'test'
+  ...
+# Subtest: site calendar conversion uses Europe/Paris DST without rewriting date labels
+ok 13 - site calendar conversion uses Europe/Paris DST without rewriting date labels
+  ---
+  duration_ms: 10.4665
+  type: 'test'
+  ...
+# Subtest: exact metric conversion retains the original source quantity and does not infer mass/volume factors
+ok 14 - exact metric conversion retains the original source quantity and does not infer mass/volume factors
+  ---
+  duration_ms: 0.197333
+  type: 'test'
+  ...
+# Subtest: draft validation returns field-specific safe errors, rejects extra authority fields and preserves expiry type
+ok 15 - draft validation returns field-specific safe errors, rejects extra authority fields and preserves expiry type
+  ---
+  duration_ms: 0.200584
+  type: 'test'
+  ...
+# Subtest: lookup codes remain bounded digit strings with leading zeros; no URL or numeric coercion
+ok 16 - lookup codes remain bounded digit strings with leading zeros; no URL or numeric coercion
+  ---
+  duration_ms: 0.672958
+  type: 'test'
+  ...
+# Subtest: OFF fixture and explicit live modes are independent of disabled private/offline providers
+ok 17 - OFF fixture and explicit live modes are independent of disabled private/offline providers
+  ---
+  duration_ms: 0.8735
+  type: 'test'
+  ...
+# Subtest: receipt editor preserves distinct product/presentation identity and version across save/reopen instead of breaking photo links
+ok 18 - receipt editor preserves distinct product/presentation identity and version across save/reopen instead of breaking photo links
+  ---
+  duration_ms: 54.113375
+  type: 'test'
+  ...
+# Subtest: receipt example separates product/presentation/batch/date/line identities; same product can have distinct actual batches
+ok 19 - receipt example separates product/presentation/batch/date/line identities; same product can have distinct actual batches
+  ---
+  duration_ms: 2.904125
+  type: 'test'
+  ...
+# Subtest: drafts preserve unknown versus measured zero/estimated/imported and reject authority fields or invented label dates
+ok 20 - drafts preserve unknown versus measured zero/estimated/imported and reject authority fields or invented label dates
+  ---
+  duration_ms: 1.862541
+  type: 'test'
+  ...
+# Subtest: exact received/disposition reconciliation enforces all four buckets, one unit/basis and recoverable per-line errors
+ok 21 - exact received/disposition reconciliation enforces all four buckets, one unit/basis and recoverable per-line errors
+  ---
+  duration_ms: 0.478459
+  type: 'test'
+  ...
+# Subtest: checked pack preview distinguishes ten packs from nominal size and keeps historical snapshot/provenance without stock effects
+ok 22 - checked pack preview distinguishes ten packs from nominal size and keeps historical snapshot/provenance without stock effects
+  ---
+  duration_ms: 0.435584
+  type: 'test'
+  ...
+# Subtest: pack conversion rejects missing review, wrong presentation/version, unsupported inference, fractional counts and precision overflow
+ok 23 - pack conversion rejects missing review, wrong presentation/version, unsupported inference, fractional counts and precision overflow
+  ---
+  duration_ms: 1.479625
+  type: 'test'
+  ...
+# Subtest: operation identity is deterministic after normalization, separates actor/action/scope/version, and detects incompatible reuse
+ok 24 - operation identity is deterministic after normalization, separates actor/action/scope/version, and detects incompatible reuse
+  ---
+  duration_ms: 0.966875
+  type: 'test'
+  ...
+# Subtest: confirmation intent requires a persisted version and explicit line/batch identities but does not authorize or post stock
+ok 25 - confirmation intent requires a persisted version and explicit line/batch identities but does not authorize or post stock
+  ---
+  duration_ms: 0.576375
+  type: 'test'
+  ...
+# Subtest: evidence declaration validates explicit size/type policy, ownership links and untrusted content without accepting server metadata
+ok 26 - evidence declaration validates explicit size/type policy, ownership links and untrusted content without accepting server metadata
+  ---
+  duration_ms: 0.561417
+  type: 'test'
+  ...
+# Subtest: draft structural bounds reject duplicate/missing identities, unsupported schemas and unbounded lines/evidence
+ok 27 - draft structural bounds reject duplicate/missing identities, unsupported schemas and unbounded lines/evidence
+  ---
+  duration_ms: 2.186
+  type: 'test'
+  ...
+# Subtest: opaque session secrets and stored hashes are distinct and key-bound
+ok 28 - opaque session secrets and stored hashes are distinct and key-bound
+  ---
+  duration_ms: 0.93075
+  type: 'test'
+  ...
+# Subtest: cookie parsing rejects duplicates and malformed secrets without choosing an identity
+ok 29 - cookie parsing rejects duplicates and malformed secrets without choosing an identity
+  ---
+  duration_ms: 0.124375
+  type: 'test'
+  ...
+# Subtest: CSRF is bound to both nonce and current session, including the pre-login state
+ok 30 - CSRF is bound to both nonce and current session, including the pre-login state
+  ---
+  duration_ms: 0.212375
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 319.24775
+
+> apptit@0.0.0 build
+> node scripts/nx.mjs run-many -t build --outputStyle=static
+
+
+ NX   Running target build for 7 projects and 2 tasks they depend on:
+
+- domain-values
+- contracts
+- identity
+- gateway-api
+- kitchen
+- runtime
+- web
+
+
+
+> nx run contracts:build  [local cache]
+
+> tsc -b
+
+
+> nx run domain-values:build  [local cache]
+
+> tsc -b
+
+
+> nx run runtime:build  [local cache]
+
+> tsc -b
+
+
+> nx run gateway-api:build  [local cache]
+
+> tsc -b
+
+
+> nx run identity:generate
+
+> node ../../scripts/database.mjs generate identity
+
+Loaded Prisma config from services/identity/prisma.config.ts.
+
+Prisma schema loaded from services/identity/prisma/schema.prisma.
+
+✔ Generated Prisma Client (7.10.1) to ./services/identity/src/generated/prisma in 60ms
+
+
+> nx run identity:build  [local cache]
+
+> tsc -b
+
+
+> nx run kitchen:generate
+
+> node ../../scripts/database.mjs generate kitchen
+
+Loaded Prisma config from services/kitchen/prisma.config.ts.
+
+Prisma schema loaded from services/kitchen/prisma/schema.prisma.
+
+✔ Generated Prisma Client (7.10.1) to ./services/kitchen/src/generated/prisma in 77ms
+
+
+> nx run kitchen:build  [local cache]
+
+> tsc -b
+
+
+> nx run web:build
+
+> next build --webpack
+
+▲ Next.js 16.4.5 (webpack)
+(node:16704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✓ Running next.config.mjs took 10ms
+
+  Creating an optimized production build ...
+(node:16713) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16758) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✓ Compiled successfully in 971ms
+  Running TypeScript ...
+  Finished TypeScript in 1135ms ...
+  Collecting page data using 7 workers ...
+(node:16789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16787) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  Generating static pages using 7 workers (0/4) ...
+(node:16790) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  Generating static pages using 7 workers (1/4)
+  Generating static pages using 7 workers (2/4)
+  Generating static pages using 7 workers (3/4)
+✓ Generating static pages using 7 workers (4/4) in 265ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/scanner
+├ ƒ /login
+└ ƒ /workspace
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+
+
+ NX   Successfully ran target build for 7 projects and 2 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 6 out of 9 tasks.
+
+  Run duration:      7.3s
+  Cache:             6/9 hit (67%)
+  Critical path:     7.2s (2 tasks)
+  Recoverable time:  <1ms

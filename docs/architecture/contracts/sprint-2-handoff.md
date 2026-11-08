@@ -26,10 +26,12 @@ Date: 2026-11-05. Review against the implemented Sprint 1 slice; this is not an 
 
 [SP2-01](receiving.md) now supplies typed receiving/evidence/future-posting ports, pure draft/confirmation-intent parsing, checked pack previews, exact reconciliation and canonical intent comparison. It does not implement the receiving repository, operation registry, effectful transaction, online receiving grants, file lifecycle or live provider adapters identified above.
 
-## Continuing boundaries
+## Current continuation after SP2-03/SP2-04
 
-OFF/AI/OCR/offline/evidence remain disabled in the runtime. No received batch, stock ledger, supplier offer, provider lookup, camera integration, food eligibility decision, director workflow, restore drill or live restaurant onboarding exists. The foundation's named volume is not a backup. Production HTTPS/session settings and deployment/recovery policies remain unresolved for live use.
+The preceding tables and SP2-01 update are historical foundation/contract boundaries. SP2-02 subsequently implemented fixture/optional read-only OFF lookup, local/manual fallback and on-device barcode scanning. SP2-03 implemented scoped receipt draft persistence, permissions, versions and durable draft-save retries; PR #10 integrated it into dev at 08e4761 with both checks and subsequent dev CI successful.
 
-SP1-06 can establish reproducibility and enabled-path checks; it cannot mark AP-150/AP-024/AP-019 globally Done or close later parent dependencies. SP2-01 is the next package after integration/review of SP1-06.
+SP2-04 adds private synthetic label evidence, immutable bytes, attributable metadata/review history and authorized upload/read/list with honest failure states. See [private evidence contract](private-evidence.md) and [delivery/verification](../../delivery/SP2-04.md). Its implementation is on feature/sp2-04-private-label-evidence; publication/integration is not implied.
 
-Sources: [quantity contract](quantity-draft.md), [individual access](individual-access.md), [catalogue contract](catalogue.md), [adapter/evidence ADR](../adr/0004-adapters-evidence-and-recovery.md), [SP2-01 acceptance](../../../plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md).
+Remaining Sprint 2 work: SP2-05 synthetic procedure-bound actual observations, then SP2-06 consolidation of connection/upload/session failure and durability scenarios. Neither photo availability nor manually entered fields establish safety approval. OCR/AI/offline remain disabled. Full AP-020/AP-035/AP-128 and global operation/stock guarantees are not Done. No ledger, stock confirmation, supplier workflow, director substitution, restore drill or live restaurant onboarding is delivered. The next task after SP2-04 verification is SP2-05; do not jump to Sprint 3 stock effects.
+
+Sources: [quantity contract](quantity-draft.md), [individual access](individual-access.md), [catalogue contract](catalogue.md), [adapter/evidence ADR](../adr/0004-adapters-evidence-and-recovery.md), [sprint acceptance](../../../plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md).

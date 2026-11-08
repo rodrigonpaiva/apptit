@@ -36,8 +36,8 @@ GraphQL `siteContext` returns only the verified actor/site/role/capabilities, no
 
 | Role | Explicit test capabilities |
 | --- | --- |
-| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write |
-| Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write |
+| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write |
+| Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write, evidence.read/write |
 | Cook | site.read, catalogue.read |
 
 No stock withdrawal, product grant, safety disposition, menu publication, director substitution or platform-administrator bypass is enabled. Quantity-draft methods remain internal pending an actual business command adapter. Existing SP1-03 attribution contexts can now be constructed by Identity, without accepting client identity claims.

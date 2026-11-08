@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. Receiving forms/persistence, stock operations, file uploads, offline capture and live external integrations remain outside the enabled slice.
+The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. SP2-03 adds scoped receipt draft save/reload without stock effects. The SP2-04 feature adds opt-in synthetic private label photos with original attribution, failure/retry states and manual fallback. Stock operations, OCR, offline capture and live operational deployment remain outside the enabled slice.
 
 ## Run locally
 
@@ -54,8 +54,8 @@ npm run smoke
 ```
 
 - `check`: Prisma schemas, lint/module boundaries, types, contract compilation, unit/configuration/security/policy tests and production builds.
-- `test:integration`: real PostgreSQL tests for quantities, version conflicts/audit rollback, migration evolution, sessions and catalogue isolation. An unavailable database fails the run instead of skipping tests.
-- `smoke`: actual HTTP login, Origin/CSRF/cookies, private catalogue, cross-site denial, forged identity rejection, expiry/revocation and dependency-failure behavior.
+- `test:integration`: real PostgreSQL tests for quantities, version conflicts/audit rollback, migration evolution, sessions, catalogue isolation and private evidence integrity/authorization. An unavailable database fails the run instead of skipping tests.
+- `smoke`: actual HTTP login, Origin/CSRF/cookies, private catalogue and receipt-image upload/read, cross-site denial, forged identity rejection, expiry/revocation and dependency-failure behavior.
 
 [Local setup, commands and troubleshooting](docs/development/local-development.md) covers configuration changes, standalone runtimes and intentional synthetic reset. No real restaurant approval, production deployment, stock availability or live recovery guarantee is claimed.
 
@@ -104,3 +104,6 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 - [Product specification v0.80](plans/APPTIT_SPEC_v0.80_EN.md)
 - [Delivery backlog v1.0](plans/backlog/APPTIT_BACKLOG_v1.0_EN.md)
 - [First four sprints](plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md)
+
+- [SP2-03 receipt drafts](docs/delivery/SP2-03.md)
+- [SP2-04 private label evidence](docs/delivery/SP2-04.md)

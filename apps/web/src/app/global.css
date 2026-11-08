@@ -301,3 +301,10 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-saved button { display: block; width: 100%; text-align: left; margin-top: 8px; overflow-wrap: anywhere; }
 .receiving fieldset:disabled { opacity: .7; }
 @media (max-width: 600px) { .receipt-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; } .receipt-fields, .receipt-line { padding: 15px; } .receipt-add form button { flex: 1 1 100%; } .receipt-actions > button { width: 100%; } .receiving-heading h2 { font-size: 24px; } }
+
+.receipt-evidence { margin-top: 20px; padding-top: 16px; border-top: 1px solid #d8dfce; overflow-wrap: anywhere; }
+.receipt-evidence h4 { margin: 0 0 8px; }
+.receipt-evidence img { display: block; max-width: 100%; height: auto; max-height: 300px; object-fit: contain; margin: 12px 0; }
+.receipt-evidence input[type=file] { width: 100%; min-width: 0; white-space: normal; }
+.receipt-evidence button { margin: 6px 6px 6px 0; max-width: 100%; white-space: normal; }
+.evidence-card { border: 1px solid #d8dfce; padding: 12px; margin: 12px 0; border-radius: 8px; }

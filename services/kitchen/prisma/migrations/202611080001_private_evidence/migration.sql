@@ -1,0 +1,7 @@
+BEGIN;
+CREATE TABLE "ReceiptEvidence" ("id" UUID PRIMARY KEY,"tenantId" UUID NOT NULL,"siteId" UUID NOT NULL,"receiptId" UUID NOT NULL,"lineId" UUID NOT NULL,"actorId" UUID NOT NULL,"uploadId" UUID NOT NULL,"intentHash" CHAR(64) NOT NULL,"snapshot" JSONB NOT NULL CHECK(jsonb_typeof("snapshot")='object'),"recordedAt" TIMESTAMPTZ(3) NOT NULL,UNIQUE("tenantId","siteId","actorId","uploadId"),UNIQUE("id","tenantId","siteId"),FOREIGN KEY("receiptId","tenantId","siteId") REFERENCES "ReceiptDraft"("id","tenantId","siteId") ON DELETE RESTRICT);
+CREATE INDEX "ReceiptEvidence_tenantId_siteId_receiptId_lineId_idx" ON "ReceiptEvidence"("tenantId","siteId","receiptId","lineId");
+CREATE TABLE "ReceiptEvidenceEvent" ("id" UUID PRIMARY KEY,"evidenceId" UUID NOT NULL,"tenantId" UUID NOT NULL,"siteId" UUID NOT NULL,"actorId" UUID NOT NULL,"sessionId" UUID NOT NULL,"correlationId" UUID NOT NULL,"recordedAt" TIMESTAMPTZ(3) NOT NULL,"snapshot" JSONB NOT NULL CHECK(jsonb_typeof("snapshot")='object'),FOREIGN KEY("evidenceId","tenantId","siteId") REFERENCES "ReceiptEvidence"("id","tenantId","siteId") ON DELETE RESTRICT);
+CREATE INDEX "ReceiptEvidenceEvent_tenantId_siteId_evidenceId_idx" ON "ReceiptEvidenceEvent"("tenantId","siteId","evidenceId");
+CREATE TRIGGER "ReceiptEvidenceEvent_append_only" BEFORE UPDATE OR DELETE ON "ReceiptEvidenceEvent" FOR EACH ROW EXECUTE FUNCTION reject_receipt_draft_history_change();
+COMMIT;

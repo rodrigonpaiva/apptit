@@ -4,6 +4,7 @@ const gatewayPort = process.env.GATEWAY_PORT ?? '4000';
 if (!/^\d+$/.test(gatewayPort) || Number(gatewayPort) < 1 || Number(gatewayPort) > 65535) throw new Error('Invalid GATEWAY_PORT');
 export default {
   poweredByHeader: false,
+  output: 'standalone',
   outputFileTracingRoot: resolve(import.meta.dirname, '../..'),
   outputFileTracingIncludes: { '/api/scanner': ['../../node_modules/zxing-wasm/dist/reader/zxing_reader.wasm'] },
   async rewrites() {

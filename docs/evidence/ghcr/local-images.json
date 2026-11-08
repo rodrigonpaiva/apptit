@@ -1,0 +1,21 @@
+{
+  "version": "local-sp2-05-dirty",
+  "revision": "89d59b9dc9f30926511edab33e6154d6565e023e",
+  "repository": "rodrigonpaiva/apptit",
+  "sourceDirty": true,
+  "status": "built",
+  "images": {
+    "api": {
+      "image": "apptit-validation-api:89d59b9dc9f3",
+      "imageId": "sha256:fcfbcacead6bafc9384274408607292407ce20cc5e06632910c37a272d541c68",
+      "platform": "linux/arm64",
+      "user": "node"
+    },
+    "web": {
+      "image": "apptit-validation-web:89d59b9dc9f3",
+      "imageId": "sha256:d27b5c9b82ba9fa52bddcaa19c18b6d87208c5d78bca62b131247153ec928922",
+      "platform": "linux/arm64",
+      "user": "node"
+    }
+  }
+}

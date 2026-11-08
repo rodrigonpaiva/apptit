@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ReceiptWorkspace, ReceiptFailure } from './application/receipt-workspace.js';
 import { OffLookup } from './infra/lookup/off.js';
 import type { Request } from 'express';
 import { CatalogueRepository } from './infra/prisma/catalogue.repository.js';
@@ -42,6 +43,25 @@ async function bootstrap(): Promise<void> {
   @Controller('internal/v1')
   class ScopedController {
     constructor(private readonly database: Database) {}
+    private async receipt(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations') {
+      try {
+        if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
+        const value = input as { scope?: unknown; command?: { scope?: unknown } };
+        const secret = req.headers['x-session-secret'];
+        const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
+          { scope: action === 'save' ? value?.command?.scope : value?.scope, capability: action === 'save' ? 'receipt.draft.write' : 'receipt.draft.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        return await new ReceiptWorkspace(this.database)[action](input, context);
+      } catch (error) {
+        if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof ReceiptFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);
+        throw new ServiceUnavailableException({ code: 'OUTCOME_UNCERTAIN' });
+      }
+    }
+    @Post('receipt-drafts/save') saveReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'save'); }
+    @Post('receipt-drafts/read') readReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'read'); }
+    @Post('receipt-drafts/list') listReceipts(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'list'); }
+    @Post('receipt-drafts/locations') receiptLocations(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'locations'); }
     @Post('product-lookup') async productLookup(@Req() req: Request, @Body() input: unknown): Promise<ScopedProductLookup> {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);

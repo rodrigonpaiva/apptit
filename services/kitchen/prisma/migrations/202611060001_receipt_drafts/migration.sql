@@ -1,0 +1,12 @@
+BEGIN;
+CREATE TABLE "ReceiptLocation" ("id" UUID PRIMARY KEY, "tenantId" UUID NOT NULL, "siteId" UUID NOT NULL, "name" VARCHAR(100) NOT NULL CHECK(length(btrim("name"))>0));
+CREATE INDEX "ReceiptLocation_tenantId_siteId_idx" ON "ReceiptLocation"("tenantId","siteId");
+CREATE TABLE "ReceiptDraft" ("id" UUID PRIMARY KEY, "tenantId" UUID NOT NULL, "siteId" UUID NOT NULL, "version" INTEGER NOT NULL CHECK("version">0), "snapshot" JSONB NOT NULL CHECK(jsonb_typeof("snapshot")='object'), "recordedAt" TIMESTAMPTZ(3) NOT NULL, UNIQUE("id","tenantId","siteId"));
+CREATE INDEX "ReceiptDraft_tenantId_siteId_recordedAt_idx" ON "ReceiptDraft"("tenantId","siteId","recordedAt");
+CREATE TABLE "ReceiptDraftRevision" ("receiptId" UUID NOT NULL,"tenantId" UUID NOT NULL,"siteId" UUID NOT NULL,"version" INTEGER NOT NULL CHECK("version">0),"actorId" UUID NOT NULL,"sessionId" UUID NOT NULL,"correlationId" UUID NOT NULL,"recordedAt" TIMESTAMPTZ(3) NOT NULL,"snapshot" JSONB NOT NULL CHECK(jsonb_typeof("snapshot")='object'),PRIMARY KEY("receiptId","version"), FOREIGN KEY("receiptId","tenantId","siteId") REFERENCES "ReceiptDraft"("id","tenantId","siteId") ON DELETE RESTRICT);
+CREATE INDEX "ReceiptDraftRevision_tenantId_siteId_receiptId_idx" ON "ReceiptDraftRevision"("tenantId","siteId","receiptId");
+CREATE TABLE "ReceiptDraftOperation" ("tenantId" UUID NOT NULL,"siteId" UUID NOT NULL,"actorId" UUID NOT NULL,"operationId" UUID NOT NULL,"intentHash" CHAR(64) NOT NULL,"snapshot" JSONB NOT NULL CHECK(jsonb_typeof("snapshot")='object'),"recordedAt" TIMESTAMPTZ(3) NOT NULL,PRIMARY KEY("tenantId","siteId","actorId","operationId"));
+CREATE FUNCTION reject_receipt_draft_history_change() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Receipt draft history is append-only' USING ERRCODE='55000'; END; $$;
+CREATE TRIGGER "ReceiptDraftRevision_append_only" BEFORE UPDATE OR DELETE ON "ReceiptDraftRevision" FOR EACH ROW EXECUTE FUNCTION reject_receipt_draft_history_change();
+CREATE TRIGGER "ReceiptDraftOperation_append_only" BEFORE UPDATE OR DELETE ON "ReceiptDraftOperation" FOR EACH ROW EXECUTE FUNCTION reject_receipt_draft_history_change();
+COMMIT;

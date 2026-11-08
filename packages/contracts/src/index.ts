@@ -15,3 +15,4 @@ export * from './catalogue.js';
 export * from './receiving.js';
 export * from './evidence.js';
 export * from './product-lookup.js';
+export * from './receipt-workspace.js';

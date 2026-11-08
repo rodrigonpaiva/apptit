@@ -46,3 +46,10 @@ The original checkout still has its preexisting generated `apps/web/next-env.d.t
 The user authorized repeating the interrupted build and integrating through PR/CI before completing Sprint 2. Docker 29.6.2 was available again with approximately 17 GiB free. On 2026-11-08, `node scripts/containers/build.mjs --version local-sp2-05-dirty` completed successfully for both images, and `node scripts/containers/validate.mjs` passed again with the same isolated synthetic migration/repeat-seed/draft/no-stock/observation/dependency-failure checks. The linked JSON reports now contain this recovered final run. No prior failed attempt is treated as a pass. No registry publication occurred.
 
 SP2-05 integration PR: https://github.com/rodrigonpaiva/apptit/pull/12. This infrastructure branch is being committed/pushed for its own PR into dev, under the user's continuation authorization. Both require passing foundation/branch-policy checks before merge. Alpha.2 remains gated on the SP2-06 work and real Sprint 2 acceptance.
+
+
+## Pre-activation workflow correction
+
+Final integration review found that `runner` context is unavailable in job-level `env`. The original release job used it there for report paths. Paths now come from runner shell variables in a first step through `GITHUB_ENV`; artifact paths remain in supported step context. This preserves exact-tag checkout, token permissions and publication gates. Source: https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability. The correction must pass its own PR/CI before alpha.2 activation; a generic foundation pass alone does not prove a release-only workflow is valid.
+
+`actionlint` 1.7.12 validated the corrected release workflow successfully (`-shellcheck=` because shellcheck is not installed locally). Binary came from the official rhysd/actionlint release into /tmp; no repository dependency/lock change. Hosted publication remains gated until Sprint 2 acceptance and release publication.

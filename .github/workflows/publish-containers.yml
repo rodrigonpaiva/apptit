@@ -24,12 +24,16 @@ jobs:
     timeout-minutes: 35
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
-      RELEASE_METADATA: ${{ runner.temp }}/release-metadata.json
-      RELEASE_SOURCE: ${{ github.workspace }}/source
-      IMAGE_REPORT: ${{ runner.temp }}/images.json
-      VALIDATION_REPORT: ${{ runner.temp }}/validation.json
-      PUBLICATION_REPORT: ${{ runner.temp }}/publication.json
     steps:
+      - name: Prepare runner-local report paths
+        run: |
+          {
+            echo "RELEASE_METADATA=$RUNNER_TEMP/release-metadata.json"
+            echo "RELEASE_SOURCE=$GITHUB_WORKSPACE/source"
+            echo "IMAGE_REPORT=$RUNNER_TEMP/images.json"
+            echo "VALIDATION_REPORT=$RUNNER_TEMP/validation.json"
+            echo "PUBLICATION_REPORT=$RUNNER_TEMP/publication.json"
+          } >> "$GITHUB_ENV"
       - name: Check out publisher tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:

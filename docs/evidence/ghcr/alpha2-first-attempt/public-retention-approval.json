@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "tag": "v0.1.0-alpha.2",
+  "revision": "4c84d4663a172b7849ed222aea5e19652d1f23e0",
+  "repository": "rodrigonpaiva/apptit",
+  "kind": "api",
+  "reference": "ghcr.io/rodrigonpaiva/apptit-api:v0.1.0-alpha.2",
+  "digest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+  "action": "retain-existing-public-digest-only",
+  "webVisibility": "private",
+  "approvedAtDate": "2026-11-13",
+  "authorization": "User explicitly chose to keep apptit-api public and publish apptit-web private without deleting anything."
+}

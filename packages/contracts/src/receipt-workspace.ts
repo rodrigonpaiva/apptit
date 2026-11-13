@@ -13,3 +13,6 @@ export interface SaveReceiptWorkspace { command: SaveReceiptDraft; items: Receip
 export interface ReceiptWorkspaceSnapshot { draft: ReceiptDraftSnapshot; items: ReceiptItemDetails[] }
 export interface ReceiptLocation { id: string; name: string }
 export interface ReceiptSummary { id: string; version: number; recordedAt: string; lineCount: number }
+
+/** Only a committed operation has a confirmed result. Missing is still uncertain. */
+export type ReceiptOperationResult = { state: 'recorded'; snapshot: ReceiptWorkspaceSnapshot } | { state: 'unconfirmed' };

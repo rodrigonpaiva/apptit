@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -104,4 +105,10 @@ test('synthetic credentials are fresh and projected by role', async () => {
   for (const role of ['web', 'gateway-api']) { const scoped = scopedEnvironment(a, role); assert.equal(scoped.IDENTITY_DATABASE_URL, undefined); assert.equal(scoped.KITCHEN_DATABASE_URL, undefined); assert.equal(scoped.POSTGRES_ADMIN_PASSWORD, undefined); }
   assert.equal(scopedEnvironment(a, 'identity').KITCHEN_DATABASE_URL, undefined);
   assert.equal(scopedEnvironment(a, 'kitchen').IDENTITY_DATABASE_URL, undefined);
+});
+
+test('build CLI accepts the workflow repository option before validating tagged files', async t => {
+  const empty = await fs.mkdtemp(path.join(os.tmpdir(), 'apptit-cli-source-'));t.after(() => fs.rm(empty, { recursive: true, force: true }));
+  const result = spawnSync(process.execPath, [new URL('../scripts/containers/build.mjs', import.meta.url).pathname, '--source', empty, '--version', metadata.tag, '--revision', sha, '--repository', metadata.repository], { encoding: 'utf8' });
+  assert.equal(result.status, 1);assert.match(result.stderr, /Tagged source lacks required container files/);assert.doesNotMatch(result.stderr, /Unknown option/);
 });

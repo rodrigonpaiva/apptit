@@ -1,3 +1,4 @@
+import { csrfForRequest, invalidateDeniedAccess, onlineSignal } from './online-request';
 import type { ReceiptItemDetails, ReceiptLineDraft, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, SiteAccess, Unit } from '@apptit/contracts';
 import { decimal, fromScaled, scaledDecimal } from './receipt-decimal';
 export interface ReceiptSeed { name: string; presentation: string; barcode: string | null }
@@ -41,10 +42,11 @@ export function restoreReceipt(snapshot: ReceiptWorkspaceSnapshot): ReceiptEdito
     return { id: line.id, batchId: line.batch.id, productId: line.product.productId, presentationId: line.product.presentationId, presentationVersion: line.product.presentationVersion, name: item.name, presentation: item.presentation, barcode: item.barcode, batch: line.batch.code.state === 'known' ? line.batch.code.value : '', expiry: line.batch.expiry.state === 'known' ? line.batch.expiry.value.date : '', expiryKind: line.batch.expiry.state === 'known' && line.batch.expiry.value.kind === 'best_before' ? 'best_before' : 'use_by', destination: line.destinationLocationId.state === 'known' ? line.destinationLocationId.value : '', amount: line.received.state === 'known' ? line.received.value.amount : '', unit: item.pack?.unit ?? (line.received.state === 'known' ? line.received.value.unit : 'g'), mode: item.pack ? 'packs' : 'direct', count: item.pack?.count ?? '', factor: item.pack?.factor ?? '', checked: Boolean(item.pack?.checked), physicalMatch: item.physicalMatch };
   });
 }
-export async function receiptRequest<T>(action: 'save' | 'read' | 'list' | 'locations', input: unknown, signal?: AbortSignal): Promise<T> {
-  const bootstrap = await fetch('/api/session/csrf', { credentials: 'same-origin', cache: 'no-store', signal });
-  if (!bootstrap.ok) throw new Error('UNAVAILABLE'); const { csrfToken } = await bootstrap.json() as { csrfToken: string };
+export async function receiptRequest<T>(action: 'save' | 'read' | 'list' | 'locations' | 'operation', input: unknown, signal?: AbortSignal): Promise<T> {
+  signal = onlineSignal(signal);
+  const csrfToken = await csrfForRequest(signal);
   const response = await fetch(`/api/receipts/${action}`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal, headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken }, body: JSON.stringify(input) });
+  invalidateDeniedAccess(response);
   if (!response.ok) { const body = await response.json().catch(() => ({})) as { code?: string }; throw new Error(body.code ?? 'OUTCOME_UNCERTAIN'); }
   return response.json() as Promise<T>;
 }

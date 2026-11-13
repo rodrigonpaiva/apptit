@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "checks": [
+    "typed product lookup used the explicit OFF fixture without inferring quantity",
+    "lost acknowledgement recovered from original operation; no new save",
+    "failed upload never displayed as available",
+    "same photo upload recovered privately",
+    "actual illustrative reading saved independently of pending condition",
+    "real client deadline and absent operation remain uncertain",
+    "retry preserved operation identity and saved once",
+    "five responsive widths without horizontal overflow",
+    "offline lock removed private editor and photo state; no local save",
+    "server reload restored two batches, observations and receipt version",
+    "expired response immediately cleared private in-memory draft",
+    "real user/site switch never inherited prior receipt or author"
+  ],
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "receiptId": "994c0ced-47e4-4ac8-8105-b8c8e2b3ebe0",
+  "pageErrors": [],
+  "storageWritesAlwaysFail": true
+}

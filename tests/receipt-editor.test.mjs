@@ -11,9 +11,9 @@ test('receipt editor preserves distinct product/presentation identity and versio
   const temporary=await mkdtemp(path.join(tmpdir(),'apptit-editor-'));
   try {
     // Execute the pure browser serializer; ordinary workspace typecheck verifies its full types.
-    for(const name of ['receipt-decimal','receipts']) {
+    for(const name of ['online-request','receipt-decimal','receipts']) {
       const source=await readFile(new URL(`../apps/web/src/lib/${name}.ts`,import.meta.url),'utf8');
-      const result=ts.transpileModule(source.replace("'./receipt-decimal'","'./receipt-decimal.mjs'"),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
+      const result=ts.transpileModule(source.replace("'./receipt-decimal'","'./receipt-decimal.mjs'").replace("'./online-request'","'./online-request.mjs'"),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
       await writeFile(path.join(temporary,name+'.mjs'),result.outputText);
     }
     const {newReceiptLine,receiptCommand,restoreReceipt}=await import(pathToFileURL(path.join(temporary,'receipts.mjs')).href);

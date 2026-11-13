@@ -1,0 +1,12 @@
+PASS: typed product lookup used the explicit OFF fixture without inferring quantity
+PASS: lost acknowledgement recovered from original operation; no new save
+PASS: failed upload never displayed as available
+PASS: same photo upload recovered privately
+PASS: actual illustrative reading saved independently of pending condition
+PASS: real client deadline and absent operation remain uncertain
+PASS: retry preserved operation identity and saved once
+PASS: five responsive widths without horizontal overflow
+PASS: offline lock removed private editor and photo state; no local save
+PASS: server reload restored two batches, observations and receipt version
+PASS: expired response immediately cleared private in-memory draft
+PASS: real user/site switch never inherited prior receipt or author

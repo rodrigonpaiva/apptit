@@ -96,3 +96,13 @@ The evidence section above records the SP2-01 contract boundary. SP2-04 now impl
 ## SP2-05 implementation update
 
 Procedure-bound actual temperature/condition observations and immutable correction history are implemented separately from receipt disposition in [receiving observations](receiving-observations.md). Explicit synthetic profile selection, missing/stale/estimated context and original rule snapshots do not establish goods eligibility. Default capture remains disabled; real PMS/chef disposition/stock activation is outside this slice.
+
+## SP2-06 — Online save-result recovery
+
+`POST /api/receipts/operation` (gateway) / `POST /internal/v1/receipt-drafts/operation` (Kitchen) accepts exactly `{ scope, operationId, receiptId }`, with validated UUIDs. It requires same-origin CSRF and a freshly authorized individual with `receipt.draft.read`. Kitchen independently reauthorizes; service identity alone is insufficient. The actor comes from Identity, never the body.
+
+The lookup key is tenant/site/current actor/operation ID. A matching committed receipt-save result returns `{ state: "recorded", snapshot }`. Missing/wrong-actor/wrong-receipt results return `{ state: "unconfirmed" }`; a forbidden scope is denied without disclosure. Unconfirmed can mean not received, still in flight, rejected without a committed registry result, or otherwise unknown. It never proves failure or authorizes a new operation identity. This narrow draft registry does not implement the entire future AP-017 stock-operation state machine.
+
+After acknowledgement loss, query this exact operation or retry the unchanged save command with the same ID. A recorded result confirms durable draft save, not chef approval, evidence completion, stock posting or current aggregate version if another operation has since updated it. Version conflicts require reload/review; no last-write-wins overwrite is introduced. The UI keeps ambiguous payloads frozen for recovery and bounds online calls to 15 seconds. Authentication/scope denial clears private in-memory views immediately; offline, blur, logout and user/site change retain the existing lock boundary.
+
+There is no local persistent draft/photo queue or offline identity policy. Capture is visibly offline-disabled; local storage failure cannot produce a saved-local claim. Unsaved memory can be lost at lock/navigation, as explicitly disclosed. A successful server reload is independent of unsent edits. Full AP-130–AP-138, device-loss recovery and live operational acceptance remain outside Sprint 2.

@@ -1,3 +1,4 @@
+import { csrfForRequest, invalidateDeniedAccess, onlineSignal } from './online-request';
 import type { Datum, ReceivingObservationData, ReceivingObservationProfile, ReceivingObservationSnapshot, SaveReceivingObservation, SiteAccess } from '@apptit/contracts';
 import type { ReceiptEditorLine } from './receipts';
 export interface ObservationEditor {
@@ -39,9 +40,10 @@ export function observationCommand(site: SiteAccess, receiptId: string, receiptV
   return { schemaVersion: 1, scope: { tenantId: site.tenantId, siteId: site.siteId }, id, operationId: crypto.randomUUID(), expectedVersion: previous?.version ?? 0, expectedReceiptVersion: receiptVersion, target: { receiptId, lineId: line.id, productId: line.productId, presentationId: line.presentationId, batchId: line.batchId }, profile: { id: profile.id, version: profile.version }, data, correctionReason: previous ? editor.correctionReason.trim() : null };
 }
 export async function observationRequest<T>(action: 'save' | 'list' | 'history', input: unknown, signal?: AbortSignal): Promise<T> {
-  const bootstrap = await fetch('/api/session/csrf', { credentials: 'same-origin', cache: 'no-store', signal });
-  if (!bootstrap.ok) throw new Error('DEPENDENCY_UNAVAILABLE'); const { csrfToken } = await bootstrap.json() as { csrfToken: string };
+  signal = onlineSignal(signal);
+  const csrfToken = await csrfForRequest(signal);
   const response = await fetch(`/api/observations/${action}`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal, headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken }, body: JSON.stringify(input) });
+  invalidateDeniedAccess(response);
   if (!response.ok) { const body = await response.json().catch(() => ({})) as { code?: string }; throw new Error(body.code ?? 'OUTCOME_UNCERTAIN'); }
   return response.json() as Promise<T>;
 }

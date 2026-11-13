@@ -95,7 +95,7 @@ async function bootstrap(): Promise<void> {
     @Post('evidence/review') reviewEvidence(@Req() req: Request, @Body() input: unknown) { return this.evidence(req, input, 'review'); }
     @Post('evidence/upload') uploadEvidence(@Req() req: Request) { return this.evidence(req, undefined, 'upload'); }
     @Post('evidence/read') readEvidence(@Req() req: Request, @Body() input: unknown, @Res() response: Response) { return this.evidence(req, input, 'read', response); }
-    private async receipt(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations') {
+    private async receipt(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations' | 'operation') {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
         const value = input as { scope?: unknown; command?: { scope?: unknown } };
@@ -111,6 +111,7 @@ async function bootstrap(): Promise<void> {
       }
     }
     @Post('receipt-drafts/save') saveReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'save'); }
+    @Post('receipt-drafts/operation') receiptOperation(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'operation'); }
     @Post('receipt-drafts/read') readReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'read'); }
     @Post('receipt-drafts/list') listReceipts(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'list'); }
     @Post('receipt-drafts/locations') receiptLocations(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'locations'); }

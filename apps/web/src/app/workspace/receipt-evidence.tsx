@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { csrfForRequest, invalidateDeniedAccess, onlineSignal } from '../../lib/online-request';
 import type { EvidenceListing, EvidenceUploadIntent, EvidenceView, SiteAccess } from '@apptit/contracts';
 import type { ReceiptEditorLine } from '../../lib/receipts';
 async function request(action: string, input: unknown, signal?: AbortSignal): Promise<Response> {
-  const bootstrap = await fetch('/api/session/csrf', { credentials: 'same-origin', cache: 'no-store', signal });
-  if (!bootstrap.ok) throw new Error('Accès indisponible.');
-  const { csrfToken } = await bootstrap.json() as { csrfToken: string };
+  signal = onlineSignal(signal);
+  const csrfToken = await csrfForRequest(signal);
   const response = await fetch(`/api/evidence/${action}`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal, headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken }, body: JSON.stringify(input) });
+  invalidateDeniedAccess(response);
   if (!response.ok) throw new Error('Photo indisponible : vérifiez votre accès et réessayez.');
   return response;
 }
@@ -34,7 +35,7 @@ export default function ReceiptEvidence({ site, receiptId, line, saved, onBusy }
   }
   async function upload() {
     if (!file || !saved || !listing || busy) return;
-    setBusy(true); onBusy(true); setMessage('Envoi en cours — photo non confirmée.'); const abort = new AbortController(); controller.current = abort;
+    setBusy(true); onBusy(true); setMessage('Envoi en cours — photo non confirmée.'); const abort = new AbortController(); controller.current = abort; const signal = onlineSignal(abort.signal);
     try {
       let current = attempt.current;
       if (!current) {
@@ -43,10 +44,10 @@ export default function ReceiptEvidence({ site, receiptId, line, saved, onBusy }
         const intent: EvidenceUploadIntent = { uploadId: crypto.randomUUID(), scope: requested, links: { receiptId, lineId: line.id, productId: line.productId, presentationId: line.presentationId, batchId: line.batchId }, originalFilename: file.name, capturedAt: { state: 'unknown', reason: 'Heure de capture non confirmée par un dispositif de confiance' }, declared: { mediaType: file.type, sizeBytes: file.size, sha256: digest } };
         current = { intent, file }; attempt.current = current;
       }
-      const pending = await (await request('begin', current.intent, abort.signal)).json() as EvidenceView;
-      const bootstrap = await fetch('/api/session/csrf', { credentials: 'same-origin', cache: 'no-store', signal: abort.signal }); if (!bootstrap.ok) throw new Error('Accès indisponible');
-      const { csrfToken } = await bootstrap.json() as { csrfToken: string };
-      const response = await fetch('/api/evidence/upload', { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal: abort.signal, headers: { 'content-type': current.file.type, 'x-csrf-token': csrfToken, 'x-tenant-id': requested.tenantId, 'x-site-id': requested.siteId, 'x-evidence-id': pending.id }, body: current.file });
+      const pending = await (await request('begin', current.intent, signal)).json() as EvidenceView;
+      const csrfToken = await csrfForRequest(signal);
+      const response = await fetch('/api/evidence/upload', { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal, headers: { 'content-type': current.file.type, 'x-csrf-token': csrfToken, 'x-tenant-id': requested.tenantId, 'x-site-id': requested.siteId, 'x-evidence-id': pending.id }, body: current.file });
+      invalidateDeniedAccess(response);
       if (!response.ok) throw new Error('Envoi non confirmé');
       const result = await response.json() as EvidenceView;
       if (!active.current) return;

@@ -4,8 +4,10 @@ import { createHash, randomUUID } from 'node:crypto';
 export async function evidenceSmoke(browser, scope, actor) {
   const unknown={state:'unknown',reason:'Synthetic smoke: not observed'};
   const line={id:randomUUID(),product:{productId:randomUUID(),presentationId:randomUUID(),presentationVersion:1},batch:{id:randomUUID(),code:unknown,expiry:unknown},received:unknown,disposition:unknown,destinationLocationId:unknown,evidenceIds:[]};
-  const receiptId=randomUUID();
-  const saved=await browser.receipt('save',{command:{schemaVersion:1,operationId:randomUUID(),scope,receiptId,expectedVersion:0,payload:{supplierReference:unknown,receivedAt:unknown,lines:[line]}},items:[{lineId:line.id,name:'Synthetic smoke image',presentation:'No actual goods',barcode:null,physicalMatch:false,pack:null}]});assert.ok(saved.ok);
+  const receiptId=randomUUID(), operationId=randomUUID();
+  const saved=await browser.receipt('save',{command:{schemaVersion:1,operationId,scope,receiptId,expectedVersion:0,payload:{supplierReference:unknown,receivedAt:unknown,lines:[line]}},items:[{lineId:line.id,name:'Synthetic smoke image',presentation:'No actual goods',barcode:null,physicalMatch:false,pack:null}]});assert.ok(saved.ok);
+  const operation={scope,receiptId,operationId};const recovered=await browser.receipt('operation',operation);assert.ok(recovered.ok);const outcome=await recovered.json();assert.equal(outcome.state,'recorded');assert.equal(outcome.snapshot.draft.state,'draft');assert.equal(outcome.snapshot.draft.createdBy.userId,actor.id);
+  assert.equal((await (await browser.receipt('operation',{...operation,operationId:randomUUID()})).json()).state,'unconfirmed');
   const bytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aSlkAAAAASUVORK5CYII=','base64');
   const input={uploadId:randomUUID(),scope,links:{receiptId,lineId:line.id,productId:line.product.productId,presentationId:line.product.presentationId,batchId:line.batch.id},originalFilename:'synthetic-smoke.png',capturedAt:unknown,declared:{mediaType:'image/png',sizeBytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')}};
   const begun=await browser.evidence('begin',input);assert.ok(begun.ok);const item=await begun.json();assert.equal(item.state,'upload_pending');assert.equal(item.author.userId,actor.id);assert.equal(item.capturedAt.state,'unknown');
@@ -19,5 +21,5 @@ export async function evidenceSmoke(browser, scope, actor) {
   assert.equal((await browser.request('/api/evidence/list',{method:'POST',headers:{'content-type':'application/json',origin:browser.origin},body:JSON.stringify({scope,receiptId})})).status,403);
   assert.equal((await browser.evidence('list',{scope,receiptId},{origin:'https://untrusted.example'})).status,403);
   const publicRead=await browser.request('/'+item.id+'.blob');assert.equal(publicRead.status,404);
-  return {id:item.id,receiptId};
+  return {id:item.id,receiptId,operation};
 }

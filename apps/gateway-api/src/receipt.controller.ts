@@ -4,7 +4,7 @@ import type { Request } from 'express';
 import { AuthFailure, cookieValue, CSRF_COOKIE, identityCall, readConfig, SESSION_COOKIE, validCsrf } from '@apptit/runtime';
 @Controller('receipts')
 export class ReceiptController {
-  private async call(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations') {
+  private async call(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations' | 'operation') {
     const config = readConfig('gateway-api'); const secret = cookieValue(req.headers.cookie, SESSION_COOKIE);
     try {
       if (req.headers.origin !== config.webOrigin || !req.is('application/json') || req.headers['sec-fetch-site'] === 'cross-site' || !validCsrf(cookieValue(req.headers.cookie, CSRF_COOKIE), secret, req.headers['x-csrf-token'], config.csrfKey)) throw new AuthFailure('FORBIDDEN', 403);
@@ -24,6 +24,7 @@ export class ReceiptController {
     }
   }
   @Post('save') save(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'save'); }
+  @Post('operation') operation(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'operation'); }
   @Post('read') read(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'read'); }
   @Post('list') list(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'list'); }
   @Post('locations') locations(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'locations'); }

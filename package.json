@@ -38,7 +38,7 @@
     "test:integration": "node scripts/integration.mjs",
     "containers:build": "node scripts/containers/build.mjs",
     "containers:smoke": "node scripts/containers/validate.mjs",
-    "containers:test": "node --test tests/container-publication.test.mjs"
+    "containers:test": "node --test tests/container-publication.test.mjs tests/container-registry.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

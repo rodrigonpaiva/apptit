@@ -1,0 +1,8 @@
+{
+  "barcode": "3017620422003",
+  "state": "found",
+  "source": {"provider": "open_food_facts", "apiVersion": "3.4", "synthetic": false, "reviewState": "unreviewed"},
+  "product": {"name": "Nutella", "presentation": "400 g e"},
+  "method": "Authenticated same-origin web GraphQL query through the published alpha.2 Compose stack",
+  "externalOperation": "read-only public barcode lookup"
+}

@@ -28,3 +28,23 @@ The namespace is owned by the PostgreSQL container. Identity, kitchen, gateway, 
 Runtime processes keep the images' `node` user. A short root-only initialization job assigns the private-photo volume to UID/GID 1000, then exits; migration/seed jobs run as `node`. Each service receives role-scoped credentials. The browser forwarder receives none. Readiness of identity/kitchen uses their own internal token without printing it.
 
 Compose file: `containers/local/compose.yaml`. The project name is `apptit-alpha2-local`; it is a single local demonstration environment. Do not use it for real restaurant data or concurrently manipulate the same project from another checkout. Do not run `docker compose config` in shared logs: resolved env files contain credentials.
+
+## Look up actual public Open Food Facts products
+
+Fresh synthetic environments use recorded examples (`OFF_MODE=fixture`). To search the real public database by barcode in the receiving tab, explicitly enable read-only access:
+
+```sh
+npm run containers:off:live
+```
+
+The command preserves credentials, database, private photos and image digests, changes only the persisted OFF mode and restarts the Compose services with that setting. It sends the barcode through the existing protected backend adapter to the fixed public OFF host; private restaurant details and photos are not submitted. The adapter retains its bounded timeout, cache and request budget. No OFF write/contribution is performed. Ordinary `containers:up` preserves the selected mode.
+
+In **Réception**, enter the textual barcode and select **Identifier**, then **Ajouter une ligne de réception**. Available product name and nominal presentation prefill the editable fields. Missing values remain empty for completion from the physical label. Batch, expiry, actual quantity and physical-match confirmation are always entered/checked by the user; the barcode does not establish them. A missing product or provider outage keeps manual entry available. Imported reference data remains unreviewed and draft save still creates no stock.
+
+For repeatable fixture demonstrations/tests, restore the examples:
+
+```sh
+npm run containers:off:fixture
+```
+
+A useful public example for a manual connectivity check is `3017620422003`; availability and content belong to OFF and can change. External reads are not a deterministic CI dependency. The separate identification view also shows available brand, allergen/nutrition declarations and source information; these are not editable received-batch facts or a completed nutrition/allergen review workflow.

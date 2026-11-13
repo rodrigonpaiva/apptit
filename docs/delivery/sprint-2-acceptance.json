@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "sprint": 2,
+  "status": "passed",
+  "validatedSourceCommit": "3880beeda643010d8a7156173290040656393c44",
+  "completed": [
+    "SP2-01",
+    "SP2-02",
+    "SP2-03",
+    "SP2-04",
+    "SP2-05",
+    "SP2-06"
+  ],
+  "evidence": "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+}

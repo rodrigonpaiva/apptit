@@ -132,3 +132,6 @@ export function toBaseQuantity(input: { amount: string; unit: 'kg' | 'l'; basis:
   const converted = quantity({ amount: fromScaled(scaledDecimal(input.amount) * 1000n), unit: input.unit === 'kg' ? 'g' : 'ml', basis: input.basis, resolution: fromScaled(scaledDecimal(input.resolution) * 1000n) });
   return { quantity: converted, provenance: { original, factor: '1000', method: 'exact_metric_scaling' as const } };
 }
+export * from './receiving.js';
+export * from './barcode.js';
+export * from './observations.js';

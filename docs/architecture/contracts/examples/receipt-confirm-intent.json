@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "operationId": "50000000-0000-4000-8000-000000000012",
+  "scope": {
+    "tenantId": "50000000-0000-4000-8000-000000000004",
+    "siteId": "50000000-0000-4000-8000-000000000005"
+  },
+  "receiptId": "50000000-0000-4000-8000-000000000006",
+  "expectedVersion": 1,
+  "payload": {
+    "lines": [
+      {
+        "lineId": "50000000-0000-4000-8000-000000000007",
+        "batchId": "50000000-0000-4000-8000-000000000008",
+        "disposition": {
+          "accepted": {
+            "amount": "40000",
+            "unit": "g",
+            "basis": "as_received",
+            "resolution": "1"
+          },
+          "rejected": {
+            "amount": "2000",
+            "unit": "g",
+            "basis": "as_received",
+            "resolution": "1"
+          },
+          "quarantined": {
+            "amount": "3000",
+            "unit": "g",
+            "basis": "as_received",
+            "resolution": "1"
+          },
+          "pending": {
+            "amount": "5000",
+            "unit": "g",
+            "basis": "as_received",
+            "resolution": "1"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -36,8 +36,8 @@ GraphQL `siteContext` returns only the verified actor/site/role/capabilities, no
 
 | Role | Explicit test capabilities |
 | --- | --- |
-| Chef | site.read, catalogue.read, quantity-draft.read/write |
-| Storekeeper | site.read, catalogue.read, quantity-draft.read |
+| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write, observation.read/capture |
+| Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write, evidence.read/write, observation.read/capture |
 | Cook | site.read, catalogue.read |
 
 No stock withdrawal, product grant, safety disposition, menu publication, director substitution or platform-administrator bypass is enabled. Quantity-draft methods remain internal pending an actual business command adapter. Existing SP1-03 attribution contexts can now be constructed by Identity, without accepting client identity claims.
@@ -48,7 +48,7 @@ Five individual synthetic accounts cover Chef A, Storekeeper A, Cook A, Chef B a
 
 Login and workspace show synthetic mode, actual signed-in identity, authorized restaurant and role. Server rendering does not place a private profile in prerendered markup; the client verifies again before displaying it. Protected responses use no-store. Login/logout use full navigation to clear the prior router state. Losing focus/visibility/network hides private profile content and requires revalidation; restored browser pages reload. Request generations prevent late responses from restoring a previous view. A failed logout keeps the UI locked with retry rather than claiming a completed user switch.
 
-No local draft/observation queue is enabled, so switching deletes no unsent operational record and transfers no authorship. Full offline access, lost-device recovery, organizational administration, complete permissions and real operating policies remain later work.
+No local durable draft/observation queue is enabled. SP2-03 receipt editing is memory-only: locking/navigation clears unsaved fields with an explicit notice; saved drafts remain server-side under their original scope/attribution. Switching transfers no authorship. Full offline access, lost-device recovery, organizational administration, complete permissions and real operating policies remain later work.
 
 ## References
 
@@ -57,3 +57,5 @@ No local draft/observation queue is enabled, so switching deletes no unsent oper
 - [OWASP CSRF prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html).
 
 These sources informed implementation choices; no external security certification or live deployment readiness is claimed.
+
+SP2-05 observation capture is separate from receipt disposition. No disposition or stock grant is activated; see the [observation contract](receiving-observations.md).

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "syntheticOnly": true,
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "blankNotPrefilled": true,
+  "pendingRecorded": true,
+  "missingContextInconclusive": true,
+  "withinIllustrativeRuleOnly": true,
+  "deviationDistinct": true,
+  "notApplicableRequiresReasonAndCannotWaiveRequiredControl": true,
+  "estimatedReadingInconclusive": true,
+  "staleReadingInconclusive": true,
+  "separateObservationTimes": true,
+  "originalRuleAndHistoryPreserved": true,
+  "reloadRetainsActualValues": true,
+  "lostResponseSameOperationNoExtraVersion": true,
+  "keyboardSave": true,
+  "lockClearsPrivateFields": true,
+  "pageErrors": []
+}

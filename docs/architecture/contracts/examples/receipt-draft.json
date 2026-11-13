@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "operationId": "50000000-0000-4000-8000-000000000003",
+  "scope": {
+    "tenantId": "50000000-0000-4000-8000-000000000004",
+    "siteId": "50000000-0000-4000-8000-000000000005"
+  },
+  "receiptId": "50000000-0000-4000-8000-000000000006",
+  "expectedVersion": 0,
+  "payload": {
+    "supplierReference": {
+      "state": "unknown",
+      "reason": "Not observed in this synthetic draft"
+    },
+    "receivedAt": {
+      "state": "known",
+      "value": "2026-11-05T12:00:00Z",
+      "quality": "measured",
+      "sourceRef": "synthetic/manual-review"
+    },
+    "lines": [
+      {
+        "id": "50000000-0000-4000-8000-000000000007",
+        "product": {
+          "productId": "50000000-0000-4000-8000-000000000001",
+          "presentationId": "50000000-0000-4000-8000-000000000002",
+          "presentationVersion": 2
+        },
+        "batch": {
+          "id": "50000000-0000-4000-8000-000000000008",
+          "code": {
+            "state": "known",
+            "value": "SYNTHETIC-BATCH-A",
+            "quality": "measured",
+            "sourceRef": "synthetic/manual-review"
+          },
+          "expiry": {
+            "state": "known",
+            "value": {
+              "kind": "use_by",
+              "date": "2026-11-08",
+              "sourceRef": "synthetic/actual-label"
+            },
+            "quality": "measured",
+            "sourceRef": "synthetic/manual-review"
+          }
+        },
+        "received": {
+          "state": "known",
+          "value": {
+            "amount": "50000",
+            "unit": "g",
+            "basis": "as_received",
+            "resolution": "1"
+          },
+          "quality": "measured",
+          "sourceRef": "synthetic/manual-review"
+        },
+        "disposition": {
+          "state": "known",
+          "value": {
+            "accepted": {
+              "amount": "40000",
+              "unit": "g",
+              "basis": "as_received",
+              "resolution": "1"
+            },
+            "rejected": {
+              "amount": "2000",
+              "unit": "g",
+              "basis": "as_received",
+              "resolution": "1"
+            },
+            "quarantined": {
+              "amount": "3000",
+              "unit": "g",
+              "basis": "as_received",
+              "resolution": "1"
+            },
+            "pending": {
+              "amount": "5000",
+              "unit": "g",
+              "basis": "as_received",
+              "resolution": "1"
+            }
+          },
+          "quality": "measured",
+          "sourceRef": "synthetic/manual-review"
+        },
+        "destinationLocationId": {
+          "state": "known",
+          "value": "50000000-0000-4000-8000-000000000009",
+          "quality": "measured",
+          "sourceRef": "synthetic/manual-review"
+        },
+        "evidenceIds": []
+      }
+    ]
+  }
+}

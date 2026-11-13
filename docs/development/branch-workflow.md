@@ -8,7 +8,7 @@ Date: 2026-11-04. Direction: isolated feature work → integration/testing on `d
 | `dev` | Integration and complete test execution | PR from `feature/*`, `fix/*`, `chore/*`, `docs/*` or `deps/*` |
 | Topic branches | One feature, fix or bounded maintenance change | Start from current `origin/dev` |
 
-Branch names use lowercase letters, numbers, dots and hyphens after one type prefix. Example for the next package: `feature/sp1-03-quantities-versioned-persistence`. SP1-03 has not started.
+Branch names use lowercase letters, numbers, dots and hyphens after one type prefix. Current Sprint 1 verification uses `feature/sp1-06-foundation-verification`. After its integration, the next package can start as `feature/sp2-01-receiving-contracts`.
 
 ## Day-to-day sequence
 
@@ -16,7 +16,7 @@ Branch names use lowercase letters, numbers, dots and hyphens after one type pre
 git fetch origin
 git switch dev
 git pull --ff-only
-git switch -c feature/sp1-03-quantities-versioned-persistence
+git switch -c feature/sp2-01-receiving-contracts
 npm run git:setup
 ```
 

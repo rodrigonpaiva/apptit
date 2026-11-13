@@ -1,4 +1,8 @@
 import 'reflect-metadata';
+import { ObservationController } from './observation.controller.js';
+import { EvidenceController } from './evidence.controller.js';
+import { ReceiptController } from './receipt.controller.js';
+import { productLookupResolver, productLookupSchema } from './product-lookup.js';
 import { catalogueResolver, catalogueSchema } from './catalogue.js';
 import { SessionController } from './session.controller.js';
 import { boundedQuery, siteResolver, siteSchema } from './site-context.js';
@@ -39,8 +43,8 @@ async function bootstrap(): Promise<void> {
   @Module({
     imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }' + quantityValidationSchema + siteSchema + catalogueSchema,
-      resolvers: { Query: { runtimeStatus: () => status, validateQuantityDraft: validateQuantityDraftInput, siteContext: siteResolver(config), catalogue: catalogueResolver(config) } },
+      typeDefs: 'type RuntimeStatus { service: String!, mode: String!, schemaVersion: Int!, operationalFeaturesEnabled: Boolean! } type Query { runtimeStatus: RuntimeStatus! }' + quantityValidationSchema + siteSchema + catalogueSchema + productLookupSchema,
+      resolvers: { Query: { runtimeStatus: () => status, validateQuantityDraft: validateQuantityDraftInput, siteContext: siteResolver(config), catalogue: catalogueResolver(config), productLookup: productLookupResolver(config) } },
       context: ({ req }: { req: Request }) => ({ req }),
       validationRules: [boundedQuery],
       introspection: false,
@@ -49,7 +53,7 @@ async function bootstrap(): Promise<void> {
       includeStacktraceInErrorResponses: false,
       formatError: error => ({ message: 'GraphQL request rejected', extensions: { code: error.extensions?.['code'] ?? 'INTERNAL_ERROR' } }),
     })],
-    controllers: [HealthController, SessionController],
+    controllers: [HealthController, SessionController, ReceiptController, EvidenceController, ObservationController],
   })
   class GatewayModule {}
   const app = await NestFactory.create<NestExpressApplication>(GatewayModule, { logger: ['error', 'warn'], abortOnError: false });

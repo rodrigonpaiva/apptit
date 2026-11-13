@@ -22,7 +22,7 @@ Recorded 2026-11-04 (Europe/Paris). Exact direct versions and all transitive res
 
 ESM `NodeNext` and `.js` relative imports are used for compiled backend code; Prisma generator emits ESM with service-local output. A common shared generated client is prohibited. Next uses Bundler module resolution. Workspace package exports/TypeScript references provide library boundaries; applications expose no importable package API.
 
-GitHub Actions uses `actions/checkout@v7` and `actions/setup-node@v7`, following their current official examples; remote execution remains unverified.
+GitHub Actions uses `actions/checkout@v7` and `actions/setup-node@v7`, following their current official examples; the integrated SP1-05 dev head passed the complete remote foundation workflow on 2026-11-05 ([run 42015585388](https://github.com/rodrigonpaiva/apptit/actions/runs/42015585388)). This evidence does not claim CI on later unpushed work.
 
 ## Primary references
 
@@ -39,3 +39,7 @@ Do not blindly install registry `latest`: at selection time it included a Prisma
 ## SP1-04 additions
 
 `argon2@0.45.2` (Node ≥16.17; tested on selected Node 22) implements password hashes; `@types/express@5.0.6` types the HTTP controllers. Exact versions are fixed in the manifests/lockfile. No auth/cloud provider or native mobile framework is selected.
+
+## SP2-02 scanner
+
+`zxing-wasm@3.1.6` is pinned in the web workspace. Only its reader is lazily imported; the matching WASM is served from the app's fixed same-origin route, with explicit Next file tracing. No CDN or scanner cloud service is used. Controlled Chromium video decoding passed; physical-device/lighting/Safari coverage remains pending. Public MIT and ZXing-C++ Apache-2.0 notices ship in apps/web/public/licenses.

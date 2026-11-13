@@ -2,6 +2,8 @@
 
 Status: SP1-01 design baseline, 2026-11-04. [Type definitions](first-slice.ts) have no framework dependency. They deliberately require later runtime validators: TypeScript string aliases cannot validate decimal/date/UUID content. Nothing here enables receipt/stock/file operations before their sprint acceptance.
 
+The subsequent [SP2-01 receiving contract](receiving.md) refines receipt/presentation/batch identities and supplies runtime parsers for drafts, conversion/reconciliation and evidence declarations. Future stock/evidence ports remain disabled.
+
 ## Public and internal API
 
 | Interface | Contract | Authorization / effect |

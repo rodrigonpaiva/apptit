@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. Receiving, stock operations, offline capture and live external integrations remain outside the enabled slice.
+The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. SP2-03 adds scoped receipt draft save/reload without stock effects. SP2-04 adds opt-in synthetic private label photos with original attribution, failure/retry states and manual fallback. SP2-05 adds explicit synthetic procedure-bound temperature/condition capture, versioned assessments and preserved corrections. SP2-06 adds committed-operation recovery, bounded online requests and honest timeout/connection/session failure states. Stock operations, OCR, offline capture and live operational deployment remain outside the enabled slice. See the [Sprint 2 technical acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md).
 
 ## Run locally
 
@@ -35,7 +35,7 @@ Use the passwords generated in your own `.local/fixture-credentials.json`:
 - `stock.a@apptit.test` / `cook.a@apptit.test`: individual storekeeper/cook accounts for A.
 - `chef.multi@apptit.test`: select either explicitly authorized restaurant.
 
-In `/workspace`, search by product name, presentation or textual barcode, for example `0012345678905`. Leaving the page hides private content; returning revalidates access and reloads the list. Logout revokes the server session. Navigation/search requires no camera permission.
+In `/workspace`, search by product name, presentation or textual barcode, for example `0012345678905`. Leaving the page hides private content; returning revalidates access and reloads the list. Logout revokes the server session. Typed navigation/search requires no camera permission. The “Identifier un produit” section optionally scans with the camera and always supports manual identification. OFF defaults to deterministic examples; explicit OFF_MODE=live enables read-only public lookup. Restart dev after configuration changes.
 
 Ctrl+C stops the app processes. `npm run infra:down` stops the local infrastructure while preserving its database volume. A volume is not a backup.
 
@@ -54,13 +54,31 @@ npm run smoke
 ```
 
 - `check`: Prisma schemas, lint/module boundaries, types, contract compilation, unit/configuration/security/policy tests and production builds.
-- `test:integration`: real PostgreSQL tests for quantities, version conflicts/audit rollback, migration evolution, sessions and catalogue isolation. An unavailable database fails the run instead of skipping tests.
-- `smoke`: actual HTTP login, Origin/CSRF/cookies, private catalogue, cross-site denial, forged identity rejection, expiry/revocation and dependency-failure behavior.
+- `test:integration`: real PostgreSQL tests for quantities, version conflicts/audit rollback, migration evolution, sessions, catalogue isolation and private evidence integrity/authorization. An unavailable database fails the run instead of skipping tests.
+- `smoke`: actual HTTP login, Origin/CSRF/cookies, private catalogue and receipt-image upload/read, cross-site denial, forged identity rejection, expiry/revocation and dependency-failure behavior.
 
 [Local setup, commands and troubleshooting](docs/development/local-development.md) covers configuration changes, standalone runtimes and intentional synthetic reset. No real restaurant approval, production deployment, stock availability or live recovery guarantee is claimed.
 
 ## Architecture
 
+- [Setup, commands and troubleshooting](docs/development/local-development.md)
+- [Toolchain compatibility](docs/development/toolchain.md)
+- [SP1-02 acceptance evidence](docs/delivery/SP1-02.md)
+- [SP1-03 quantities and versioned persistence](docs/delivery/SP1-03.md)
+- [SP1-04 individual access](docs/delivery/SP1-04.md)
+- [SP1-05 private product list](docs/delivery/SP1-05.md)
+- [Sprint 1 demonstration and verification](docs/development/foundation-demo.md)
+- [SP1-06 delivery evidence](docs/delivery/SP1-06.md)
+- [SP2-01 receiving/operation/evidence contracts](docs/delivery/SP2-01.md)
+- [SP2-02 product identification and OFF/manual fallback](docs/delivery/SP2-02.md)
+- [SP2-03 receipt drafts](docs/delivery/SP2-03.md)
+- [SP2-04 private label evidence](docs/delivery/SP2-04.md)
+- [SP2-05 synthetic receiving observations](docs/delivery/SP2-05.md)
+- [SP2-06 draft durability and recovery](docs/delivery/SP2-06.md)
+- [Sprint 2 technical acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md)
+- [Container builds and private GHCR release publication](docs/development/container-publication.md)
+
+Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 TypeScript, Nx/npm workspaces, Next.js/React, NestJS/Apollo GraphQL, Prisma and PostgreSQL. Exact versions are recorded in the lockfile and [toolchain matrix](docs/development/toolchain.md).
 
 | Location | Responsibility |
@@ -68,7 +86,7 @@ TypeScript, Nx/npm workspaces, Next.js/React, NestJS/Apollo GraphQL, Prisma and 
 | `apps/web` | Responsive web client and same-origin API proxy |
 | `apps/gateway-api` | Public GraphQL/session boundary and response composition |
 | `services/identity` | Users, sessions, sites, memberships and authoritative access checks |
-| `services/kitchen` | Scoped catalogue and internal versioned reference-draft persistence |
+| `services/kitchen` | Scoped catalogue, receipt/evidence/observation and versioned draft persistence |
 | `packages/*` | Shared contracts, exact domain values and runtime helpers |
 
 Identity and Kitchen own separate databases and generated clients. The gateway has no business database. See [architecture/ADRs](docs/architecture/README.md) and the [typed first-slice contract](docs/architecture/contracts/first-slice.md).
@@ -90,3 +108,8 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 - [Product specification v0.80](plans/APPTIT_SPEC_v0.80_EN.md)
 - [Delivery backlog v1.0](plans/backlog/APPTIT_BACKLOG_v1.0_EN.md)
 - [First four sprints](plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md)
+
+- [SP2-03 receipt drafts](docs/delivery/SP2-03.md)
+- [SP2-04 private label evidence](docs/delivery/SP2-04.md)
+
+- [SP2-05 procedure-bound receiving observations](docs/delivery/SP2-05.md)

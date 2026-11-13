@@ -1,0 +1,24 @@
+{
+  "uploadId": "50000000-0000-4000-8000-000000000013",
+  "scope": {
+    "tenantId": "50000000-0000-4000-8000-000000000004",
+    "siteId": "50000000-0000-4000-8000-000000000005"
+  },
+  "links": {
+    "receiptId": "50000000-0000-4000-8000-000000000006",
+    "lineId": "50000000-0000-4000-8000-000000000007",
+    "productId": "50000000-0000-4000-8000-000000000001",
+    "presentationId": "50000000-0000-4000-8000-000000000002",
+    "batchId": "50000000-0000-4000-8000-000000000008"
+  },
+  "originalFilename": "synthetic-label.jpg",
+  "capturedAt": {
+    "state": "unknown",
+    "reason": "Not observed in this synthetic draft"
+  },
+  "declared": {
+    "mediaType": "image/jpeg",
+    "sizeBytes": 1024,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

@@ -1,0 +1,5 @@
+
+> apptit@0.0.0 smoke
+> node scripts/smoke.mjs
+
+PASS: web shell, same-origin GraphQL, recoverable value validation, individual sessions/CSRF/site isolation/revocation/expiry, private scoped catalogue, receipt images and synthetic observations, synthetic seeds, internal authentication, database isolation and degraded readiness.

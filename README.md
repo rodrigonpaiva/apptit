@@ -113,3 +113,7 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 - [SP2-04 private label evidence](docs/delivery/SP2-04.md)
 
 - [SP2-05 procedure-bound receiving observations](docs/delivery/SP2-05.md)
+
+### Run the published alpha.2 containers
+
+With Docker Desktop running and port 3000 free, run `npm run containers:up`, then open http://127.0.0.1:3000/login. Generated private fixture credentials are in `.local/alpha2/fixture-credentials.json`. Stop with `npm run containers:down`; database and photo volumes are preserved. See [the local release container guide](docs/development/local-release-containers.md) for requirements, isolation and troubleshooting.

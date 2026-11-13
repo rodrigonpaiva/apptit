@@ -1,0 +1,131 @@
+name: apptit-alpha2-local
+services:
+  postgres:
+    build:
+      context: ../../infra
+    env_file: ../../.local/alpha2/postgres.env
+    ports:
+      - "127.0.0.1:3000:8080"
+    volumes:
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  evidence-init:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    user: "0:0"
+    entrypoint: [node, -e]
+    command: ["require('node:fs').chownSync('/tmp/apptit-private-evidence',1000,1000);require('node:fs').chmodSync('/tmp/apptit-private-evidence',0o700)"]
+    volumes:
+      - evidence:/tmp/apptit-private-evidence
+  identity-init:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/identity-init.env
+    entrypoint: [node, /local/initialize.mjs]
+    command: [identity]
+    volumes:
+      - ./initialize.mjs:/local/initialize.mjs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+  kitchen-init:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/kitchen-init.env
+    entrypoint: [node, /local/initialize.mjs]
+    command: [kitchen]
+    volumes:
+      - ./initialize.mjs:/local/initialize.mjs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+  identity:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/identity.env
+    command: [identity]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4001/health/ready',{headers:{'x-internal-token':process.env.IDENTITY_INTERNAL_TOKEN}}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      identity-init:
+        condition: service_completed_successfully
+  kitchen:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/kitchen.env
+    command: [kitchen]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4002/health/ready',{headers:{'x-internal-token':process.env.KITCHEN_INTERNAL_TOKEN}}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      kitchen-init:
+        condition: service_completed_successfully
+      evidence-init:
+        condition: service_completed_successfully
+    volumes:
+      - evidence:/tmp/apptit-private-evidence
+  gateway:
+    image: ghcr.io/rodrigonpaiva/apptit-api@sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/gateway.env
+    command: [gateway-api]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4000/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      identity:
+        condition: service_healthy
+      kitchen:
+        condition: service_healthy
+  web:
+    image: ghcr.io/rodrigonpaiva/apptit-web@sha256:ef78628a7b45a3829ae146aab383452f503b14166c2b476b9df4ee04a0b35fb8
+    platform: linux/amd64
+    network_mode: service:postgres
+    env_file: ../../.local/alpha2/web.env
+    command: [web]
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      gateway:
+        condition: service_healthy
+  browser:
+    image: ghcr.io/rodrigonpaiva/apptit-web@sha256:ef78628a7b45a3829ae146aab383452f503b14166c2b476b9df4ee04a0b35fb8
+    platform: linux/amd64
+    network_mode: service:postgres
+    entrypoint: [node, /local/proxy.mjs]
+    volumes:
+      - ./proxy.mjs:/local/proxy.mjs:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+volumes:
+  database:
+  evidence:

@@ -9,6 +9,10 @@ on:
         description: Exact tag of an already published release
         required: true
         type: string
+      verify_existing:
+        description: Verify approved existing digests without building or pushing
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,14 +63,22 @@ jobs:
       - name: Verify tagged files and Sprint 2 acceptance
         run: node publisher/scripts/containers/release.mjs verify
       - name: Build both images before any push
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.verify_existing }}
         env:
           VERSION: ${{ steps.release.outputs.tag }}
           REVISION: ${{ steps.release.outputs.sha }}
         run: node publisher/scripts/containers/build.mjs --source "$RELEASE_SOURCE" --version "$VERSION" --revision "$REVISION" --repository "$GITHUB_REPOSITORY" --report "$IMAGE_REPORT"
       - name: Validate both images with disposable synthetic data
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.verify_existing }}
         run: node publisher/scripts/containers/validate.mjs --source "$RELEASE_SOURCE" --images "$IMAGE_REPORT" --report "$VALIDATION_REPORT"
       - name: Publish packages and record verified visibility
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.verify_existing }}
         run: node publisher/scripts/containers/release.mjs publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify existing approved images without any push
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.verify_existing }}
+        run: node publisher/scripts/containers/verify-existing.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Summarize execution status

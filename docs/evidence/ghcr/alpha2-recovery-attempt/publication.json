@@ -1,0 +1,42 @@
+{
+  "tag": "v0.1.0-alpha.2",
+  "revision": "4c84d4663a172b7849ed222aea5e19652d1f23e0",
+  "status": "failed",
+  "published": {
+    "api": {
+      "reference": "ghcr.io/rodrigonpaiva/apptit-api:v0.1.0-alpha.2",
+      "digest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "retainedFromRun": 43417110222,
+      "visibility": "public",
+      "verification": "anonymous-registry-readable",
+      "ownerApprovedPublicRetention": true
+    },
+    "web": {
+      "reference": "ghcr.io/rodrigonpaiva/apptit-web:v0.1.0-alpha.2",
+      "digest": "sha256:ef78628a7b45a3829ae146aab383452f503b14166c2b476b9df4ee04a0b35fb8"
+    }
+  },
+  "publicationPartial": false,
+  "priorPublicationPartial": true,
+  "packages": {
+    "api": {
+      "route": "/users/rodrigonpaiva/packages/container/apptit-api",
+      "exists": true,
+      "existingDigest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "packageExists": true,
+      "visibility": "public",
+      "verification": "anonymous-registry-readable",
+      "registryManifestExists": true,
+      "ownerApprovedPublicRetention": true
+    },
+    "web": {
+      "route": "/users/rodrigonpaiva/packages/container/apptit-web",
+      "exists": false,
+      "existingDigest": null,
+      "packageExists": false,
+      "registryManifestExists": false
+    }
+  },
+  "existingPublicationPartial": true,
+  "error": "Post-push private visibility/digest not verified for web"
+}

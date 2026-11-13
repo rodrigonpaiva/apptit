@@ -74,3 +74,15 @@ The first alpha.2 run is partial and its API manifest is publicly readable; web 
 ## Approved alpha.2 visibility exception
 
 The owner explicitly authorized retaining the already-public alpha.2 API and completing the web as private, without deletion. The versioned `public-retention-approval.json` is an exact one-image retention receipt: release tag, source commit, repository, kind, reference and digest must match the prior validated publication, on the same platform. It never enables a public push, changed digest or another version. API is read/verified and skipped; web is built/validated from the original tag and requires private proof. The final report/summary explicitly marks API public (approved retention) and web private, rather than claiming both private. Final manifest digests and visibility are rechecked. All other public-package cases remain blocked. See [the exact decision](../evidence/ghcr/alpha2-first-attempt/README.md#explicit-owner-decision--2026-11-13).
+
+## Verify retained alpha.2 images without publishing
+
+The owner authorized retaining both existing alpha.2 images publicly. The exact digests, original publication runs and bounded authorization are recorded in `docs/evidence/ghcr/alpha2-recovery-attempt/`. This exception does not authorize publishing new public images or changing release tags.
+
+After integrating the verification tooling through dev/main CI, run:
+
+```sh
+gh workflow run publish-containers.yml --ref main -f release_tag=v0.1.0-alpha.2 -f verify_existing=true
+```
+
+This mode skips builds, startup tests and publication. It verifies the existing digests against each image's original paired build/startup evidence and reads the registry twice. The output explicitly reports historical test provenance and no fresh build/startup execution. A mismatch fails without registry writes. Default release publication retains its private-package requirement; do not rerun an older publication job as a substitute for this read-only mode.

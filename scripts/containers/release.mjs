@@ -48,12 +48,12 @@ export function validatedPair(metadata, build, validation) {
   if (build.status !== 'built' || build.sourceDirty || build.version !== metadata.tag || build.revision !== metadata.revision || build.repository !== metadata.repository || validation.passed !== true) throw new Error('Both exact-tag images must build and pass validation before any push');
   for (const kind of ['api', 'web']) if (!build.images[kind]?.imageId || validation.images?.[kind]?.imageId !== build.images[kind].imageId) throw new Error(`Untested ${kind} image`);
 }
-export async function privatePackages(metadata, request = github, inspectRegistry) {
+export async function privatePackages(metadata, request = github, inspectRegistry, allowPublicRetention) {
   const prefix = metadata.ownerType === 'Organization' ? 'orgs' : 'users'; const result = {};
   for (const kind of ['api', 'web']) {
     const route = `/${prefix}/${metadata.owner}/packages/container/apptit-${kind}`; let pkg, restUnavailable = false;
     try { pkg = await request(route); } catch (error) { if (!inspectRegistry) throw error; restUnavailable = true; }
-    if (pkg && pkg.visibility !== 'private') throw new Error(`apptit-${kind} is not private; no images were pushed`);
+    if (pkg && pkg.visibility !== 'private' && !inspectRegistry) throw new Error(`apptit-${kind} is not private; no images were pushed`);
     result[kind] = { route, exists: Boolean(pkg), existingDigest: null, ...(restUnavailable ? { restUnavailable: true } : {}) };
     if (!pkg && !inspectRegistry) continue;
     for (let page = 1; pkg && !inspectRegistry; page++) {
@@ -65,10 +65,11 @@ export async function privatePackages(metadata, request = github, inspectRegistr
     }
     if (inspectRegistry) {
       const registry = await inspectRegistry(kind);
-      if (registry.visibility === 'public') throw new Error(`apptit-${kind} permits anonymous reads; no images were pushed`);
+      const approvedPublic = registry.visibility === 'public' && allowPublicRetention?.(kind, registry.existingDigest) === true;
+      if ((registry.visibility === 'public' || pkg && pkg.visibility !== 'private') && !approvedPublic) throw new Error(`apptit-${kind} permits anonymous reads; no images were pushed`);
       if (result[kind].existingDigest && registry.existingDigest !== result[kind].existingDigest) throw new Error('REST and registry release digests disagree');
-      if (registry.exists && !pkg && registry.visibility !== 'private') throw new Error('Private package visibility cannot be established');
-      result[kind] = { ...result[kind], ...registry, exists: Boolean(pkg) || registry.exists, registryManifestExists: registry.exists, visibility: pkg?.visibility ?? registry.visibility };
+      if (registry.exists && !pkg && registry.visibility !== 'private' && !approvedPublic) throw new Error('Private package visibility cannot be established');
+      result[kind] = { ...result[kind], ...registry, exists: Boolean(pkg) || registry.exists, registryManifestExists: registry.exists, visibility: approvedPublic ? 'public' : pkg?.visibility ?? registry.visibility, ...(approvedPublic ? { ownerApprovedPublicRetention: true } : {}) };
     }
   }
   return result;
@@ -77,7 +78,7 @@ export async function recordedRecovery() {
   const root = new URL('../../docs/evidence/ghcr/alpha2-first-attempt/', import.meta.url);
   const result = {};
   for (const [key, file] of Object.entries({ metadata: 'release-metadata.json', build: 'images.json', validation: 'validation.json', publication: 'publication.json' })) result[key] = JSON.parse(await fs.readFile(new URL(file, root), 'utf8'));
-  result.runId = 43417110222; return result;
+  result.runId = 43417110222; result.publicRetentionApproval = JSON.parse(await fs.readFile(new URL('public-retention-approval.json', root), 'utf8')); return result;
 }
 export function recoveryProof(metadata, kind, digest, recovery, image) {
   if (!recovery) return null;
@@ -89,12 +90,18 @@ export function recoveryProof(metadata, kind, digest, recovery, image) {
   if (!recorded || typeof image.platform !== 'string' || recorded.digest !== digest || recorded.reference !== `ghcr.io/${metadata.owner}/apptit-${kind}:${metadata.tag}` || recovery.build.images[kind].platform !== image.platform) return null;
   return { ...recorded, retainedFromRun: recovery.runId };
 }
+export function approvedPublicRetention(metadata, kind, digest, recovery, image) {
+  const approval = recovery?.publicRetentionApproval;
+  if (metadata.ownerType !== 'User' || !approval || approval.schemaVersion !== 1 || approval.action !== 'retain-existing-public-digest-only' || approval.webVisibility !== 'private' || approval.kind !== 'api' || kind !== 'api') return false;
+  if (approval.tag !== metadata.tag || approval.revision !== metadata.revision || approval.repository !== metadata.repository || approval.digest !== digest || approval.reference !== `ghcr.io/${metadata.owner}/apptit-api:${metadata.tag}`) return false;
+  return Boolean(recoveryProof(metadata, kind, digest, recovery, image));
+}
 export async function publishPair({ metadata, source, build, validation, reportFile, request = github, execute = run, token = process.env.GITHUB_TOKEN, summary = process.env.GITHUB_STEP_SUMMARY, inspectRegistry, recovery }) {
   const report = { tag: metadata.tag, revision: metadata.revision, status: 'preflight', published: {}, publicationPartial: false }; let credentials;
   async function checkpoint() {
     report.publicationPartial = Object.keys(report.published).length === 1 || (Object.keys(report.published).length === 0 && (report.existingPublicationPartial === true || report.priorPublicationPartial === true));
     await saveReport(reportFile, report);
-    if (summary) await fs.appendFile(summary, `\nGHCR checkpoint: **${report.status}** — ${metadata.tag}, commit ${metadata.revision}.\n` + Object.values(report.published).map(image => `- ${image.reference} @ ${image.digest}\n`).join('') + (report.publicationPartial ? '\n**PARTIAL PUBLICATION: only one image is recorded. Do not treat this release as complete.**\n' : '') + (report.publicationUncertain ? '\n**UNCERTAIN REGISTRY EFFECT: a push failed without a confirmed digest. Inspect both packages before retrying.**\n' : '') + (report.error ? `\nFailure: ${report.error}\n` : ''));
+    if (summary) await fs.appendFile(summary, `\nGHCR checkpoint: **${report.status}** — ${metadata.tag}, commit ${metadata.revision}.\n` + Object.values(report.published).map(image => `- ${image.reference} @ ${image.digest} — ${image.visibility ?? 'visibility unverified'}${image.retainedFromRun ? '; retained from run ' + image.retainedFromRun : ''}\n`).join('') + (report.publicationPartial ? '\n**PARTIAL PUBLICATION: only one image is recorded. Do not treat this release as complete.**\n' : '') + (report.publicationUncertain ? '\n**UNCERTAIN REGISTRY EFFECT: a push failed without a confirmed digest. Inspect both packages before retrying.**\n' : '') + (report.error ? `\nFailure: ${report.error}\n` : ''));
   }
   try {
     validatedPair(metadata, build, validation);
@@ -103,14 +110,15 @@ export async function publishPair({ metadata, source, build, validation, reportF
     }
     await verifySource(source, metadata, execute);
     const current = await resolveRelease(metadata.tag, metadata.repository, request); if (current.revision !== metadata.revision) throw new Error('Release tag moved; refusing publication');
-    report.packages = await privatePackages(metadata, request, inspectRegistry);
+    const allowPublic = (kind, digest) => approvedPublicRetention(metadata, kind, digest, recovery, build.images[kind]);
+    report.packages = await privatePackages(metadata, request, inspectRegistry, allowPublic);
     const existing = Object.values(report.packages).filter(pkg => pkg.existingDigest);
     report.existingPublicationPartial = existing.length === 1;
     for (const kind of ['api', 'web']) {
       const digest = report.packages[kind].existingDigest; if (!digest) continue;
       const retained = recoveryProof(metadata, kind, digest, recovery, build.images[kind]);
-      if (!retained || report.packages[kind].visibility !== 'private') throw new Error('Release tag already exists without exact validated recovery proof; never overwrite. Inspect existing digests/partial state before recovery.');
-      report.published[kind] = { ...retained, visibility: 'private', verification: report.packages[kind].verification };
+      if (!retained || report.packages[kind].visibility !== 'private' && !allowPublic(kind, digest)) throw new Error('Release tag already exists without exact validated recovery proof; never overwrite. Inspect existing digests/partial state before recovery.');
+      report.published[kind] = { ...retained, visibility: report.packages[kind].visibility, verification: report.packages[kind].verification, ...(allowPublic(kind, digest) ? { ownerApprovedPublicRetention: true } : {}) };
     }
     if (!token) throw new Error('GITHUB_TOKEN is required');
     // Re-check both validated local image identities before the first push; mutable local tags are not authority.
@@ -133,6 +141,13 @@ export async function publishPair({ metadata, source, build, validation, reportF
       if (registry?.visibility === 'public') throw new Error(`Post-push anonymous access detected for ${kind}`);
       report.published[kind].visibility = 'private';
       report.published[kind].verification = pkg ? 'REST-private' : registry.verification;
+    }
+    if (inspectRegistry) {
+      for (const kind of ['api', 'web']) {
+        const current = await inspectRegistry(kind), published = report.published[kind];
+        if (current.existingDigest !== published.digest || metadata.ownerType === 'User' && current.visibility !== published.visibility || current.visibility === 'public' && !allowPublic(kind, current.existingDigest)) throw new Error(`Final registry state changed for ${kind}; inspect before recovery`);
+      }
+      report.finalRegistryVerified = true;
     }
     report.status = 'published'; return report;
   } catch (error) { report.status = 'failed'; report.error = error.message; if (report.pushAttempt) report.publicationUncertain = true; throw error; }

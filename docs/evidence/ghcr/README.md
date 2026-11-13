@@ -59,3 +59,8 @@ Final integration review found that `runner` context is unavailable in job-level
 The accepted Sprint 2 baseline was promoted through PR #17, after exact-dev CI and a bounded no-content-change ancestry sync (#18). Main `4c84d46` passed push CI. Alpha.2 was published as a prerelease at that exact commit; alpha.1 remained unchanged. Release workflow 43417110222 built and validated both images, pushed API, then stopped at private visibility verification before web. Subsequent anonymous registry reading confirmed the API digest is publicly readable. [Exact evidence, cause and blocked recovery](alpha2-first-attempt/README.md).
 
 The correction does not move the release tag, overwrite the API, delete versions or publish web into an unresolved public namespace. Registry preflight and strict existing-digest proof now precede any push; lack of REST metadata never establishes privacy. A new owner decision is required because GitHub does not support public-to-private package conversion. Future activation must use updated reviewed workflow tooling, with image sources still checked out from the original release commit.
+
+
+## Owner-approved alpha.2 API retention
+
+The user subsequently explicitly authorized keeping the exact existing `apptit-api` alpha.2 digest public and publishing `apptit-web` private, without deletion. The reviewed approval record permits retention only for that source/tag/digest/platform with prior two-image validation. It never permits a new public API push or an overwrite. Other packages/releases remain private by default. [Decision and tests](alpha2-first-attempt/README.md#explicit-owner-decision--2026-11-13). The release tag is not moved; a manual workflow from updated main will use the original tagged image sources.

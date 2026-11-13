@@ -65,7 +65,7 @@ jobs:
         run: node publisher/scripts/containers/build.mjs --source "$RELEASE_SOURCE" --version "$VERSION" --revision "$REVISION" --repository "$GITHUB_REPOSITORY" --report "$IMAGE_REPORT"
       - name: Validate both images with disposable synthetic data
         run: node publisher/scripts/containers/validate.mjs --source "$RELEASE_SOURCE" --images "$IMAGE_REPORT" --report "$VALIDATION_REPORT"
-      - name: Publish private packages and record digests
+      - name: Publish packages and record verified visibility
         run: node publisher/scripts/containers/release.mjs publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,23 @@
+{
+  "tag": "v0.1.0-alpha.2",
+  "revision": "4c84d4663a172b7849ed222aea5e19652d1f23e0",
+  "repository": "rodrigonpaiva/apptit",
+  "schemaVersion": 1,
+  "action": "retain-existing-public-digests-only",
+  "approvedAtDate": "2026-11-13",
+  "authorization": "User explicitly authorized keeping both packages public and preserving both digests. No deletion, overwrite or new image push is authorized by this exception.",
+  "images": {
+    "api": {
+      "reference": "ghcr.io/rodrigonpaiva/apptit-api:v0.1.0-alpha.2",
+      "digest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "visibility": "public",
+      "runId": 43417110222
+    },
+    "web": {
+      "reference": "ghcr.io/rodrigonpaiva/apptit-web:v0.1.0-alpha.2",
+      "digest": "sha256:ef78628a7b45a3829ae146aab383452f503b14166c2b476b9df4ee04a0b35fb8",
+      "visibility": "public",
+      "runId": 43426740932
+    }
+  }
+}

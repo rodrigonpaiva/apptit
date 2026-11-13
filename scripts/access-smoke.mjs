@@ -99,6 +99,9 @@ export async function accessSmoke(config, web) {
   const b = new Browser(origin);
   const chefB = await b.login('chef.b@apptit.test', process.env.FIXTURE_CHEF_B_PASSWORD);
   const scopeB = { tenantId: chefB.selectedSite.tenantId, siteId: chefB.selectedSite.siteId };
+  assert.equal((await b.receipt('operation', { ...photo.operation, scope: scopeB })).status, 201);
+  assert.equal((await (await b.receipt('operation', { ...photo.operation, scope: scopeB })).json()).state, 'unconfirmed');
+  assert.equal((await b.receipt('operation', photo.operation)).status, 403);
   assert.equal((await b.evidence('read', { scope: scopeB, id: photo.id })).status, 404);
   assert.equal((await b.observation('history', { scope: scopeB, id: observations.id })).status, 404);
   assert.equal((await b.observation('history', { scope: scopeA, id: observations.id })).status, 403);
@@ -118,6 +121,7 @@ export async function accessSmoke(config, web) {
     assert.equal(denied.status, 401, 'Catalogue cannot be read with only service credentials.');
     const receiptDenied = await fetch(`${config.kitchenOrigin}/internal/v1/receipt-drafts/list`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA }) });
     assert.equal(receiptDenied.status, 401);
+    const operationDenied=await fetch(`${config.kitchenOrigin}/internal/v1/receipt-drafts/operation`, { method:'POST',headers:{'content-type':'application/json',...headers},body:JSON.stringify(photo.operation) });assert.equal(operationDenied.status,401);
     const evidenceDenied = await fetch(`${config.kitchenOrigin}/internal/v1/evidence/list`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, receiptId: photo.receiptId }) });
     assert.equal(evidenceDenied.status, 401);
     const observationDenied = await fetch(`${config.kitchenOrigin}/internal/v1/observations/list`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA, receiptId: observations.receiptId }) });

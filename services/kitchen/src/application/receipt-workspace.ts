@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { AuthorizedSiteContext, ReceiptItemDetails, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, Scope } from '@apptit/contracts';
+import type { AuthorizedSiteContext, ReceiptItemDetails, ReceiptOperationResult, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, Scope } from '@apptit/contracts';
 import { InputError, invalid, object, productBarcode, receiptOperationIdentity, saveReceiptDraft, scope, text, uuid, decimal, scaledDecimal, fromScaled } from '@apptit/domain-values';
 import { Prisma } from '../generated/prisma/client.js';
 import type { PrismaClient } from '../generated/prisma/client.js';
@@ -93,6 +93,16 @@ export class ReceiptWorkspace {
       }
       throw error;
     }
+  }
+  async operation(input: unknown, context: AuthorizedSiteContext): Promise<ReceiptOperationResult> {
+    const value = object(input, ['scope', 'operationId', 'receiptId'], 'operation'); const requested = scope(value['scope']);
+    this.authorize(context, 'receipt.draft.read', requested);
+    const operationId = uuid(value['operationId'], 'operationId'), receiptId = uuid(value['receiptId'], 'receiptId');
+    const found = await this.db.receiptDraftOperation.findUnique({ where: { tenantId_siteId_actorId_operationId: { ...requested, actorId: context.actor.userId, operationId } } });
+    if (!found) return { state: 'unconfirmed' };
+    const result = snapshot(found.snapshot);
+    if (result.draft.id !== receiptId) return { state: 'unconfirmed' };
+    return { state: 'recorded', snapshot: result };
   }
   async read(input: unknown, context: AuthorizedSiteContext) {
     const value = object(input, ['scope', 'id'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);

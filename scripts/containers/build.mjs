@@ -29,7 +29,7 @@ export async function buildImages({ source, version, revision, repository = 'rod
   } catch (error) { report.status = 'failed'; report.error = error.message; throw error; } finally { await saveReport(reportFile, report); }
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { values } = parseArgs({ options: { source: { type: 'string', default: process.cwd() }, version: { type: 'string', default: 'local-validation' }, revision: { type: 'string' }, report: { type: 'string', default: '/tmp/apptit-images.json' } } });
+  const { values } = parseArgs({ options: { source: { type: 'string', default: process.cwd() }, version: { type: 'string', default: 'local-validation' }, revision: { type: 'string' }, repository: { type: 'string', default: 'rodrigonpaiva/apptit' }, report: { type: 'string', default: '/tmp/apptit-images.json' } } });
   const source = path.resolve(values.source); const revision = values.revision ?? (await run('git', ['rev-parse', 'HEAD'], { cwd: source })).trim();
-  try { await fs.mkdir(path.dirname(path.resolve(values.report)), { recursive: true }); await buildImages({ source, version: values.version, revision, reportFile: path.resolve(values.report) }); } catch (error) { console.error(error.message); process.exitCode = 1; }
+  try { await fs.mkdir(path.dirname(path.resolve(values.report)), { recursive: true }); await buildImages({ source, version: values.version, revision, repository: values.repository, reportFile: path.resolve(values.report) }); } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

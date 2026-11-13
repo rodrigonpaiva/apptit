@@ -78,3 +78,22 @@ test('full Kitchen migration chain adds receipt drafts while preserving populate
   assert.deepEqual((await connection.query(`SELECT payload FROM "RuntimeFixture" WHERE id='receipt-preservation'`)).rows[0].payload,{preserved:true});
  }finally{await connection.query('ROLLBACK');await connection.query('SET search_path TO public');await connection.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);connection.release();await pool.end();}
 });
+
+test('lost acknowledgement can recover only the original actor/site/receipt operation without another write', async () => {
+ const db=client();try {
+  const ctx=context(),value=input(ctx),app=new ReceiptWorkspace(db); const query={scope:ctx.scope,receiptId:value.command.receiptId,operationId:value.command.operationId};
+  assert.deepEqual(await app.operation(query,ctx),{state:'unconfirmed'});
+  const saved=await app.save(value,ctx); // Simulate an acknowledgement lost after the durable commit.
+  assert.deepEqual(await app.operation(query,ctx),{state:'recorded',snapshot:saved});
+  assert.equal((await app.save(value,ctx)).draft.version,1);
+  assert.equal(await db.receiptDraftRevision.count({where:{receiptId:value.command.receiptId}}),1);
+  assert.deepEqual(await app.operation(query,{...ctx,actor:{...ctx.actor,userId:randomUUID()}}),{state:'unconfirmed'});
+  assert.deepEqual(await app.operation({...query,receiptId:randomUUID()},ctx),{state:'unconfirmed'});
+  const foreign=context();assert.deepEqual(await app.operation({...query,scope:foreign.scope},foreign),{state:'unconfirmed'});
+  await assert.rejects(app.operation(query,foreign),e=>e.code==='FORBIDDEN');
+  await assert.rejects(app.operation(query,{...ctx,capabilities:[]}),e=>e.code==='FORBIDDEN');
+  await assert.rejects(app.operation({...query,actorId:ctx.actor.userId},ctx));
+  const failed=input(ctx);failed.command.payload.lines[0].destinationLocationId=known(randomUUID());
+  await assert.rejects(app.save(failed,ctx));assert.deepEqual(await app.operation({scope:ctx.scope,receiptId:failed.command.receiptId,operationId:failed.command.operationId},ctx),{state:'unconfirmed'});
+ }finally{await db.$disconnect();}
+});

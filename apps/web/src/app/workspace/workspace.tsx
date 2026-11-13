@@ -36,9 +36,9 @@ export default function Workspace() {
     const focus = () => { if (!logoutFailed) void refresh(); };
     const visibility = () => { if (document.hidden) lock(); else focus(); };
     const restored = (event: PageTransitionEvent) => { if (event.persisted) { lock(); window.location.reload(); } };
-    window.addEventListener('blur', lock); window.addEventListener('focus', focus); window.addEventListener('offline', lock);
+    window.addEventListener('blur', lock); window.addEventListener('focus', focus); window.addEventListener('offline', lock); window.addEventListener('apptit:access-invalidated', lock);
     document.addEventListener('visibilitychange', visibility); window.addEventListener('pageshow', restored);
-    return () => { window.removeEventListener('blur', lock); window.removeEventListener('focus', focus); window.removeEventListener('offline', lock); document.removeEventListener('visibilitychange', visibility); window.removeEventListener('pageshow', restored); };
+    return () => { window.removeEventListener('blur', lock); window.removeEventListener('focus', focus); window.removeEventListener('offline', lock); window.removeEventListener('apptit:access-invalidated', lock); document.removeEventListener('visibilitychange', visibility); window.removeEventListener('pageshow', restored); };
   }, [refresh, logoutFailed]);
   async function logout() {
     setReceiptSeed(null); locked.current = true; generation.current++;

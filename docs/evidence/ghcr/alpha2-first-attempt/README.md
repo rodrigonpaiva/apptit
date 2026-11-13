@@ -23,4 +23,6 @@ After the public readability and risk assessment were disclosed, the user explic
 
 This decision supersedes the original requirement that both alpha.2 packages be private for the already-published API only. It does not authorize deleting/recreating any package, exposing credentials, moving either Git tag or overwriting the API. The source files for the image build remain the immutable alpha.2 tag; only reviewed orchestration/approval changes are promoted before a manual run from updated main.
 
-Validation: `npm run containers:test` — 29 passed / zero failures; repository ESLint — passed. Added cases prove the explicit public exception retains API without any API tag/push, publishes only private web, and cannot apply to another kind, digest, tag, source, platform or missing approval. No production/customer data or secrets were introduced.
+Validation: `npm run containers:test` — 30 passed / zero failures; repository ESLint — passed. Added cases prove the explicit public exception retains API without any API tag/push, publishes only private web, and cannot apply to another kind, digest, tag, source, platform or missing approval. No production/customer data or secrets were introduced.
+
+A final registry-drift regression also verifies that a changed retained API digest after the web push prevents a successful completion report; it never retags or pushes API as a repair.

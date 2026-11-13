@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "images": {
+    "api": {
+      "image": "apptit-validation-api:4c84d4663a17",
+      "imageId": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "platform": "linux/amd64",
+      "user": "node"
+    },
+    "web": {
+      "image": "apptit-validation-web:4c84d4663a17",
+      "imageId": "sha256:b74a2ee1f9d6b0793d6990ac109ee964b8506b7a6ef50f0d7676401d58f57541",
+      "platform": "linux/amd64",
+      "user": "node"
+    }
+  },
+  "syntheticOnly": true,
+  "isolatedDatabase": true,
+  "publishedPorts": [],
+  "checks": [
+    "migrations",
+    "repeat-seed",
+    "api-ready",
+    "web-200"
+  ],
+  "probe": {
+    "phase": "ready",
+    "web": 200,
+    "draftState": "draft",
+    "sp205InImage": true,
+    "observationStaysPending": true,
+    "stockFlagFalse": true,
+    "inventoryCountsUnchanged": true,
+    "inheritedAccessSmoke": true
+  },
+  "dependencyFailureVerified": true,
+  "cleanup": "task-owned containers/anonymous database volume/env files removed"
+}

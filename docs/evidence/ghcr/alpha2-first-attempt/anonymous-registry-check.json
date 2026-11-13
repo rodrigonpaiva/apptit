@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-11-13T12:17:39.836Z",
+  "authentication": "none",
+  "packages": {
+    "api": {
+      "tokenStatus": 200,
+      "tagsStatus": 200,
+      "tags": [
+        "v0.1.0-alpha.2"
+      ],
+      "moreTags": false,
+      "manifestStatus": 200,
+      "digest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "advertisedDigest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c"
+    },
+    "web": {
+      "tokenStatus": 403
+    }
+  }
+}

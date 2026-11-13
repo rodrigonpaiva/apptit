@@ -4,6 +4,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { requireContainerSource } from './build.mjs';
 import { run, saveReport } from './tooling.mjs';
+import { registryInspector } from './registry.mjs';
 export function releaseTag(value) {
   if (typeof value !== 'string' || value.length > 100 || !/^v\d+\.\d+\.\d+(?:-[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*)?$/.test(value)) throw new Error('A version tag, never a branch/ref/expression, is required');
   return value;
@@ -47,42 +48,77 @@ export function validatedPair(metadata, build, validation) {
   if (build.status !== 'built' || build.sourceDirty || build.version !== metadata.tag || build.revision !== metadata.revision || build.repository !== metadata.repository || validation.passed !== true) throw new Error('Both exact-tag images must build and pass validation before any push');
   for (const kind of ['api', 'web']) if (!build.images[kind]?.imageId || validation.images?.[kind]?.imageId !== build.images[kind].imageId) throw new Error(`Untested ${kind} image`);
 }
-export async function privatePackages(metadata, request = github) {
+export async function privatePackages(metadata, request = github, inspectRegistry) {
   const prefix = metadata.ownerType === 'Organization' ? 'orgs' : 'users'; const result = {};
   for (const kind of ['api', 'web']) {
-    const route = `/${prefix}/${metadata.owner}/packages/container/apptit-${kind}`; const pkg = await request(route);
+    const route = `/${prefix}/${metadata.owner}/packages/container/apptit-${kind}`; let pkg, restUnavailable = false;
+    try { pkg = await request(route); } catch (error) { if (!inspectRegistry) throw error; restUnavailable = true; }
     if (pkg && pkg.visibility !== 'private') throw new Error(`apptit-${kind} is not private; no images were pushed`);
-    result[kind] = { route, exists: Boolean(pkg), existingDigest: null };
-    if (!pkg) continue;
-    for (let page = 1; ; page++) {
+    result[kind] = { route, exists: Boolean(pkg), existingDigest: null, ...(restUnavailable ? { restUnavailable: true } : {}) };
+    if (!pkg && !inspectRegistry) continue;
+    for (let page = 1; pkg && !inspectRegistry; page++) {
       if (page > 20) throw new Error('Package version history exceeds safe preflight bound');
       const versions = await request(`${route}/versions?per_page=100&page=${page}`); if (!Array.isArray(versions)) throw new Error('Cannot verify package version metadata');
       const found = versions.find(version => version.metadata?.container?.tags?.includes(metadata.tag));
       if (found) { result[kind].existingDigest = found.name; break; }
       if (versions.length < 100) break;
     }
+    if (inspectRegistry) {
+      const registry = await inspectRegistry(kind);
+      if (registry.visibility === 'public') throw new Error(`apptit-${kind} permits anonymous reads; no images were pushed`);
+      if (result[kind].existingDigest && registry.existingDigest !== result[kind].existingDigest) throw new Error('REST and registry release digests disagree');
+      if (registry.exists && !pkg && registry.visibility !== 'private') throw new Error('Private package visibility cannot be established');
+      result[kind] = { ...result[kind], ...registry, exists: Boolean(pkg) || registry.exists, registryManifestExists: registry.exists, visibility: pkg?.visibility ?? registry.visibility };
+    }
   }
   return result;
 }
-export async function publishPair({ metadata, source, build, validation, reportFile, request = github, execute = run, token = process.env.GITHUB_TOKEN, summary = process.env.GITHUB_STEP_SUMMARY }) {
+export async function recordedRecovery() {
+  const root = new URL('../../docs/evidence/ghcr/alpha2-first-attempt/', import.meta.url);
+  const result = {};
+  for (const [key, file] of Object.entries({ metadata: 'release-metadata.json', build: 'images.json', validation: 'validation.json', publication: 'publication.json' })) result[key] = JSON.parse(await fs.readFile(new URL(file, root), 'utf8'));
+  result.runId = 43417110222; return result;
+}
+export function recoveryProof(metadata, kind, digest, recovery, image) {
+  if (!recovery) return null;
+  if (recovery.metadata.tag !== metadata.tag || recovery.metadata.revision !== metadata.revision || recovery.metadata.repository !== metadata.repository) return null;
+  validatedPair(metadata, recovery.build, recovery.validation);
+  const previous = recovery.publication;
+  if (previous.tag !== metadata.tag || previous.revision !== metadata.revision || previous.status !== 'failed' || !previous.publicationPartial || !recovery.runId) return null;
+  const recorded = previous.published?.[kind];
+  if (!recorded || typeof image.platform !== 'string' || recorded.digest !== digest || recorded.reference !== `ghcr.io/${metadata.owner}/apptit-${kind}:${metadata.tag}` || recovery.build.images[kind].platform !== image.platform) return null;
+  return { ...recorded, retainedFromRun: recovery.runId };
+}
+export async function publishPair({ metadata, source, build, validation, reportFile, request = github, execute = run, token = process.env.GITHUB_TOKEN, summary = process.env.GITHUB_STEP_SUMMARY, inspectRegistry, recovery }) {
   const report = { tag: metadata.tag, revision: metadata.revision, status: 'preflight', published: {}, publicationPartial: false }; let credentials;
   async function checkpoint() {
-    report.publicationPartial = report.existingPublicationPartial === true || Object.keys(report.published).length === 1;
+    report.publicationPartial = Object.keys(report.published).length === 1 || (Object.keys(report.published).length === 0 && (report.existingPublicationPartial === true || report.priorPublicationPartial === true));
     await saveReport(reportFile, report);
     if (summary) await fs.appendFile(summary, `\nGHCR checkpoint: **${report.status}** — ${metadata.tag}, commit ${metadata.revision}.\n` + Object.values(report.published).map(image => `- ${image.reference} @ ${image.digest}\n`).join('') + (report.publicationPartial ? '\n**PARTIAL PUBLICATION: only one image is recorded. Do not treat this release as complete.**\n' : '') + (report.publicationUncertain ? '\n**UNCERTAIN REGISTRY EFFECT: a push failed without a confirmed digest. Inspect both packages before retrying.**\n' : '') + (report.error ? `\nFailure: ${report.error}\n` : ''));
   }
   try {
-    validatedPair(metadata, build, validation); await verifySource(source, metadata, execute);
+    validatedPair(metadata, build, validation);
+    if (recovery?.metadata.tag === metadata.tag && recovery.metadata.revision === metadata.revision && recovery.metadata.repository === metadata.repository && recovery.publication.publicationPartial) {
+      validatedPair(metadata, recovery.build, recovery.validation); report.priorPublicationPartial = true;
+    }
+    await verifySource(source, metadata, execute);
     const current = await resolveRelease(metadata.tag, metadata.repository, request); if (current.revision !== metadata.revision) throw new Error('Release tag moved; refusing publication');
-    report.packages = await privatePackages(metadata, request);
+    report.packages = await privatePackages(metadata, request, inspectRegistry);
     const existing = Object.values(report.packages).filter(pkg => pkg.existingDigest);
-    if (existing.length) { report.existingPublicationPartial = existing.length === 1; throw new Error('Release tag already exists in one or both packages; never overwrite. Inspect existing digests/partial state before recovery.'); }
+    report.existingPublicationPartial = existing.length === 1;
+    for (const kind of ['api', 'web']) {
+      const digest = report.packages[kind].existingDigest; if (!digest) continue;
+      const retained = recoveryProof(metadata, kind, digest, recovery, build.images[kind]);
+      if (!retained || report.packages[kind].visibility !== 'private') throw new Error('Release tag already exists without exact validated recovery proof; never overwrite. Inspect existing digests/partial state before recovery.');
+      report.published[kind] = { ...retained, visibility: 'private', verification: report.packages[kind].verification };
+    }
     if (!token) throw new Error('GITHUB_TOKEN is required');
     // Re-check both validated local image identities before the first push; mutable local tags are not authority.
     for (const kind of ['api', 'web']) { const [image] = JSON.parse(await execute('docker', ['image', 'inspect', build.images[kind].image])); if (image.Id !== build.images[kind].imageId) throw new Error(`Validated ${kind} image was replaced`); }
     credentials = await fs.mkdtemp(path.join(os.tmpdir(), 'apptit-ghcr-login-')); const env = { ...process.env, DOCKER_CONFIG: credentials }; delete env.GITHUB_TOKEN;
     await execute('docker', ['login', 'ghcr.io', '--username', metadata.owner, '--password-stdin'], { env, input: token + '\n', secrets: [token] });
     for (const kind of ['api', 'web']) {
+      if (report.published[kind]) continue; // Preserve the exact previously validated digest; never tag/push it again.
       const reference = `ghcr.io/${metadata.owner}/apptit-${kind}:${metadata.tag}`;
       await execute('docker', ['tag', build.images[kind].imageId, reference], { env });
       report.status = `pushing-${kind}`; report.pushAttempt = { kind, reference }; await checkpoint();
@@ -91,8 +127,12 @@ export async function publishPair({ metadata, source, build, validation, reportF
       report.published[kind] = { reference, digest: digest ?? 'unknown: push completed but digest capture failed' }; await checkpoint();
       if (!digest) throw new Error(`Digest unavailable after ${kind} push; inspect GHCR before retry`);
       delete report.pushAttempt;
-      const pkg = await request(report.packages[kind].route); if (!pkg || pkg.visibility !== 'private') throw new Error(`Post-push private visibility not verified for ${kind}`);
+      let pkg; try { pkg = await request(report.packages[kind].route); } catch (error) { if (!inspectRegistry) throw error; }
+      const registry = inspectRegistry ? await inspectRegistry(kind) : null;
+      if ((pkg && pkg.visibility !== 'private') || (registry && registry.existingDigest !== digest) || (!pkg && registry?.visibility !== 'private')) throw new Error(`Post-push private visibility/digest not verified for ${kind}`);
+      if (registry?.visibility === 'public') throw new Error(`Post-push anonymous access detected for ${kind}`);
       report.published[kind].visibility = 'private';
+      report.published[kind].verification = pkg ? 'REST-private' : registry.verification;
     }
     report.status = 'published'; return report;
   } catch (error) { report.status = 'failed'; report.error = error.message; if (report.pushAttempt) report.publicationUncertain = true; throw error; }
@@ -105,7 +145,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     else {
       const metadata = JSON.parse(await fs.readFile(file, 'utf8')); const source = process.env.RELEASE_SOURCE;
       if (mode === 'verify') await verifySource(source, metadata);
-      else if (mode === 'publish') await publishPair({ metadata, source, build: JSON.parse(await fs.readFile(process.env.IMAGE_REPORT, 'utf8')), validation: JSON.parse(await fs.readFile(process.env.VALIDATION_REPORT, 'utf8')), reportFile: process.env.PUBLICATION_REPORT });
+      else if (mode === 'publish') await publishPair({ metadata, source, build: JSON.parse(await fs.readFile(process.env.IMAGE_REPORT, 'utf8')), validation: JSON.parse(await fs.readFile(process.env.VALIDATION_REPORT, 'utf8')), reportFile: process.env.PUBLICATION_REPORT, inspectRegistry: registryInspector(metadata, process.env.GITHUB_TOKEN), recovery: await recordedRecovery() });
       else throw new Error('Unknown release operation');
     }
   } catch (error) { console.error(error.message); process.exitCode = 1; }

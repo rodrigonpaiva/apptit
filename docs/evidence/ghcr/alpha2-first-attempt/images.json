@@ -1,0 +1,21 @@
+{
+  "version": "v0.1.0-alpha.2",
+  "revision": "4c84d4663a172b7849ed222aea5e19652d1f23e0",
+  "repository": "rodrigonpaiva/apptit",
+  "sourceDirty": false,
+  "status": "built",
+  "images": {
+    "api": {
+      "image": "apptit-validation-api:4c84d4663a17",
+      "imageId": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c",
+      "platform": "linux/amd64",
+      "user": "node"
+    },
+    "web": {
+      "image": "apptit-validation-web:4c84d4663a17",
+      "imageId": "sha256:b74a2ee1f9d6b0793d6990ac109ee964b8506b7a6ef50f0d7676401d58f57541",
+      "platform": "linux/amd64",
+      "user": "node"
+    }
+  }
+}

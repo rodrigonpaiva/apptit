@@ -1,0 +1,25 @@
+{
+  "tag": "v0.1.0-alpha.2",
+  "revision": "4c84d4663a172b7849ed222aea5e19652d1f23e0",
+  "status": "failed",
+  "published": {
+    "api": {
+      "reference": "ghcr.io/rodrigonpaiva/apptit-api:v0.1.0-alpha.2",
+      "digest": "sha256:1b5f536cb3e9c1ad3314cb47a11bbdcdeae79bc4b816aea8c8f81fba4032ac8c"
+    }
+  },
+  "publicationPartial": true,
+  "packages": {
+    "api": {
+      "route": "/users/rodrigonpaiva/packages/container/apptit-api",
+      "exists": false,
+      "existingDigest": null
+    },
+    "web": {
+      "route": "/users/rodrigonpaiva/packages/container/apptit-web",
+      "exists": false,
+      "existingDigest": null
+    }
+  },
+  "error": "Post-push private visibility not verified for api"
+}

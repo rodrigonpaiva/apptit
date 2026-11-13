@@ -5,12 +5,12 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { requiredContainerFiles } from '../scripts/containers/build.mjs';
-import { releaseTag, releasePolicy, sprint2Policy, resolveRelease, verifySource, validatedPair, privatePackages, publishPair } from '../scripts/containers/release.mjs';
+import { releaseTag, releasePolicy, sprint2Policy, resolveRelease, verifySource, validatedPair, privatePackages, publishPair, recordedRecovery, recoveryProof } from '../scripts/containers/release.mjs';
 import { syntheticEnvironment, scopedEnvironment } from '../scripts/containers/validate.mjs';
 const sha = 'a'.repeat(40), digest = 'sha256:' + 'b'.repeat(64);
 const metadata = { tag: 'v0.1.0-alpha.1', revision: sha, repository: 'rodrigonpaiva/apptit', owner: 'rodrigonpaiva', ownerType: 'User' };
 const release = { tag_name: metadata.tag, published_at: '2026-11-08', draft: false };
-const images = { api: { image: 'local-api', imageId: 'api-id' }, web: { image: 'local-web', imageId: 'web-id' } };
+const images = { api: { image: 'local-api', imageId: 'api-id', platform: 'linux/amd64' }, web: { image: 'local-web', imageId: 'web-id', platform: 'linux/amd64' } };
 const build = { status: 'built', sourceDirty: false, version: metadata.tag, revision: sha, repository: metadata.repository, images };
 const validation = { passed: true, images };
 function metadataRequest(route) {
@@ -62,7 +62,7 @@ test('public packages and preexisting release tags block publication', async () 
   const result = await privatePackages(metadata, async route => route.includes('/versions?') ? [{ name: digest, metadata: { container: { tags: [metadata.tag] } } }] : { visibility: 'private' });
   assert.equal(result.api.existingDigest, digest); assert.equal(result.web.existingDigest, digest);
 });
-async function publishFixture(t, { failWeb = false, replaceWeb = false, publicWeb = false, existingApi = false, moved = false } = {}) {
+async function publishFixture(t, { failWeb = false, replaceWeb = false, publicWeb = false, existingApi = false, moved = false, recover = false, registryPublic = false } = {}) {
   const source = await fixture(t), events = [], pushed = new Set(); const reportFile = path.join(source, 'result.json');
   const request = async route => {
     if (route.includes('/packages/')) {
@@ -81,7 +81,9 @@ async function publishFixture(t, { failWeb = false, replaceWeb = false, publicWe
     if (args[0] === 'push') { const kind = args[1].includes('apptit-api') ? 'api' : 'web'; if (kind === 'web' && failWeb) throw new Error('simulated registry failure'); pushed.add(kind); return `digest: ${digest}`; }
     return '';
   };
-  let error; try { await publishPair({ metadata, source, build, validation, reportFile, request, execute, token: 'test-token', summary: undefined }); } catch (caught) { error = caught; }
+  const recovery = recover ? { metadata, build, validation, runId: 1234, publication: { tag: metadata.tag, revision: metadata.revision, status: 'failed', publicationPartial: true, published: { api: { reference: `ghcr.io/${metadata.owner}/apptit-api:${metadata.tag}`, digest } } } } : undefined;
+  const inspectRegistry = recover || registryPublic ? async kind => ({ exists: kind === 'api' || pushed.has(kind), existingDigest: kind === 'api' || pushed.has(kind) ? digest : null, visibility: registryPublic ? 'public' : 'private', verification: 'authenticated-manifest-and-anonymous-denial' }) : undefined;
+  let error; try { await publishPair({ metadata, source, build, validation, reportFile, request, execute, token: 'test-token', summary: undefined, recovery, inspectRegistry }); } catch (caught) { error = caught; }
   const report = JSON.parse(await fs.readFile(reportFile)); assert.ok(!JSON.stringify(report).includes('test-token'));
   return { report, events, error };
 }
@@ -111,4 +113,29 @@ test('build CLI accepts the workflow repository option before validating tagged 
   const empty = await fs.mkdtemp(path.join(os.tmpdir(), 'apptit-cli-source-'));t.after(() => fs.rm(empty, { recursive: true, force: true }));
   const result = spawnSync(process.execPath, [new URL('../scripts/containers/build.mjs', import.meta.url).pathname, '--source', empty, '--version', metadata.tag, '--revision', sha, '--repository', metadata.repository], { encoding: 'utf8' });
   assert.equal(result.status, 1);assert.match(result.stderr, /Tagged source lacks required container files/);assert.doesNotMatch(result.stderr, /Unknown option/);
+});
+
+test('recorded private API recovery pushes only web and preserves the exact API digest', async t => {
+ const {report,events,error}=await publishFixture(t,{existingApi:true,recover:true});assert.equal(error,undefined);assert.equal(report.status,'published');assert.equal(report.publicationPartial,false);assert.equal(report.published.api.digest,digest);assert.equal(report.published.api.retainedFromRun,1234);assert.equal(report.published.web.visibility,'private');assert.equal(events.filter(value=>value.startsWith('docker push')).length,1);assert.ok(events.some(value=>value.startsWith('docker push ghcr.io/rodrigonpaiva/apptit-web:')));assert.ok(!events.some(value=>value.startsWith('docker tag api-id')));
+});
+test('failed recovered web push still records existing API and partial/uncertain state', async t=>{
+ const {report,error}=await publishFixture(t,{existingApi:true,recover:true,failWeb:true});assert.ok(error);assert.equal(report.publicationPartial,true);assert.equal(report.publicationUncertain,true);assert.equal(report.published.api.digest,digest);
+});
+test('anonymous public access blocks recovery before any push and retains prior partial warning',async t=>{
+ const {report,error,events}=await publishFixture(t,{existingApi:true,recover:true,registryPublic:true});assert.ok(error);assert.equal(report.publicationPartial,true);assert.ok(!events.some(value=>value.startsWith('docker push')));
+});
+test('the versioned first-attempt proof allows only the recorded API digest, source and platform',async()=>{
+ const proof=await recordedRecovery();const meta=proof.metadata,api=proof.publication.published.api;
+ assert.ok(recoveryProof(meta,'api',api.digest,proof,proof.build.images.api));
+ assert.equal(recoveryProof(meta,'web',api.digest,proof,proof.build.images.web),null);
+ assert.equal(recoveryProof({...meta,revision:'e'.repeat(40)},'api',api.digest,proof,proof.build.images.api),null);
+ assert.equal(recoveryProof(meta,'api','sha256:'+'f'.repeat(64),proof,proof.build.images.api),null);
+ assert.equal(recoveryProof(meta,'api',api.digest,proof,{...proof.build.images.api,platform:'linux/arm64'}),null);
+ assert.throws(()=>recoveryProof(meta,'api',api.digest,{...proof,validation:{passed:false}},proof.build.images.api));
+});
+
+test('unavailable package REST metadata cannot bypass registry privacy and exact-digest preflight',async()=>{
+ const result=await privatePackages(metadata,async()=>{throw new Error('REST metadata inaccessible');},async()=>({exists:true,existingDigest:digest,visibility:'private',verification:'authenticated-registry-and-anonymous-denial'}));assert.equal(result.api.restUnavailable,true);assert.equal(result.api.visibility,'private');assert.equal(result.api.existingDigest,digest);
+ await assert.rejects(privatePackages(metadata,async()=>{throw new Error('REST metadata inaccessible');},async()=>({exists:false,existingDigest:null,visibility:'public'})),/anonymous reads/);
+ await assert.rejects(privatePackages({...metadata,ownerType:'Organization'},async()=>null,async()=>({exists:true,existingDigest:digest,visibility:'restricted'})),/cannot be established/);
 });

@@ -42,7 +42,9 @@
     "containers:up": "node scripts/containers/local.mjs up",
     "containers:down": "node scripts/containers/local.mjs down",
     "containers:status": "node scripts/containers/local.mjs status",
-    "containers:logs": "node scripts/containers/local.mjs logs"
+    "containers:logs": "node scripts/containers/local.mjs logs",
+    "containers:off:live": "node scripts/containers/local.mjs off-live",
+    "containers:off:fixture": "node scripts/containers/local.mjs off-fixture"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

@@ -38,7 +38,11 @@
     "test:integration": "node scripts/integration.mjs",
     "containers:build": "node scripts/containers/build.mjs",
     "containers:smoke": "node scripts/containers/validate.mjs",
-    "containers:test": "node --test tests/container-publication.test.mjs tests/container-registry.test.mjs tests/container-retention.test.mjs"
+    "containers:test": "node --test tests/container-publication.test.mjs tests/container-registry.test.mjs tests/container-retention.test.mjs",
+    "containers:up": "node scripts/containers/local.mjs up",
+    "containers:down": "node scripts/containers/local.mjs down",
+    "containers:status": "node scripts/containers/local.mjs status",
+    "containers:logs": "node scripts/containers/local.mjs logs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

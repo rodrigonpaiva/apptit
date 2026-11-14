@@ -66,7 +66,7 @@ export class EvidenceWorkspace {
     if (this.config.evidenceMode !== 'fixture') return { mode: 'disabled', maxBytes: 0, mediaTypes: [], items: [] };
     const rows = await this.db.receiptEvidence.findMany({ where: { ...requested, receiptId }, orderBy: [{ recordedAt: 'asc' }, { id: 'asc' }], take: 1001 });
     if (rows.length > 1000) throw new ReceiptFailure('EVIDENCE_LIMIT', 400);
-    return { mode: 'fixture', maxBytes: this.config.evidenceMaxBytes, mediaTypes: [...evidenceTypes], items: rows.map(row => this.view(row)) };
+    return { localLabelOcr: this.config.ocrMode === 'browser_local', mode: 'fixture', maxBytes: this.config.evidenceMaxBytes, mediaTypes: [...evidenceTypes], items: rows.map(row => this.view(row)) };
   }
   async upload(input: unknown, context: AuthorizedSiteContext, bytes: Buffer) {
     const row = await this.find(input, context, true);

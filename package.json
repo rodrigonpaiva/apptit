@@ -44,7 +44,9 @@
     "containers:status": "node scripts/containers/local.mjs status",
     "containers:logs": "node scripts/containers/local.mjs logs",
     "containers:off:live": "node scripts/containers/local.mjs off-live",
-    "containers:off:fixture": "node scripts/containers/local.mjs off-fixture"
+    "containers:off:fixture": "node scripts/containers/local.mjs off-fixture",
+    "containers:ocr:preview": "node scripts/containers/local.mjs ocr-preview",
+    "containers:release": "node scripts/containers/local.mjs release"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

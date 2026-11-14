@@ -67,3 +67,21 @@ test('private file adapter rejects public roots, symlinks, excessive bytes and u
 test('disabled evidence is explicit and cannot upload even with draft/evidence rights',async()=>{
  const f=await fixture();try{const disabled=new EvidenceWorkspace(f.db,{...f.options,evidenceMode:'disabled'});assert.equal((await disabled.list({scope:f.context.scope,receiptId:f.intent.links.receiptId},f.context)).mode,'disabled');await assert.rejects(disabled.begin(f.intent,f.context),e=>e.code==='CAPABILITY_DISABLED');}finally{await f.close();}
 });
+
+test('reviewed label suggestions require the exact available line/photo/digest and are persisted with draft actor audit',async()=>{
+ const f=await fixture();try{
+  const {app,intent,context,db,receiptInput}=f;const pending=await app.begin(intent,context);const query={scope:context.scope,id:pending.id};
+  const input=structuredClone(receiptInput);input.command.operationId=randomUUID();input.command.expectedVersion=1;
+  const known=value=>({state:'known',value,quality:'estimated',sourceRef:`evidence:${pending.id}/human-reviewed-label`});
+  input.command.payload.lines[0].batch.code=known('001AB23');input.command.payload.lines[0].batch.expiry=known({date:'2028-12-31',kind:'use_by',sourceRef:'operator/photo-review'});
+  input.items[0].labelReview={schemaVersion:1,evidenceId:pending.id,imageSha256:declared.sha256,engine:'tesseract.js@7.0.0/fra@1.0.0',extractedAt:new Date().toISOString(),proposed:{batch:'001AB28',expiry:'2028-12-31',expiryKind:'use_by'},batch:'001AB23',expiry:{date:'2028-12-31',kind:'use_by'}};
+  const receipt=new ReceiptWorkspace(db);await assert.rejects(receipt.save(input,context),e=>e.code==='LABEL_REVIEW_CONFLICT');
+  await app.upload(query,context,bytes);
+  for(const mutate of[v=>v.items[0].labelReview.imageSha256='f'.repeat(64),v=>v.items[0].labelReview.evidenceId=randomUUID(),v=>v.items[0].labelReview.batch='OTHER',v=>v.items[0].labelReview.expiry.kind='best_before']){const forged=structuredClone(input);mutate(forged);await assert.rejects(receipt.save(forged,context),e=>e.code==='LABEL_REVIEW_CONFLICT');}
+  await assert.rejects(receipt.save(input,{...context,capabilities:['receipt.draft.write']}),e=>e.code==='FORBIDDEN');
+  const saved=await receipt.save(input,context);assert.deepEqual(saved.items[0].labelReview,input.items[0].labelReview);assert.equal(saved.draft.state,'draft');assert.deepEqual((await receipt.operation({scope:context.scope,receiptId:input.command.receiptId,operationId:input.command.operationId},context)).snapshot,saved);
+  const revision=await db.receiptDraftRevision.findFirst({where:{receiptId:input.command.receiptId,version:2}});assert.equal(revision.actorId,context.actor.userId);assert.equal(revision.sessionId,context.sessionId);
+  await app.review({...query,readability:'unreadable'},context);const next=structuredClone(input);next.command.expectedVersion=2;next.command.operationId=randomUUID();await assert.rejects(receipt.save(next,context),e=>e.code==='LABEL_REVIEW_CONFLICT');
+  assert.deepEqual((await app.read(query,context)).bytes,bytes);assert.equal(await db.receiptDraftRevision.count({where:{receiptId:input.command.receiptId}}),2);
+ }finally{await f.close();}
+});

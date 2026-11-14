@@ -48,3 +48,22 @@ npm run containers:off:fixture
 ```
 
 A useful public example for a manual connectivity check is `3017620422003`; availability and content belong to OFF and can change. External reads are not a deterministic CI dependency. The separate identification view also shows available brand, allergen/nutrition declarations and source information; these are not editable received-batch facts or a completed nutrition/allergen review workflow.
+
+## Local OCR preview (AP-128)
+
+Published alpha.2 digests do not contain AP-128. Keep those images/tags intact. Build a clean committed AP-128 checkout into separate **local-only** images:
+
+```sh
+npm run containers:build -- --version local-ap128 --report .local/alpha2/ocr-images.json
+npm run containers:ocr:preview
+```
+
+The preview verifies image IDs and OCI source revision/version, writes a private Compose override and enables `OCR_MODE=browser_local`. It reuses the same local database, private-photo volume, accounts and loopback URL. `containers:up`, `down`, status and logs retain this selected preview. The images are never pushed to GHCR by these commands. Return to the published alpha.2 runtime without deleting data:
+
+```sh
+npm run containers:release
+```
+
+In receiving, save the draft, upload a legible JPEG/PNG label, then select **Proposer le lot et la date depuis cette photo**. Compare the displayed original, correct the proposals, select the fields to apply and confirm comparison. Applying changes only the draft; save it to retain source provenance and the actor-attributed revision. No stock is posted. Dates without a reliable type, ambiguous dates/batches, short years and low-confidence readings require manual completion. Clear framing and a readable label matter; this local synthetic evaluation is not an operational accuracy guarantee.
+
+OCR stays on device; worker/WASM/French model assets are served by the app, with no image sent to a cloud OCR API. A 60-second UI deadline, cancellation, photo read failure or unsupported browser leaves manual entry and the original photo available. Browser worker initialization failure may require reloading before another OCR attempt. Model/image memory is discarded; no OCR image/text is stored in IndexedDB/localStorage. Scope/session lock discards in-flight local state.

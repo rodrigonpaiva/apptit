@@ -1,3 +1,5 @@
+import { labelReview, reviewMatchesLine } from './label-review.js';
+import type { EvidenceView } from '@apptit/contracts';
 import { createHash } from 'node:crypto';
 import type { AuthorizedSiteContext, ReceiptItemDetails, ReceiptOperationResult, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, Scope } from '@apptit/contracts';
 import { InputError, invalid, object, productBarcode, receiptOperationIdentity, saveReceiptDraft, scope, text, uuid, decimal, scaledDecimal, fromScaled } from '@apptit/domain-values';
@@ -9,7 +11,7 @@ export function parseReceiptWorkspace(input: unknown): SaveReceiptWorkspace {
   const command = saveReceiptDraft(value['command']);
   if (!Array.isArray(value['items']) || value['items'].length !== command.payload.lines.length) invalid('items', 'INVALID_LIST', 'One private identity snapshot per line is required.');
   const items: ReceiptItemDetails[] = value['items'].map((input, index) => {
-    const item = object(input, ['lineId', 'name', 'presentation', 'barcode', 'physicalMatch', 'pack'], `items[${index}]`);
+    const item = object(input, ['lineId', 'name', 'presentation', 'barcode', 'physicalMatch', 'pack', 'labelReview'], `items[${index}]`);
     if (typeof item['physicalMatch'] !== 'boolean') invalid('physicalMatch', 'INVALID_MATCH', 'Explicit match state required.');
     let pack: ReceiptItemDetails['pack'] = null;
     if (item['pack'] !== null) {
@@ -19,7 +21,7 @@ export function parseReceiptWorkspace(input: unknown): SaveReceiptWorkspace {
       if (raw['unit'] === 'each' && factor.includes('.')) invalid('pack.factor', 'INVALID_CONVERSION', 'Item conversion must be whole.');
       pack = { count, factor, unit: raw['unit'] as 'g' | 'ml' | 'each', checked: true };
     }
-    return { lineId: uuid(item['lineId'], 'lineId'), name: text(item['name'], 'name', 200), presentation: text(item['presentation'], 'presentation', 200), barcode: item['barcode'] === null ? null : productBarcode(item['barcode']), physicalMatch: item['physicalMatch'] as boolean, pack };
+    return { lineId: uuid(item['lineId'], 'lineId'), name: text(item['name'], 'name', 200), presentation: text(item['presentation'], 'presentation', 200), barcode: item['barcode'] === null ? null : productBarcode(item['barcode']), physicalMatch: item['physicalMatch'] as boolean, ...(item['labelReview'] === undefined ? {} : { labelReview: labelReview(item['labelReview']) }), pack };
   });
   if (new Set(items.map(item => item.lineId)).size !== items.length) invalid('items', 'DUPLICATE_ID', 'Duplicate line details.');
   for (const line of command.payload.lines) {
@@ -57,6 +59,12 @@ export class ReceiptWorkspace {
           const links = (record.snapshot as unknown as { links: { lineId: string; productId: string; presentationId: string; batchId: string } }).links;
           const line = command.payload.lines.find(line => line.id === links.lineId);
           if (!line || line.product.productId !== links.productId || line.product.presentationId !== links.presentationId || line.batch.id !== links.batchId) throw new ReceiptFailure('EVIDENCE_LINK_CONFLICT', 409);
+        }
+        for (const item of items) if (item.labelReview) {
+          if (!context.capabilities.includes('evidence.read') || !context.capabilities.includes('evidence.write')) throw new ReceiptFailure('FORBIDDEN', 403);
+          const line = command.payload.lines.find(line => line.id === item.lineId)!;
+          const evidence = linked.find(record => record.id === item.labelReview!.evidenceId)?.snapshot as unknown as EvidenceView | undefined;
+          if (!reviewMatchesLine(item.labelReview, line, evidence)) throw new ReceiptFailure('LABEL_REVIEW_CONFLICT', 409);
         }
         const observations = await tx.receiptObservation.findMany({ where: { ...command.scope, receiptId: command.receiptId } });
         for (const row of observations) {

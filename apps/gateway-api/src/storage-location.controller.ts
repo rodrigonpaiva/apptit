@@ -4,7 +4,7 @@ import type { Request } from 'express';
 import { AuthFailure, cookieValue, CSRF_COOKIE, identityCall, readConfig, SESSION_COOKIE, validCsrf } from '@apptit/runtime';
 @Controller('storage-locations')
 export class StorageLocationController {
-  private async call(req: Request, input: unknown, action: 'list' | 'save') {
+  private async call(req: Request, input: unknown, action: 'list' | 'save' | 'remove') {
     const config = readConfig('gateway-api'), secret = cookieValue(req.headers.cookie, SESSION_COOKIE);
     try {
       if (req.headers.origin !== config.webOrigin || !req.is('application/json') || req.headers['sec-fetch-site'] === 'cross-site' || !validCsrf(cookieValue(req.headers.cookie, CSRF_COOKIE), secret, req.headers['x-csrf-token'], config.csrfKey)) throw new AuthFailure('FORBIDDEN', 403);
@@ -16,5 +16,6 @@ export class StorageLocationController {
     } catch (error) { if (error instanceof HttpException) throw error; if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status); throw new HttpException({ code: 'DEPENDENCY_UNAVAILABLE' }, 503); }
   }
   @Post('list') list(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'list'); }
+  @Post('remove') remove(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'remove'); }
   @Post('save') save(@Req() req: Request, @Body() input: unknown) { return this.call(req, input, 'save'); }
 }

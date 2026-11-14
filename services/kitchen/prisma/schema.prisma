@@ -96,6 +96,7 @@ model ReceiptLocation {
   category String? @db.VarChar(32)
   isActive Boolean @default(true)
   version Int @default(1)
+  deletedAt DateTime? @db.Timestamptz(3)
   revisions ReceiptLocationRevision[]
   @@index([tenantId, siteId])
 }

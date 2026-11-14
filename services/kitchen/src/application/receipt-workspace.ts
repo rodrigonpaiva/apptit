@@ -83,7 +83,7 @@ export class ReceiptWorkspace {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${storageLock(command.scope.tenantId, command.scope.siteId)}, 0))`;
         const previous = before ? snapshot(before.snapshot) : null;
         const locations = command.payload.lines.flatMap(line => line.destinationLocationId.state === 'known' ? [line.destinationLocationId.value] : []);
-        const available = locations.length ? await tx.receiptLocation.findMany({ where: { ...command.scope, isActive: true, id: { in: [...new Set(locations)] } } }) : [];
+        const available = locations.length ? await tx.receiptLocation.findMany({ where: { ...command.scope, isActive: true, deletedAt: null, id: { in: [...new Set(locations)] } } }) : [];
         for (const line of command.payload.lines) if (line.destinationLocationId.state === 'known') {
           const destinationId = line.destinationLocationId.value;
           const selected = available.find(row => row.id === destinationId);
@@ -145,7 +145,7 @@ export class ReceiptWorkspace {
   }
   async locations(input: unknown, context: AuthorizedSiteContext) {
     const value = object(input, ['scope'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);
-    return this.db.receiptLocation.findMany({ where: { ...requested, isActive: true, category: { in: [...storageCategories] } }, select: { id: true, name: true, category: true, isActive: true, version: true }, orderBy: { name: 'asc' }, take: 200 }) as Promise<ReceiptLocation[]>;
+    return this.db.receiptLocation.findMany({ where: { ...requested, isActive: true, deletedAt: null, category: { in: [...storageCategories] } }, select: { id: true, name: true, category: true, isActive: true, version: true }, orderBy: { name: 'asc' }, take: 200 }) as Promise<ReceiptLocation[]>;
   }
 }
 export { InputError };

@@ -1,3 +1,4 @@
+import { labelImageDimensions } from './label-image';
 import type { Worker } from 'tesseract.js';
 import { LABEL_ENGINE, labelProposals } from './label-proposals';
 let activeWorker = false;
@@ -17,10 +18,12 @@ export async function recognizeLabel(blob: Blob, signal: AbortSignal, progress: 
   const timer = setTimeout(abort, 60000);
   try {
     if (signal.aborted) throw new Error('CANCELLED');
+    labelImageDimensions(new Uint8Array(await blob.arrayBuffer()));
+    if (expired || signal.aborted) throw new Error('CANCELLED');
     image = await createImageBitmap(blob);
     if (image.width < 1 || image.height < 1 || image.width * image.height > 24000000) throw new Error('INVALID_DIMENSIONS');
     const canvas = document.createElement('canvas'), scale = Math.min(1, 2200 / Math.max(image.width, image.height));
-    canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale);
+    canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale));
     const context = canvas.getContext('2d'); if (!context) throw new Error('UNAVAILABLE');
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const { createWorker } = await import('tesseract.js');

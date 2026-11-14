@@ -13,6 +13,7 @@ export function labelProposals(text: string, confidence: number): LabelProposals
   const empty = { batch: null, expiry: null, expiryKind: null, uncertain: true };
   if (!Number.isFinite(confidence) || confidence < 55 || text.length > 8000) return empty;
   const lines = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  let uncertainDate = false;
   const batches = new Set<string>(), dates = new Map<string, LabelDateKind | null>();
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
@@ -26,13 +27,13 @@ export function labelProposals(text: string, confidence: number): LabelProposals
     const matches = candidate.match(/\b(?:\d{4}-\d{2}-\d{2}|\d{2}[/.-]\d{2}[/.-]\d{4})\b/g) ?? [];
     for (const match of matches) {
       const local = /^(\d{2})[/.-](\d{2})[/.-]\d{4}$/.exec(match);
-      if (local && Number(local[1]) <= 12 && Number(local[2]) <= 12 && local[1] !== local[2]) continue;
-      const date = labelDate(match); if (!date) continue;
+      if (local && Number(local[1]) <= 12 && Number(local[2]) <= 12 && local[1] !== local[2]) { uncertainDate = true; continue; }
+      const date = labelDate(match); if (!date) { uncertainDate = true; continue; }
       const kind = useBy && !bestBefore ? 'use_by' : bestBefore && !useBy ? 'best_before' : null;
       if (dates.has(date) && dates.get(date) !== kind) dates.set(date, null); else dates.set(date, kind);
     }
   }
-  const batch = batches.size === 1 ? [...batches][0]! : null, expiry = dates.size === 1 ? [...dates.keys()][0]! : null;
+  const batch = batches.size === 1 ? [...batches][0]! : null, expiry = !uncertainDate && dates.size === 1 ? [...dates.keys()][0]! : null;
   const expiryKind = expiry ? dates.get(expiry)! : null;
   return { batch, expiry, expiryKind, uncertain: !batch || !expiry || !expiryKind };
 }

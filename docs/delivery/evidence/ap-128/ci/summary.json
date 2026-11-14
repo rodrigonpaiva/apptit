@@ -1,0 +1,12 @@
+{
+  "validatedFeatureCommit": "100d3aee08e8e23c65e11e6d74083fb132dccb39",
+  "containerSourceCommit": "a3ba8582a6a0a0902d1000a9f1432f5acb34cdc2",
+  "foundationRun": "https://github.com/rodrigonpaiva/apptit/actions/runs/43574616376",
+  "containerRun": "https://github.com/rodrigonpaiva/apptit/actions/runs/43574616387",
+  "tests": 79,
+  "integrationTests": 42,
+  "smoke": "passed",
+  "containerBrowser": "passed",
+  "registryPushExecuted": false,
+  "localActivation": "blocked: local disk ENOSPC and Docker daemon unavailable"
+}

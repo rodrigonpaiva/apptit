@@ -11,6 +11,7 @@ These engineering decisions select the local synthetic implementation baseline. 
 | [0001](adr/0001-topology-and-workspace.md) | Capability-grouped microservices, Nx/npm, responsive web | Selected for first slice |
 | [0002](adr/0002-data-and-transactions.md) | PostgreSQL authority, Prisma isolation, atomic ledger and outbox | Selected; persistence implemented later |
 | [0003](adr/0003-identity-and-offline.md) | Opaque revocable sessions, site capabilities, isolated draft ownership | Selected online contract; offline capture disabled initially |
+| [0005](adr/0005-local-label-ocr.md) | Local label OCR proposals with explicit human review and image provenance | AP-128 synthetic extension; opt-in |
 | [0004](adr/0004-adapters-evidence-and-recovery.md) | Explicit adapter modes, private evidence, provisional retention and recovery | Local choices selected; live integrations remain gated |
 
 The [wire and domain contracts](contracts/first-slice.md) and [dependency-free TypeScript definitions](contracts/first-slice.ts) express the same baseline. They are design artifacts, not runtime validators or an application package. [SP1-01 evidence and handoff](../delivery/SP1-01.md) maps acceptance and remaining work.

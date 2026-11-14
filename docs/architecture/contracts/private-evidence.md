@@ -51,3 +51,9 @@ EVIDENCE_MODE=fixture EVIDENCE_ROOT="$PWD/.local/private-evidence" EVIDENCE_MAX_
 `npm run smoke` enables fixture images only in its own child processes with a task-owned temporary directory. It deletes only that synthetic test directory after stopping them; default app settings are untouched. Synthetic test metadata is not a reusable business record. For manual environment resets, `infra:reset` still resets databases only; it is not evidence retention/purge. Preserve referenced private files unless deliberately resetting the entire disposable fixture environment.
 
 [Delivery and actual verification](../../delivery/SP2-04.md).
+
+## AP-128 local assisted review extension
+
+[ADR-0005](../adr/0005-local-label-ocr.md) supersedes the disabled-only browser behavior above for the explicit `OCR_MODE=browser_local` extension. Listing advertises optional `localLabelOcr`; existing per-photo `extraction.state=disabled` still means no server extraction record/attestation. The browser may read the authorized original and run pinned same-origin local OCR, with no image sent to an OCR provider. Readability and original availability stay separate from local extraction success/failure.
+
+Optional receipt item `labelReview` records the photo ID/SHA-256, pinned engine, client-reported extraction time/proposals and selected corrected batch/expiry values. This is untrusted human-review input. Kitchen validates allowed fields, exact calendar dates/kinds, current evidence capabilities, available source under the same receipt/scope/line/product/presentation/batch, matching image digest and equality with the saved fields. Existing receipt locking/version/idempotency and revision audit provide actor/server timestamp and preserve history. Manual field changes drop the active association. No photo bytes, path, raw OCR text, actor override or stock authority enter this DTO. See [AP-128 execution evidence](../../delivery/AP-128.md).

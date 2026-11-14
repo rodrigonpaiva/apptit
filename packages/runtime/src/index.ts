@@ -27,6 +27,7 @@ export interface RuntimeConfig {
   loginLimit: number;
   loginWindowSeconds: number;
   identityKitchenToken?: string;
+  ocrMode: 'disabled' | 'browser_local';
   observationMode: 'disabled' | 'fixture';
   evidenceMode: 'disabled' | 'fixture';
   evidenceRoot?: string;
@@ -79,7 +80,10 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
   const evidenceMode = required(env, 'EVIDENCE_MODE');
   if (!['disabled', 'fixture'].includes(evidenceMode)) throw new ConfigurationError('EVIDENCE_MODE');
   const evidenceMaxBytes = evidenceMode === 'fixture' ? positive(env, 'EVIDENCE_MAX_BYTES', 2_097_152) : 0;
+  const ocrMode = required(env, 'OCR_MODE');
+  if (!['disabled', 'browser_local'].includes(ocrMode)) throw new ConfigurationError('OCR_MODE');
   const config: RuntimeConfig = {
+    ocrMode: ocrMode as RuntimeConfig['ocrMode'],
     observationMode: observationMode as RuntimeConfig['observationMode'],
     evidenceMode: evidenceMode as RuntimeConfig['evidenceMode'], evidenceMaxBytes,
     offMode: offMode as RuntimeConfig['offMode'], offUserAgent, offTimeoutMs: positive(env, 'OFF_TIMEOUT_MS', 10000), offCacheSeconds: positive(env, 'OFF_CACHE_SECONDS', 86400),
@@ -113,7 +117,7 @@ export function readConfig(service: RuntimeName, env: NodeJS.ProcessEnv = proces
     if (!path.isAbsolute(root) || root.split(path.sep).some(part => ['public', 'static', '.next', 'node_modules', '..'].includes(part))) throw new ConfigurationError('EVIDENCE_ROOT');
     config.evidenceRoot = root;
   }
-  for (const key of ['AI_MODE', 'OCR_MODE', 'OFFLINE_MODE']) {
+  for (const key of ['AI_MODE', 'OFFLINE_MODE']) {
     if (required(env, key) !== 'disabled') throw new ConfigurationError(key);
   }
   return Object.freeze(config);

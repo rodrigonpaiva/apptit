@@ -1,0 +1,57 @@
+name: Validate local label OCR containers
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [dev]
+    paths:
+      - 'apps/**'
+      - 'services/**'
+      - 'packages/**'
+      - 'containers/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/validate-label-ocr.yml'
+permissions:
+  contents: read
+concurrency:
+  group: local-label-ocr-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run local:env
+      - name: Build both immutable local images without publishing
+        run: npm run containers:build -- --version local-ap128 --report .local/alpha2/ocr-images.json
+      - name: Start isolated synthetic preview with local OCR
+        run: npm run containers:ocr:preview
+      - name: Install isolated pinned browser for evaluation
+        run: |
+          npm install --prefix "$RUNNER_TEMP/ap128-browser" --save-exact playwright@1.65.1
+          PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/ap128-browser/browsers" node "$RUNNER_TEMP/ap128-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Exercise actual container OCR and reviewed receipt persistence
+        run: PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/ap128-browser/browsers" node tests/browser/ap128.mjs "$RUNNER_TEMP/ap128-browser/node_modules/playwright/index.mjs" compose
+      - name: Stop only the synthetic preview, preserving diagnostic volumes
+        if: always()
+        run: npm run containers:down
+      - name: Retain sanitized image and browser evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: local-label-ocr-evidence
+          if-no-files-found: warn
+          path: |
+            .local/alpha2/ocr-images.json
+            docs/delivery/evidence/ap-128/browser.json
+            docs/delivery/evidence/ap-128/*.png

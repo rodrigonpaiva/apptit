@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { previewProfile } from '../scripts/containers/preview.mjs';
+test('local preview pins both validated image IDs and only removes its active profile on release switch', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'apptit-preview-profile-')); t.after(() => fs.rm(root, { recursive: true, force: true })); const directory = pathToFileURL(root + '/');
+  const report = { status: 'built', sourceDirty: false, version: 'local-ap128', repository: 'rodrigonpaiva/apptit', revision: 'a'.repeat(40), images: { api: { imageId: 'sha256:' + 'b'.repeat(64), platform: 'linux/arm64' }, web: { imageId: 'sha256:' + 'c'.repeat(64), platform: 'linux/arm64' } } };
+  const file = path.join(root, 'ocr-images.json'); await fs.writeFile(file, JSON.stringify(report));
+  const execute = async (command, args) => { assert.equal(command, 'docker'); assert.deepEqual(args.slice(0, 2), ['image', 'inspect']); return JSON.stringify([{ Id: args[2], Os: 'linux', Architecture: 'arm64', Config: { Labels: { 'org.opencontainers.image.revision': report.revision, 'org.opencontainers.image.version': report.version, 'org.opencontainers.image.source': 'https://github.com/rodrigonpaiva/apptit' } } }]); };
+  const overlay = await previewProfile(directory, 'ocr-preview', execute), parsed = JSON.parse(await fs.readFile(overlay));
+  assert.equal(parsed.services.kitchen.image, report.images.api.imageId); assert.equal(parsed.services.browser.image, report.images.web.imageId); assert.equal(parsed.services.web.pull_policy, 'never');
+  assert.ok(await previewProfile(directory, 'up', execute));
+  await assert.rejects(previewProfile(directory, 'up', async () => JSON.stringify([{ Id: 'wrong', Config: { Labels: {} } }])));
+  await fs.writeFile(path.join(root, 'fixture-credentials.json'), 'preserve');
+  assert.equal(await previewProfile(directory, 'release', execute), null); assert.equal(await fs.readFile(path.join(root, 'fixture-credentials.json'), 'utf8'), 'preserve'); assert.ok(await fs.stat(file));
+  await fs.writeFile(file, JSON.stringify({ ...report, sourceDirty: true })); await assert.rejects(previewProfile(directory, 'ocr-preview', execute));
+});

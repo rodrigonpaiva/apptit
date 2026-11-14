@@ -5,7 +5,7 @@ import type { CataloguePage } from '@apptit/contracts';
 import { AuthFailure, cookieValue, identityCall, SESSION_COOKIE } from '@apptit/runtime';
 import type { RuntimeConfig } from '@apptit/runtime';
 export const catalogueSchema = `
-  type CatalogueProduct { id: ID!, name: String!, presentation: String!, barcode: String }
+  type CatalogueProduct { id: ID!, name: String!, presentation: String!, barcode: String, imageUrl: String }
   type CataloguePage { items: [CatalogueProduct!]!, hasMore: Boolean! }
   extend type Query { catalogue(input: SiteScopeInput!): CataloguePage! }
 `;

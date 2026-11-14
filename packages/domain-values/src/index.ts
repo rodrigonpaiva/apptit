@@ -135,3 +135,10 @@ export function toBaseQuantity(input: { amount: string; unit: 'kg' | 'l'; basis:
 export * from './receiving.js';
 export * from './barcode.js';
 export * from './observations.js';
+
+/** Public product-reference images only. Never private batch-evidence paths or server fetch targets. */
+export function referenceImageUrl(input: unknown): string | null {
+  if (typeof input !== 'string' || input.length > 500) return null;
+  if (/^\/product-images\/[A-Za-z0-9/_-]+\.(?:png|jpe?g|webp|avif|svg)$/.test(input)) return input;
+  try { const url = new URL(input); return url.protocol === 'https:' && !url.username && !url.password && !url.port && !url.hash && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(url.hostname) && !/\.(?:local|localhost|internal|test)$/i.test(url.hostname) ? url.href : null; } catch { return null; }
+}

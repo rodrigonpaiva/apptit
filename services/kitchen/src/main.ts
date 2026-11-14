@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { StorageLocations } from './application/storage-locations.js';
 import { ReceivingObservations } from './application/receiving-observations.js';
 import { EvidenceWorkspace } from './application/evidence-workspace.js';
 import { boundedBytes, EvidenceStorageFailure } from './infra/private-evidence-store.js';
@@ -10,7 +11,7 @@ import type { ScopedProductLookup } from '@apptit/contracts';
 import type { CataloguePage } from '@apptit/contracts';
 import type { AuthorizedSiteContext } from '@apptit/contracts';
 import { AuthFailure, identityCall } from '@apptit/runtime';
-import { InputError, object, uuid, productBarcode } from '@apptit/domain-values';
+import { InputError, object, uuid, productBarcode, referenceImageUrl } from '@apptit/domain-values';
 import { Controller, Get, Injectable, Module, ServiceUnavailableException, UnauthorizedException, Headers, Body, HttpException, Post, Req, Res } from '@nestjs/common';
 import type { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -115,6 +116,20 @@ async function bootstrap(): Promise<void> {
     @Post('receipt-drafts/read') readReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'read'); }
     @Post('receipt-drafts/list') listReceipts(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'list'); }
     @Post('receipt-drafts/locations') receiptLocations(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'locations'); }
+    private async storage(req: Request, input: unknown, action: 'list' | 'save') {
+      try {
+        if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
+        const secret = req.headers['x-session-secret'];
+        const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined, { scope: (input as { scope?: unknown })?.scope, capability: 'storage.location.manage' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        return await new StorageLocations(this.database)[action](input, context);
+      } catch (error) {
+        if (error instanceof AuthFailure || error instanceof ReceiptFailure) throw new HttpException({ code: error.code }, error.status);
+        if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT' }, 400);
+        throw new ServiceUnavailableException({ code: 'DEPENDENCY_UNAVAILABLE' });
+      }
+    }
+    @Post('storage-locations/list') listStorage(@Req() req: Request, @Body() input: unknown) { return this.storage(req, input, 'list'); }
+    @Post('storage-locations/save') saveStorage(@Req() req: Request, @Body() input: unknown) { return this.storage(req, input, 'save'); }
     @Post('product-lookup') async productLookup(@Req() req: Request, @Body() input: unknown): Promise<ScopedProductLookup> {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
@@ -123,8 +138,8 @@ async function bootstrap(): Promise<void> {
         const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
           { scope: value['scope'], capability: 'catalogue.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
         const barcode = productBarcode(value['barcode']);
-        const localCandidates = await this.database.catalogueProduct.findMany({ where: { ...context.scope, barcode }, select: { id: true, name: true, presentation: true, barcode: true }, take: 10, orderBy: { id: 'asc' } });
-        return { ...await lookup.lookup(barcode), localCandidates };
+        const localCandidates = await this.database.catalogueProduct.findMany({ where: { ...context.scope, barcode }, select: { id: true, name: true, presentation: true, barcode: true, imageUrl: true }, take: 10, orderBy: { id: 'asc' } });
+        return { ...await lookup.lookup(barcode), localCandidates: localCandidates.map(row => ({ ...row, imageUrl: referenceImageUrl(row.imageUrl) })) };
       } catch (error) {
         if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
         if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);

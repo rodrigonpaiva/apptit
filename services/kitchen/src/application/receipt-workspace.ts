@@ -1,3 +1,6 @@
+import { storageLock } from './storage-locations.js';
+import { storageCategories } from '@apptit/contracts';
+import type { StorageCategory, ReceiptLocation } from '@apptit/contracts';
 import { labelReview, reviewMatchesLine } from './label-review.js';
 import type { EvidenceView } from '@apptit/contracts';
 import { createHash } from 'node:crypto';
@@ -76,13 +79,29 @@ export class ReceiptWorkspace {
         const before = await tx.receiptDraft.findFirst({ where });
         if (!before && command.expectedVersion !== 0) throw new ReceiptFailure('NOT_FOUND', 404);
         if (before && before.version !== command.expectedVersion) throw new ReceiptFailure('VERSION_CONFLICT', 409);
+        if (before && snapshot(before.snapshot).draft.state !== 'draft') throw new ReceiptFailure('RECEIPT_READ_ONLY', 409);
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${storageLock(command.scope.tenantId, command.scope.siteId)}, 0))`;
+        const previous = before ? snapshot(before.snapshot) : null;
         const locations = command.payload.lines.flatMap(line => line.destinationLocationId.state === 'known' ? [line.destinationLocationId.value] : []);
-        if (locations.length) {
-          const found = await tx.receiptLocation.count({ where: { ...command.scope, id: { in: [...new Set(locations)] } } });
-          if (found !== new Set(locations).size) throw new ReceiptFailure('INVALID_DESTINATION', 400);
+        const available = locations.length ? await tx.receiptLocation.findMany({ where: { ...command.scope, isActive: true, id: { in: [...new Set(locations)] } } }) : [];
+        for (const line of command.payload.lines) if (line.destinationLocationId.state === 'known') {
+          const destinationId = line.destinationLocationId.value;
+          const selected = available.find(row => row.id === destinationId);
+          const prior = previous?.draft.data.lines.find(row => row.id === line.id)?.destinationLocationId;
+          const unchangedLegacy = prior?.state === 'known' && prior.value === line.destinationLocationId.value;
+          if (!selected || !selected.category && !unchangedLegacy) throw new ReceiptFailure('INVALID_DESTINATION', 400);
         }
-        const recordedAt = this.clock().toISOString(); const previous = before ? snapshot(before.snapshot) : null;
-        const value: ReceiptWorkspaceSnapshot = { draft: { id: command.receiptId, scope: command.scope, version: command.expectedVersion + 1, state: 'draft', data: command.payload, createdBy: previous?.draft.createdBy ?? context.actor, updatedBy: context.actor, recordedAt }, items };
+        const enrichedItems = items.map(item => {
+          const line = command.payload.lines.find(line => line.id === item.lineId)!;
+          const destinationId = line.destinationLocationId.state === 'known' ? line.destinationLocationId.value : null;
+          const selected = available.find(row => row.id === destinationId);
+          const priorItem = previous?.items.find(row => row.lineId === item.lineId);
+          const priorDestination = previous?.draft.data.lines.find(row => row.id === item.lineId)?.destinationLocationId;
+          const legacyDestination = priorItem?.legacyDestination ?? (priorDestination?.state === 'known' && !priorItem?.destinationSnapshot ? String(priorDestination.value) : undefined);
+          return { ...item, ...(selected ? { destinationSnapshot: priorItem?.destinationSnapshot?.id === selected.id ? priorItem.destinationSnapshot : { id: selected.id, name: selected.name, category: selected.category as StorageCategory | null } } : {}), ...(legacyDestination ? { legacyDestination } : {}) };
+        });
+        const recordedAt = this.clock().toISOString();
+        const value: ReceiptWorkspaceSnapshot = { draft: { id: command.receiptId, scope: command.scope, version: command.expectedVersion + 1, state: 'draft', data: command.payload, createdBy: previous?.draft.createdBy ?? context.actor, updatedBy: context.actor, recordedAt }, items: enrichedItems };
         if (!before) await tx.receiptDraft.create({ data: { ...where, version: 1, snapshot: json(value), recordedAt } });
         else {
           const updated = await tx.receiptDraft.updateMany({ where: { ...where, version: command.expectedVersion }, data: { version: { increment: 1 }, snapshot: json(value), recordedAt } });
@@ -116,7 +135,8 @@ export class ReceiptWorkspace {
     const value = object(input, ['scope', 'id'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);
     const found = await this.db.receiptDraft.findFirst({ where: { ...requested, id: uuid(value['id'], 'id') } });
     if (!found) throw new ReceiptFailure('NOT_FOUND', 404);
-    return snapshot(found.snapshot);
+    const result = snapshot(found.snapshot);
+    return result.draft.state === 'draft' ? result : { ...result, readOnly: true };
   }
   async list(input: unknown, context: AuthorizedSiteContext) {
     const value = object(input, ['scope'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);
@@ -125,7 +145,7 @@ export class ReceiptWorkspace {
   }
   async locations(input: unknown, context: AuthorizedSiteContext) {
     const value = object(input, ['scope'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);
-    return this.db.receiptLocation.findMany({ where: requested, select: { id: true, name: true }, orderBy: { name: 'asc' }, take: 50 });
+    return this.db.receiptLocation.findMany({ where: { ...requested, isActive: true, category: { in: [...storageCategories] } }, select: { id: true, name: true, category: true, isActive: true, version: true }, orderBy: { name: 'asc' }, take: 200 }) as Promise<ReceiptLocation[]>;
   }
 }
 export { InputError };

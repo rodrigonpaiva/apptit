@@ -317,3 +317,13 @@ button:disabled { opacity: .6; cursor: wait; }
 .observation-result, .observation-history article { border: 1px solid #d8dfce; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 13px; line-height: 1.7; }
 .receipt-observations .button-row button { max-width: 100%; white-space: normal; }
 @media (max-width: 600px) { .observation-fields, .observation-fields fieldset { padding: 10px; } .receipt-observations .button-row > button { width: 100%; } }
+
+.storage-references { margin-top: 12px; font-size: 13px; max-width: 100%; }
+.storage-references summary { cursor: pointer; padding: 8px 0; min-height: 44px; }
+.storage-references ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+.storage-references li { padding: 8px; border: 1px solid var(--workspace-border, #d9dde1); border-radius: 8px; }
+.storage-references .storage-selected { background: #edf0e6; border-color: #526a53; }
+.storage-references p { margin: 4px 0; }
+.storage-configuration fieldset { min-width: 0; display: grid; gap: 12px; margin: 16px 0; }
+.storage-configuration ul { list-style: none; padding: 0; }
+.storage-configuration li { padding: 12px 0; border-bottom: 1px solid #d9dde1; overflow-wrap: anywhere; }

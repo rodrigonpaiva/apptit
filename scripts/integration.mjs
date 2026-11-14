@@ -1,6 +1,6 @@
 import { loadLocalEnv, run, safeFailure, serviceEnv } from './lib.mjs';
 try {
   loadLocalEnv();
-  await run(process.execPath, ['--test', 'tests/integration/quantity-draft.test.mjs', 'tests/integration/catalogue.test.mjs', 'tests/integration/product-lookup.test.mjs', 'tests/integration/receipt-draft.test.mjs', 'tests/integration/evidence.test.mjs', 'tests/integration/observations.test.mjs'], { env: serviceEnv('kitchen') });
+  await run(process.execPath, ['--test', 'tests/integration/quantity-draft.test.mjs', 'tests/integration/catalogue.test.mjs', 'tests/integration/product-lookup.test.mjs', 'tests/integration/receipt-draft.test.mjs', 'tests/integration/storage-locations.test.mjs', 'tests/integration/evidence.test.mjs', 'tests/integration/observations.test.mjs'], { env: serviceEnv('kitchen') });
   await run(process.execPath, ['--test', 'tests/integration/sessions.test.mjs'], { env: serviceEnv('identity') });
 } catch { safeFailure(); }

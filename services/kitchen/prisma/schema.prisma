@@ -23,6 +23,7 @@ model CatalogueProduct {
   name         String @db.VarChar(200)
   presentation String @db.VarChar(200)
   barcode      String? @db.VarChar(64)
+  imageUrl     String? @db.VarChar(500)
 
   @@index([tenantId, siteId, name, id])
 }
@@ -92,6 +93,10 @@ model ReceiptLocation {
   tenantId String @db.Uuid
   siteId String @db.Uuid
   name String @db.VarChar(100)
+  category String? @db.VarChar(32)
+  isActive Boolean @default(true)
+  version Int @default(1)
+  revisions ReceiptLocationRevision[]
   @@index([tenantId, siteId])
 }
 model ReceiptDraft {
@@ -191,4 +196,21 @@ model ReceiptObservationOperation {
   snapshot Json
   recordedAt DateTime @db.Timestamptz(3)
   @@id([tenantId, siteId, actorId, operationId])
+}
+
+model ReceiptLocationRevision {
+  id String @id @db.Uuid
+  locationId String @db.Uuid
+  location ReceiptLocation @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  version Int
+  actorId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  before Json?
+  snapshot Json
+  @@unique([locationId, version])
+  @@index([tenantId, siteId, locationId], map: "ReceiptLocationRevision_scope_idx")
 }

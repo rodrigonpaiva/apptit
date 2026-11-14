@@ -8,8 +8,8 @@ async function seed(): Promise<void> {
   try {
     for (const product of catalogueFixtures) await db.catalogueProduct.upsert({ where: { id: product.id }, create: product, update: {} });
     const scopes = [...new Map(catalogueFixtures.map(product => [product.siteId, { tenantId: product.tenantId, siteId: product.siteId }])).values()];
-    for (const [index, scope] of scopes.entries()) for (const [offset, name] of ['Réserve synthétique', 'Cuisine synthétique'].entries()) {
-      const location = { id: `60000000-0000-4000-8000-${String(index * 2 + offset + 1).padStart(12, '0')}`, ...scope, name };
+    for (const [index, scope] of scopes.entries()) for (const [offset, [name, category]] of [['Chambre BOF 1', 'cold_bof'], ['Chambre BOF 2', 'cold_bof'], ['Économat 1', 'dry'], ['Économat 2', 'dry']].entries()) {
+      const location = { id: `61000000-0000-4000-8000-${String(index * 4 + offset + 1).padStart(12, '0')}`, ...scope, name: name!, category: category! };
       await db.receiptLocation.upsert({ where: { id: location.id }, create: location, update: {} });
     }
     const payload = { mode: 'synthetic', service: 'kitchen', data: { products: [{ id: 'fixture-rice-a', name: 'Synthetic rice', site: 'fixture-site-a' }], stockEnabled: false } };

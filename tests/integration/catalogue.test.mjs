@@ -22,7 +22,7 @@ test('catalogue read keeps both scope IDs, textual leading zeros and a real empt
     ] });
     const repository = new CatalogueRepository(db);
     const result = await repository.list(context(a));
-    assert.deepEqual(result, { items: [{ id, name: 'Synthetic A', presentation: 'Bag of 5 kg reference only', barcode: '0000012345678' }], hasMore: false });
+    assert.deepEqual(result, { items: [{ id, name: 'Synthetic A', presentation: 'Bag of 5 kg reference only', barcode: '0000012345678', imageUrl: null }], hasMore: false });
     assert.equal((await repository.list(context(b))).items[0].barcode, null);
     for (const scope of [{ tenantId: a.tenantId, siteId: b.siteId }, { tenantId: b.tenantId, siteId: a.siteId }, { tenantId: randomUUID(), siteId: randomUUID() }]) {
       assert.deepEqual(await repository.list(context(scope)), { items: [], hasMore: false });

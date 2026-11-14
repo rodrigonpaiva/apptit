@@ -1,3 +1,4 @@
+import type { StorageLocation } from './storage-locations.js';
 import type { ReceiptDraftSnapshot, SaveReceiptDraft } from './receiving.js';
 import type { Unit } from './quantity-draft.js';
 /** Client-reported OCR suggestions reviewed by the authenticated draft author; not an OCR attestation. */
@@ -16,11 +17,14 @@ export interface ReceiptItemDetails {
   barcode: string | null;
   physicalMatch: boolean;
   labelReview?: LabelReview;
+  /** Server-captured labels; callers cannot submit these fields. */
+  destinationSnapshot?: Pick<StorageLocation, 'id' | 'name' | 'category'>;
+  legacyDestination?: string;
   pack: { count: string; factor: string; unit: Unit; checked: boolean } | null;
 }
-export interface SaveReceiptWorkspace { command: SaveReceiptDraft; items: ReceiptItemDetails[] }
-export interface ReceiptWorkspaceSnapshot { draft: ReceiptDraftSnapshot; items: ReceiptItemDetails[] }
-export interface ReceiptLocation { id: string; name: string }
+export interface SaveReceiptWorkspace { command: SaveReceiptDraft; items: Omit<ReceiptItemDetails, 'destinationSnapshot' | 'legacyDestination'>[] }
+export interface ReceiptWorkspaceSnapshot { readOnly?: boolean; draft: ReceiptDraftSnapshot; items: ReceiptItemDetails[] }
+export type ReceiptLocation = StorageLocation;
 export interface ReceiptSummary { id: string; version: number; recordedAt: string; lineCount: number }
 
 /** Only a committed operation has a confirmed result. Missing is still uncertain. */

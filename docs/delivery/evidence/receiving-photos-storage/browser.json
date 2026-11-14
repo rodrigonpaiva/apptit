@@ -10,6 +10,7 @@
     "chosen physical ID persists per line after real save and reopen",
     "real gateway/API rejects both foreign and newly inactive destinations",
     "explicit synthetic historical-finalized fixture reopens read-only with its original inactive destination",
+    "chef cancels then confirms deletion; location disappears while saved receipt retains its historical destination",
     "a genuinely empty site shows French empty states and chef configuration access",
     "storekeeper cannot configure locations by navigation or direct API"
   ],

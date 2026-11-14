@@ -68,3 +68,21 @@ test('destination save serializes with deactivation across real PostgreSQL conne
   await ready; const pending = new ReceiptWorkspace(db).save(receipt(ctx, [row.id]), ctx); const outcome = assert.rejects(pending, error => error.code === 'INVALID_DESTINATION'); release(); await deactivate; await outcome;
  } finally { await db.$disconnect(); await other.$disconnect(); }
 });
+test('chef deletion is scoped, versioned, replay-safe and retains receipt destinations and immutable history', async () => {
+ const db = connect(); try {
+  const ctx = context(), config = new StorageLocations(db), receipts = new ReceiptWorkspace(db), row = await config.save(location(ctx), ctx);
+  const saved = await receipts.save(receipt(ctx, [row.id]), ctx), command = { scope: ctx.scope, id: row.id, expectedVersion: row.version };
+  await assert.rejects(config.remove(command, { ...ctx, capabilities: ['receipt.draft.write'] }), error => error.code === 'FORBIDDEN');
+  for (const scope of [{ tenantId: ctx.scope.tenantId, siteId: randomUUID() }, { tenantId: randomUUID(), siteId: ctx.scope.siteId }]) await assert.rejects(config.remove({ ...command, scope }, { ...ctx, scope }), error => error.code === 'NOT_FOUND');
+  await assert.rejects(config.remove({ ...command, expectedVersion: 2 }, ctx), error => error.code === 'VERSION_CONFLICT');
+  assert.deepEqual(await config.remove(command, ctx), { id: row.id }); assert.deepEqual(await config.remove(command, ctx), { id: row.id });
+  assert.deepEqual(await config.list({ scope: ctx.scope }, ctx), []); assert.deepEqual(await receipts.locations({ scope: ctx.scope }, ctx), []);
+  const stored = await db.receiptLocation.findUniqueOrThrow({ where: { id: row.id } }); assert.ok(stored.deletedAt); assert.equal(stored.isActive, false); assert.equal(stored.version, 2);
+  const reopened = await receipts.read({ scope: ctx.scope, id: saved.draft.id }, ctx); assert.deepEqual(reopened, saved);
+  assert.equal(await db.receiptLocationRevision.count({ where: { locationId: row.id } }), 2);
+  const audit = await db.receiptLocationRevision.findFirst({ where: { locationId: row.id, version: 2 } }); assert.equal(audit.actorId, ctx.actor.userId); assert.ok(audit.snapshot.deletedAt);
+  await assert.rejects(config.save({ ...location(ctx), id: row.id, expectedVersion: 2 }, ctx), error => error.code === 'NOT_FOUND');
+  await assert.rejects(receipts.save(receipt(ctx, [row.id]), ctx), error => error.code === 'INVALID_DESTINATION');
+  await assert.rejects(db.receiptLocation.update({ where: { id: row.id }, data: { isActive: true } }));
+ } finally { await db.$disconnect(); }
+});

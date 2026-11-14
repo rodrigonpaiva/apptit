@@ -116,7 +116,7 @@ async function bootstrap(): Promise<void> {
     @Post('receipt-drafts/read') readReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'read'); }
     @Post('receipt-drafts/list') listReceipts(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'list'); }
     @Post('receipt-drafts/locations') receiptLocations(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'locations'); }
-    private async storage(req: Request, input: unknown, action: 'list' | 'save') {
+    private async storage(req: Request, input: unknown, action: 'list' | 'save' | 'remove') {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
         const secret = req.headers['x-session-secret'];
@@ -130,6 +130,7 @@ async function bootstrap(): Promise<void> {
     }
     @Post('storage-locations/list') listStorage(@Req() req: Request, @Body() input: unknown) { return this.storage(req, input, 'list'); }
     @Post('storage-locations/save') saveStorage(@Req() req: Request, @Body() input: unknown) { return this.storage(req, input, 'save'); }
+    @Post('storage-locations/remove') removeStorage(@Req() req: Request, @Body() input: unknown) { return this.storage(req, input, 'remove'); }
     @Post('product-lookup') async productLookup(@Req() req: Request, @Body() input: unknown): Promise<ScopedProductLookup> {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);

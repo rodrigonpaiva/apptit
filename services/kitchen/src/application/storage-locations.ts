@@ -15,7 +15,7 @@ export class StorageLocations {
   }
   async list(input: unknown, context: AuthorizedSiteContext): Promise<StorageLocation[]> {
     const value = object(input, ['scope'], 'locations'), requested = this.authorize(value['scope'], context);
-    const rows = await this.db.receiptLocation.findMany({ where: requested, orderBy: [{ name: 'asc' }, { id: 'asc' }], take: 201 });
+    const rows = await this.db.receiptLocation.findMany({ where: { ...requested, deletedAt: null }, orderBy: [{ name: 'asc' }, { id: 'asc' }], take: 201 });
     if (rows.length > 200) throw new ReceiptFailure('LOCATION_LIMIT', 400);
     return rows.map(({ id, name, category, isActive, version }) => ({ id, name, category: category as StorageCategory | null, isActive, version }));
   }
@@ -26,10 +26,11 @@ export class StorageLocations {
     return this.db.$transaction(async tx => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${storageLock(requested.tenantId, requested.siteId)}, 0))`;
       const before = await tx.receiptLocation.findFirst({ where: { ...requested, id } });
+      if (before?.deletedAt) throw new ReceiptFailure('NOT_FOUND', 404);
       if (value['id'] !== null && value['expectedVersion'] !== 0 && !before) throw new ReceiptFailure('NOT_FOUND', 404);
       if (before?.version === 1 && value['expectedVersion'] === 0 && before.name === name && before.category === value['category'] && before.isActive === value['isActive']) return { id, name, category: before.category as StorageCategory, isActive: before.isActive, version: before.version };
       if ((before?.version ?? 0) !== value['expectedVersion']) throw new ReceiptFailure('VERSION_CONFLICT', 409);
-      if (!before && await tx.receiptLocation.count({ where: requested }) >= 200) throw new ReceiptFailure('LOCATION_LIMIT', 400);
+      if (!before && await tx.receiptLocation.count({ where: { ...requested, deletedAt: null } }) >= 200) throw new ReceiptFailure('LOCATION_LIMIT', 400);
       const data = { ...requested, id, name, category: value['category'] as StorageCategory, isActive: value['isActive'] as boolean, version: (before?.version ?? 0) + 1 };
       if (before) await tx.receiptLocation.update({ where: { id }, data }); else await tx.receiptLocation.create({ data });
       const result = { id, name, category: data.category, isActive: data.isActive, version: data.version };
@@ -37,4 +38,22 @@ export class StorageLocations {
       return result;
     });
   }
+  async remove(input: unknown, context: AuthorizedSiteContext): Promise<{ id: string }> {
+    const value = object(input, ['scope', 'id', 'expectedVersion'], 'location'), requested = this.authorize(value['scope'], context);
+    const id = uuid(value['id'], 'id');
+    if (!Number.isSafeInteger(value['expectedVersion']) || (value['expectedVersion'] as number) < 1 || (value['expectedVersion'] as number) > 2147483645) throw new ReceiptFailure('INVALID_INPUT', 400);
+    return this.db.$transaction(async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${storageLock(requested.tenantId, requested.siteId)}, 0))`;
+      const before = await tx.receiptLocation.findFirst({ where: { ...requested, id } });
+      if (!before) throw new ReceiptFailure('NOT_FOUND', 404);
+      if (before.deletedAt && before.version === (value['expectedVersion'] as number) + 1) return { id };
+      if (before.deletedAt) throw new ReceiptFailure('NOT_FOUND', 404);
+      if (before.version !== value['expectedVersion']) throw new ReceiptFailure('VERSION_CONFLICT', 409);
+      const deletedAt = new Date(), version = before.version + 1;
+      await tx.receiptLocation.update({ where: { id }, data: { deletedAt, isActive: false, version } });
+      await tx.receiptLocationRevision.create({ data: { id: randomUUID(), locationId: id, ...requested, version, actorId: context.actor.userId, sessionId: context.sessionId, correlationId: context.correlationId, recordedAt: deletedAt, before: JSON.parse(JSON.stringify(before)) as Prisma.InputJsonObject, snapshot: { id, name: before.name, category: before.category, isActive: false, version, deletedAt: deletedAt.toISOString() } } });
+      return { id };
+    });
+  }
+
 }

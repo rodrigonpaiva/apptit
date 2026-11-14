@@ -4,6 +4,7 @@ export interface CatalogueProduct {
   name: string;
   presentation: string;
   barcode: string | null;
+  imageUrl?: string | null;
 }
 export interface CataloguePage {
   items: CatalogueProduct[];

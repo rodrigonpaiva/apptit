@@ -42,6 +42,12 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/ap128-browser/browsers" node "$RUNNER_TEMP/ap128-browser/node_modules/playwright/cli.js" install --with-deps chromium
       - name: Exercise actual container OCR and reviewed receipt persistence
         run: PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/ap128-browser/browsers" node tests/browser/ap128.mjs "$RUNNER_TEMP/ap128-browser/node_modules/playwright/index.mjs" compose
+      - name: Validate populated storage migration without rewriting legacy data
+        run: |
+          mkdir -p docs/delivery/evidence/receiving-photos-storage
+          node tests/database/storage-upgrade.mjs apptit-alpha2-local-postgres-1 > docs/delivery/evidence/receiving-photos-storage/upgrade.json
+      - name: Exercise real receiving scanner, product photos and physical destinations
+        run: PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/ap128-browser/browsers" node tests/browser/receiving-storage.mjs "$RUNNER_TEMP/ap128-browser/node_modules/playwright/index.mjs" compose
       - name: Stop only the synthetic preview, preserving diagnostic volumes
         if: always()
         run: npm run containers:down
@@ -55,3 +61,4 @@ jobs:
             .local/alpha2/ocr-images.json
             docs/delivery/evidence/ap-128/browser.json
             docs/delivery/evidence/ap-128/*.png
+            docs/delivery/evidence/receiving-photos-storage/

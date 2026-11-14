@@ -36,7 +36,7 @@ GraphQL `siteContext` returns only the verified actor/site/role/capabilities, no
 
 | Role | Explicit test capabilities |
 | --- | --- |
-| Chef | site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write, observation.read/capture |
+| Chef | storage.location.manage, site.read, catalogue.read, quantity-draft.read/write, receipt.draft.read/write, evidence.read/write, observation.read/capture |
 | Storekeeper | site.read, catalogue.read, quantity-draft.read, receipt.draft.read/write, evidence.read/write, observation.read/capture |
 | Cook | site.read, catalogue.read |
 

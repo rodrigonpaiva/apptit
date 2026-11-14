@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checks": [
+    "real camera ZXing scan reuses one protected lookup and prefers scoped catalogue image",
+    "real second camera scan uses supplied OFF front image without another product lookup",
+    "missing image keeps the design-system placeholder and receiving action available",
+    "image load failure also keeps placeholder and manual continuation",
+    "two camera scans retain the second selection when the first response arrives late",
+    "chef creates two real instances in the same category; API rejects an out-of-list category",
+    "chosen physical ID persists per line after real save and reopen",
+    "real gateway/API rejects both foreign and newly inactive destinations",
+    "explicit synthetic historical-finalized fixture reopens read-only with its original inactive destination",
+    "a genuinely empty site shows French empty states and chef configuration access",
+    "storekeeper cannot configure locations by navigation or direct API"
+  ],
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "pageErrors": []
+}

@@ -4,13 +4,12 @@ import type { FormEvent } from 'react';
 import type { ScopedProductLookup, SiteAccess } from '@apptit/contracts';
 import { identifyProduct } from '../../lib/product-lookup';
 import Scanner from './scanner';
-import Image from 'next/image';
+import ProductReferencePhoto from './product-reference-photo';
 import Icon from './workspace-icon';
 import type { ReceiptSeed } from '../../lib/receipts';
 const allergenNames: Record<string, string> = { 'en:milk': 'Lait', 'en:nuts': 'Fruits à coque', 'en:soybeans': 'Soja', 'en:gluten': 'Gluten', 'en:eggs': 'Œufs', 'en:peanuts': 'Arachides', 'en:fish': 'Poisson', 'en:crustaceans': 'Crustacés', 'en:molluscs': 'Mollusques', 'en:celery': 'Céleri', 'en:mustard': 'Moutarde', 'en:sesame-seeds': 'Graines de sésame', 'en:sulphur-dioxide-and-sulphites': 'Sulfites', 'en:lupin': 'Lupin' };
 const labels = { name: 'Nom du produit', brands: 'Marque', presentation: 'Présentation déclarée', allergens: 'Allergènes déclarés', nutrition: 'Nutrition déclarée' };
 export default function ProductIdentification({ site, onStartReceipt }: { site: SiteAccess; onStartReceipt: (seed: ReceiptSeed) => void }) {
-  const [imageFailed, setImageFailed] = useState(false);
   const [code, setCode] = useState(''); const [result, setResult] = useState<ScopedProductLookup | null>(null);
   const [failure, setFailure] = useState(''); const [busy, setBusy] = useState(false); const [camera, setCamera] = useState(false);
   const [manual, setManual] = useState(false); const [preview, setPreview] = useState(false); const [matched, setMatched] = useState(false);
@@ -18,7 +17,7 @@ export default function ProductIdentification({ site, onStartReceipt }: { site: 
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => request.current?.abort(), []);
   const lookup = useCallback(async (barcode: string) => {
-    request.current?.abort(); setResult(null); setImageFailed(false); setPreview(false); setMatched(false); setManual(false); setName(''); setPresentation(''); setFailure('');
+    request.current?.abort(); setResult(null); setPreview(false); setMatched(false); setManual(false); setName(''); setPresentation(''); setFailure('');
     if (!/^(?:\d{8}|\d{12}|\d{13}|\d{14})$/.test(barcode)) { setBusy(false); setFailure('Entrez 8, 12, 13 ou 14 chiffres, en conservant les zéros initiaux.'); return; }
     const controller = new AbortController(); request.current = controller; setBusy(true);
     try {
@@ -44,7 +43,7 @@ export default function ProductIdentification({ site, onStartReceipt }: { site: 
       {result.reason && <p>La source ne peut pas répondre maintenant{result.retryAfterSeconds ? ` ; réessayez dans ${result.retryAfterSeconds} secondes` : ''}. La saisie manuelle reste disponible.</p>}
       {result.product && <>
         <div className="lookup-product-overview">
-          <figure className="lookup-photo">{result.product.imageUrl && !imageFailed ? <Image unoptimized src={result.product.imageUrl} width={200} height={200} referrerPolicy="no-referrer" alt={`Emballage : ${result.product.name.value ?? 'produit identifié'}`} onError={() => setImageFailed(true)} /> : <div className="lookup-photo-empty"><Icon name="grid" /><span>Photo indisponible</span></div>}{result.product.imageUrl && !imageFailed && <figcaption><a href={result.source?.url} target="_blank" rel="noopener noreferrer">Photo : contributeurs Open Food Facts</a> · <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 3.0</a></figcaption>}</figure>
+          <ProductReferencePhoto key={result.product.imageUrl ?? result.barcode} url={result.product.imageUrl} source="open_food_facts" sourceUrl={result.source?.url} />
           <div className="lookup-product-summary"><p className="eyebrow">{result.product.brands.value ?? 'Marque inconnue'}</p><h4>{result.product.name.value ?? 'Nom du produit à compléter'}</h4><p className="lookup-presentation">{result.product.presentation.value ?? 'Présentation à vérifier sur l’étiquette'}</p><p className="lookup-match-note">Comparez le nom, le format et la photo à votre emballage.</p></div>
         </div>
         <section className="lookup-allergen-panel" aria-label="Allergènes déclarés"><div className="lookup-section-heading"><Icon name="shield" /><h4>Allergènes déclarés</h4><span>À vérifier</span></div>{result.product.allergens.value ? <ul className="lookup-allergen-tags">{result.product.allergens.value.split(', ').map(tag => <li key={tag}>{allergenNames[tag] ?? tag}</li>)}</ul> : <p className="lookup-unknown">Information inconnue dans la source</p>}<p className="lookup-small">Vérifiez l’étiquette, y compris les traces éventuelles. Une information absente ne signifie pas « sans allergènes ».</p></section>

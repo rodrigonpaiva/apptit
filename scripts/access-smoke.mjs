@@ -80,7 +80,10 @@ export async function accessSmoke(config, web) {
   const photo = await evidenceSmoke(browser, scopeA, chef.user);
   const observations = await observationSmoke(browser, scopeA, chef.user);
   const productsA = await browser.catalogue(scopeA);
-  assert.equal(productsA.data.catalogue.items.length, 3);
+  const fixtureIdsA = ['40000000-0000-4000-8000-000000000001','40000000-0000-4000-8000-000000000002','40000000-0000-4000-8000-000000000003'];
+  // Receiving may add legitimate unreviewed references; fixture identity and isolation remain exact.
+  assert.deepEqual(productsA.data.catalogue.items.filter(item => fixtureIdsA.includes(item.id)).map(item => item.id).sort(), fixtureIdsA);
+  assert.ok(productsA.data.catalogue.items.every(item => item.id !== '40000000-0000-4000-8000-000000000004'));
   assert.ok(productsA.data.catalogue.items.some(item => item.barcode === '0012345678905'));
   assert.ok(productsA.data.catalogue.items.some(item => item.barcode === null));
   assert.equal(productsA.data.catalogue.hasMore, false);
@@ -114,7 +117,9 @@ export async function accessSmoke(config, web) {
   }
   assert.equal((await b.site(scopeA)).errors[0].extensions.code, 'FORBIDDEN');
   assert.equal((await b.catalogue(scopeA)).errors[0].extensions.code, 'FORBIDDEN');
-  assert.equal((await b.catalogue(scopeB)).data.catalogue.items.length, 1);
+  const siteBReferences = (await b.catalogue(scopeB)).data.catalogue.items;
+  assert.ok(siteBReferences.some(item => item.id === '40000000-0000-4000-8000-000000000004'));
+  assert.ok(siteBReferences.every(item => !fixtureIdsA.includes(item.id)));
   assert.equal((await b.identify(scopeB, '0012345678905')).data.productLookup.localCandidates.length, 0);
   for (const headers of [{}, { 'x-internal-token': config.kitchenToken, 'x-correlation-id': randomUUID() }]) {
     const denied = await fetch(`${config.kitchenOrigin}/internal/v1/catalogue`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify({ scope: scopeA }) });
@@ -158,7 +163,9 @@ export async function accessSmoke(config, web) {
     assert.ok(!cook.selectedSite.capabilities.includes('quantity-draft.write'));
     assert.equal((await old.site(scopeA)).errors[0].extensions.code, 'SESSION_REVOKED');
     assert.equal((await browser.site(scopeA)).data.siteContext.userId, cook.user.id);
-    assert.equal((await browser.catalogue(scopeA)).data.catalogue.items.length, 3);
+    const cookReferences = (await browser.catalogue(scopeA)).data.catalogue.items;
+    assert.deepEqual(cookReferences.filter(item => fixtureIdsA.includes(item.id)).map(item => item.id).sort(), fixtureIdsA);
+    assert.ok(cookReferences.every(item => item.id !== '40000000-0000-4000-8000-000000000004'));
     // Only the exact sessions created by this smoke are changed, never another user's session.
     await stored.query('UPDATE "AccessSession" SET "revokedAt"=now() WHERE "tokenHash"=$1', [sessionHash(browser.cookies.get(SESSION_COOKIE), config.sessionHashKey)]);
     assert.equal((await browser.site(scopeA)).errors[0].extensions.code, 'SESSION_REVOKED');

@@ -2,7 +2,7 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The integrated `dev` baseline supports individual scoped access, a private reference catalogue and traceable receiving drafts: product lookup/scanning, quantity/batch/date entry, private label photos, synthetic procedure-bound observations and committed-save recovery. Post-Sprint-2 extensions add opt-in local OCR with explicit human review, catalogue/OFF reference photos, and chef-managed physical storage destinations with historical retention. Saving or reviewing a draft creates no stock. Offline capture and live operational deployment remain disabled.
+The integrated `dev` baseline supports individual scoped access, a private reference catalogue and traceable receiving drafts: product lookup/scanning, quantity/batch/date entry, private label photos, synthetic procedure-bound observations and committed-save recovery. Post-Sprint-2 extensions add opt-in local OCR with explicit human review, catalogue/OFF reference photos, persistent server-validated product/presentation identities, and chef-managed physical storage destinations with historical retention. Saving or reviewing a draft creates no stock. Offline capture and live operational deployment remain disabled.
 
 Start with the [current execution matrix](docs/planning/DELIVERY-STATUS.md) for SP/AP coverage, integration links, partial parent criteria and the next planned package, **SP3-01**. The [Sprint 2 acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md) is historical evidence for the bounded synthetic release, not evidence that later extensions are present in published alpha.2.
 

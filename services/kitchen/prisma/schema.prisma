@@ -24,8 +24,39 @@ model CatalogueProduct {
   presentation String @db.VarChar(200)
   barcode      String? @db.VarChar(64)
   imageUrl     String? @db.VarChar(500)
+  isActive     Boolean @default(true)
+  presentations ProductPresentation[]
+
+  @@unique([id, tenantId, siteId])
 
   @@index([tenantId, siteId, name, id])
+}
+
+// Persistent commercial presentation; identity is independent of receipt lines/batches.
+model ProductPresentation {
+  id String @id @db.Uuid
+  productId String @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  label String @db.VarChar(200)
+  barcode String? @db.VarChar(64)
+  version Int @default(1)
+  isActive Boolean @default(true)
+  product CatalogueProduct @relation(fields: [productId, tenantId, siteId], references: [id, tenantId, siteId], onDelete: Restrict)
+  @@unique([id, tenantId, siteId])
+  @@index([tenantId, siteId, barcode])
+}
+model ProductReferenceOperation {
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  actorId String @db.Uuid
+  operationId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  intentHash String @db.VarChar(64)
+  result Json
+  @@id([tenantId, siteId, actorId, operationId])
 }
 
 // Reference draft only: no receipt, availability, reservation or stock effect.

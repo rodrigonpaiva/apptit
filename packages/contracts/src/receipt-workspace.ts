@@ -1,5 +1,5 @@
 import type { StorageLocation } from './storage-locations.js';
-import type { ReceiptDraftSnapshot, SaveReceiptDraft } from './receiving.js';
+import type { ReceiptDraftSnapshot, SaveReceiptDraft, ReceiptProductIdentity } from './receiving.js';
 import type { Unit } from './quantity-draft.js';
 /** Client-reported OCR suggestions reviewed by the authenticated draft author; not an OCR attestation. */
 export interface LabelReview {
@@ -12,6 +12,10 @@ export interface LabelReview {
 /** Receipt-private identity snapshot, never a catalogue approval or stock item. */
 export interface ReceiptItemDetails {
   lineId: string;
+  /** Explicit selection; validated against persistent scoped records on every save. */
+  catalogueReference?: ReceiptProductIdentity | null;
+  /** Server-owned resolution state. Missing historical state is unresolved. */
+  identityState?: 'linked' | 'legacy_unresolved';
   name: string;
   presentation: string;
   barcode: string | null;
@@ -22,7 +26,7 @@ export interface ReceiptItemDetails {
   legacyDestination?: string;
   pack: { count: string; factor: string; unit: Unit; checked: boolean } | null;
 }
-export interface SaveReceiptWorkspace { command: SaveReceiptDraft; items: Omit<ReceiptItemDetails, 'destinationSnapshot' | 'legacyDestination'>[] }
+export interface SaveReceiptWorkspace { command: SaveReceiptDraft; items: Omit<ReceiptItemDetails, 'destinationSnapshot' | 'legacyDestination' | 'identityState'>[] }
 export interface ReceiptWorkspaceSnapshot { readOnly?: boolean; draft: ReceiptDraftSnapshot; items: ReceiptItemDetails[] }
 export type ReceiptLocation = StorageLocation;
 export interface ReceiptSummary { id: string; version: number; recordedAt: string; lineCount: number }

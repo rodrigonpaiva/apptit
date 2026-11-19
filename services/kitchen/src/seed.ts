@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { readConfig, reportStartupFailure } from '@apptit/runtime';
 import { PrismaClient } from './generated/prisma/client.js';
@@ -6,7 +7,10 @@ async function seed(): Promise<void> {
   const config = readConfig('kitchen');
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: config.databaseUrl!, connectionTimeoutMillis: config.internalTimeoutMs }) });
   try {
-    for (const product of catalogueFixtures) await db.catalogueProduct.upsert({ where: { id: product.id }, create: product, update: {} });
+    for (const product of catalogueFixtures) {
+      await db.catalogueProduct.upsert({ where: { id: product.id }, create: product, update: {} });
+      if (!await db.productPresentation.findFirst({ where: { productId: product.id, tenantId: product.tenantId, siteId: product.siteId } })) await db.productPresentation.create({ data: { id: randomUUID(), productId: product.id, tenantId: product.tenantId, siteId: product.siteId, label: product.presentation, barcode: product.barcode } });
+    }
     const scopes = [...new Map(catalogueFixtures.map(product => [product.siteId, { tenantId: product.tenantId, siteId: product.siteId }])).values()];
     for (const [index, scope] of scopes.entries()) for (const [offset, [name, category]] of [['Chambre BOF 1', 'cold_bof'], ['Chambre BOF 2', 'cold_bof'], ['Économat 1', 'dry'], ['Économat 2', 'dry']].entries()) {
       const location = { id: `61000000-0000-4000-8000-${String(index * 4 + offset + 1).padStart(12, '0')}`, ...scope, name: name!, category: category! };

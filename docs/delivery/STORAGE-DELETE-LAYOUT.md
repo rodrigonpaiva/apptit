@@ -1,5 +1,8 @@
 # Storage deletion and management layout
 
+> Status reconciliation — 2026-11-19: integrated through [PR #28](https://github.com/rodrigonpaiva/apptit/pull/28) with passing CI. See the [execution matrix](../planning/DELIVERY-STATUS.md). Original planned checks and counts below retain their historical context; shared browser/upgrade evidence was subsequently extended by PR #28. No independent approval is claimed.
+
+
 Task: user-requested chef storage deletion and professional management layout. Owner: coding agent; independent review pending. Branch: `feature/storage-delete-layout`, base `ea212a5`. Dependencies: receiving photo/physical storage PR #27 integrated into dev.
 
 Scope: chef-only logical removal of a physical location, excluding it from configuration/new receipt choices while preserving historical destination snapshots and location revisions. Same tenant/site/capability and expected-version checks as management. Serialization uses the existing storage lock; retries of the same deletion return the original ID without duplicating history. No stock operation, hard deletion, new role, temperature rule or receipt-finalization feature is introduced.
@@ -8,7 +11,7 @@ Owned surfaces: storage contracts/controller/application, additive `202611140002
 
 Acceptance: chef confirms or cancels removal; storekeeper/foreign scope denied; stale versions rejected; historical receipts remain readable; deleted rooms cannot be reactivated or selected. UI groups category cards, separates the editor, displays actual counts and status, maintains keyboard focus and reflows at five widths.
 
-Checks and evidence: pending final execution. Synthetic isolated PostgreSQL and localhost services only; the running user containers are preserved until integration.
+Original verification plan (subsequently executed below): Synthetic isolated PostgreSQL and localhost services only; the running user containers are preserved until integration.
 
 ## Executed results
 

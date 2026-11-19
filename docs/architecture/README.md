@@ -47,7 +47,9 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP2-05 receiving observations](contracts/receiving-observations.md) define actual capture, synthetic versioned profiles, assessment and correction history without chef disposition or stock authority.
 
-## Implementation sequence
+## Historical implementation sequence
+
+The foundation/receiving packages below are now integrated in their bounded scope; the [execution matrix](../planning/DELIVERY-STATUS.md) is the current progress index. Sprint 3 remains planned.
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.
 2. SP1-03: runtime quantity/date validation, versioned persistence, schema migrations and attributable changes.

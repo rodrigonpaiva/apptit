@@ -2,7 +2,9 @@
 
 B2B foodservice planning, execution and inventory platform, currently implemented as a local synthetic development environment.
 
-The current `dev` baseline supports individual sign-in, server-verified restaurant access and a private product-reference catalogue. Product references describe presentations; they do not represent received batches or available stock. SP2-01 adds receiving/operation/evidence contracts and pure draft validation. SP2-02 adds authenticated code lookup, optional on-device scanning and temporary manual identification. SP2-03 adds scoped receipt draft save/reload without stock effects. SP2-04 adds opt-in synthetic private label photos with original attribution, failure/retry states and manual fallback. SP2-05 adds explicit synthetic procedure-bound temperature/condition capture, versioned assessments and preserved corrections. SP2-06 adds committed-operation recovery, bounded online requests and honest timeout/connection/session failure states. Stock operations, OCR, offline capture and live operational deployment remain outside the enabled slice. See the [Sprint 2 technical acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md).
+The integrated `dev` baseline supports individual scoped access, a private reference catalogue and traceable receiving drafts: product lookup/scanning, quantity/batch/date entry, private label photos, synthetic procedure-bound observations and committed-save recovery. Post-Sprint-2 extensions add opt-in local OCR with explicit human review, catalogue/OFF reference photos, and chef-managed physical storage destinations with historical retention. Saving or reviewing a draft creates no stock. Offline capture and live operational deployment remain disabled.
+
+Start with the [current execution matrix](docs/planning/DELIVERY-STATUS.md) for SP/AP coverage, integration links, partial parent criteria and the next planned package, **SP3-01**. The [Sprint 2 acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md) is historical evidence for the bounded synthetic release, not evidence that later extensions are present in published alpha.2.
 
 ## Run locally
 
@@ -76,7 +78,7 @@ npm run smoke
 - [SP2-05 synthetic receiving observations](docs/delivery/SP2-05.md)
 - [SP2-06 draft durability and recovery](docs/delivery/SP2-06.md)
 - [Sprint 2 technical acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md)
-- [Container builds and private GHCR release publication](docs/development/container-publication.md)
+- [Container builds and GHCR publication/retention](docs/development/container-publication.md)
 
 Run `npm run verify:foundation` with app ports free for the complete sequential foundation check and a private local JSON report. Run `npm run check` for schema/lint/type/contract/test/build verification. Run `npm run test:integration` and `npm run smoke` after building and starting/migrating/seeding the synthetic databases as documented. No real restaurant approval or deployment is claimed.
 TypeScript, Nx/npm workspaces, Next.js/React, NestJS/Apollo GraphQL, Prisma and PostgreSQL. Exact versions are recorded in the lockfile and [toolchain matrix](docs/development/toolchain.md).
@@ -105,6 +107,9 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 
 ## Product and planning
 
+- [Current execution matrix and AP parent coverage](docs/planning/DELIVERY-STATUS.md)
+- [Status definitions, maintenance and release boundaries](docs/planning/README.md)
+
 - [Product specification v0.80](plans/APPTIT_SPEC_v0.80_EN.md)
 - [Delivery backlog v1.0](plans/backlog/APPTIT_BACKLOG_v1.0_EN.md)
 - [First four sprints](plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md)
@@ -116,4 +121,4 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 
 ### Run the published alpha.2 containers
 
-With Docker Desktop running and port 3000 free, run `npm run containers:up`, then open http://127.0.0.1:3000/login. Generated private fixture credentials are in `.local/alpha2/fixture-credentials.json`. Stop with `npm run containers:down`; database and photo volumes are preserved. See [the local release container guide](docs/development/local-release-containers.md) for requirements, isolation and troubleshooting.
+With Docker Desktop running and port 3000 free, run `npm run containers:up`, then open http://127.0.0.1:3000/login. Generated private fixture credentials are in `.local/alpha2/fixture-credentials.json`. Stop with `npm run containers:down`; database and photo volumes are preserved. On a fresh setup this uses published alpha.2; an existing selected local preview is retained. Published alpha.2 does not contain the later OCR/photo/storage extensions. See [the local release container guide](docs/development/local-release-containers.md) for the explicit local build/preview commands, requirements and troubleshooting.

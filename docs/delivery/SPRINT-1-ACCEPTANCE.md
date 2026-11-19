@@ -1,5 +1,8 @@
 # Sprint 1 — Technical acceptance test record
 
+> Current-status reconciliation — 2026-11-19: retain this exact-source historical acceptance and its original results. Integration/release steps below may since have completed; the [execution register](../planning/DELIVERY-STATUS.md) records current bounded delivery status. Later OCR/storage extensions have separate evidence and do not alter this acceptance or the published tag.
+
+
 Date: 2026-11-05 (Europe/Paris).
 Result: **PASS for the enabled local synthetic Sprint 1 scope.** All executed checks passed; no skipped tests or blocking defect was found by this validation. This records technical evidence for the owner's sprint decision, not production readiness or an independent security certification.
 

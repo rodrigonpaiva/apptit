@@ -2,7 +2,7 @@
 
 <!-- Generated from delivery-status.json by node scripts/delivery-status.mjs --write. -->
 
-As of **2026-11-19**; assessed integrated dev: `cb112eeb6775c6248e7422285f297102da871d38`. This is a dated execution snapshot, not a claim about the current branch head or running services.
+As of **2026-11-19**; assessed integrated dev: `6a07dd45f48e168980688a00f895799742e3b007`. This is a dated execution snapshot, not a claim about the current branch head or running services.
 
 ## Reading this register
 
@@ -53,6 +53,7 @@ These retrospective parent links identify affected scope; they do not expand the
 | Local label OCR with human review | AP-128, AP-035, AP-020 | [AP-128](../delivery/AP-128.md); [PR](https://github.com/rodrigonpaiva/apptit/pull/26) |
 | Reference photos and physical destinations | AP-030, AP-031, AP-041, AP-145, AP-146 | [RECEIVING-PHOTOS-STORAGE](../delivery/RECEIVING-PHOTOS-STORAGE.md); [PR](https://github.com/rodrigonpaiva/apptit/pull/27) |
 | Chef location removal and management layout | AP-041, AP-019, AP-024, AP-145, AP-146 | [STORAGE-DELETE-LAYOUT](../delivery/STORAGE-DELETE-LAYOUT.md); [PR](https://github.com/rodrigonpaiva/apptit/pull/28) |
+| Persistent product/presentation identity in receiving | AP-029, AP-030, AP-031, AP-034, AP-017, AP-019, AP-024, AP-145, AP-146 | [RECEIVING-PERSISTENT-IDENTITY](../delivery/RECEIVING-PERSISTENT-IDENTITY.md); [PR](https://github.com/rodrigonpaiva/apptit/pull/30) |
 
 ## Parent stories with partial evidence
 
@@ -68,20 +69,20 @@ The machine-readable register contains all 173 IDs, including every not-assessed
 | AP-014 | SP1-03 | Exact quantity/date primitives exist; all later aggregates/conversions remain to be verified. |
 | AP-015 | SP1-03 | Draft/version persistence exists; transactional stock and other domain aggregates are not implemented. |
 | AP-016 | SP1-03 | Enabled HTTP/contracts exist; all future domain/error/event contracts remain open. |
-| AP-017 | SP2-01, SP2-06 | Draft-save operation recovery exists; stock command outcomes, terminal rejection and contention require SP3-01. |
-| AP-019 | SP1-03, SP1-06, EXT-STORAGE-DELETE-LAYOUT | Enabled changes preserve actor/version/history; ledger and later domain audits remain open. |
+| AP-017 | SP2-01, SP2-06, EXT-PERSISTENT-PRODUCT-IDENTITY | Draft save and reference resolution have durable replay/outcome handling; stock command outcomes, terminal rejection and contention still require SP3-01. |
+| AP-019 | SP1-03, SP1-06, EXT-STORAGE-DELETE-LAYOUT, EXT-PERSISTENT-PRODUCT-IDENTITY | Enabled changes preserve actor/version/history; ledger and later domain audits remain open. |
 | AP-020 | SP2-01, SP2-04, EXT-LABEL-OCR | Private receipt originals exist; complete retention, holds, export, restore and evidence categories remain open. |
 | AP-021 | SP1-02, EXT-LOCAL-COMPOSE | Configuration/secret safeguards have evidence; reconcile all original parent checks and dependencies before recording full acceptance. |
 | AP-022 | SP1-04 | Synthetic memberships exist; organization/site administration, operating calendars and explicit holidays/closures remain open. |
 | AP-023 | SP1-04 | Online authentication/revocation has evidence; record full original AC/dependency acceptance separately. Offline capabilities belong to their own stories. |
-| AP-024 | SP1-04, SP1-06, EXT-STORAGE-DELETE-LAYOUT | Enabled routes/files are scoped; future modules/jobs and full capability administration remain open. |
+| AP-024 | SP1-04, SP1-06, EXT-STORAGE-DELETE-LAYOUT, EXT-PERSISTENT-PRODUCT-IDENTITY | Enabled routes/files are scoped; future modules/jobs and full capability administration remain open. |
 | AP-025 | SP1-04, SP2-05 | Minimal fixture capabilities exist; disposition, director substitution and full grants/revocations are not implemented. |
-| AP-029 | SP1-05 | Scoped reference catalogue exists; full reviewed product/presentation master and lifecycle remain open. |
-| AP-030 | SP2-02, EXT-OFF-LIVE, EXT-RECEIVING-PHOTOS-STORAGE | Protected fixture/live lookup has evidence; original parent acceptance and dependency review have not been recorded as complete. |
-| AP-031 | SP2-02, EXT-RECEIVING-PHOTOS-STORAGE | Reference candidates/manual snapshots exist; reviewed persistent master identity must precede stock confirmation. |
+| AP-029 | SP1-05, EXT-PERSISTENT-PRODUCT-IDENTITY | Persistent product/presentation IDs, scoped FK and protected identity are delivered; generic ingredients, supplier identity and full master curation remain open. |
+| AP-030 | SP2-02, EXT-OFF-LIVE, EXT-RECEIVING-PHOTOS-STORAGE, EXT-PERSISTENT-PRODUCT-IDENTITY | Protected fixture/live lookup has evidence; original parent acceptance and dependency review have not been recorded as complete. |
+| AP-031 | SP2-02, EXT-RECEIVING-PHOTOS-STORAGE, EXT-PERSISTENT-PRODUCT-IDENTITY | Durable unreviewed references and explicit receiving association are delivered; reviewed-field curation, external update differences and full parent acceptance remain open. |
 | AP-032 | SP2-01, SP2-03 | Checked draft pack previews exist; all conversion/version/use cases remain open. |
 | AP-033 | SP2-02, EXT-OFF-LIVE | OFF source attribution/live read policy exists; external-change differences and wider source selection/update review remain open. |
-| AP-034 | SP2-01, SP2-03 | Receipt drafts persist; accepted-stock confirmation and full receiving workflow await Sprint 3. |
+| AP-034 | SP2-01, SP2-03, EXT-PERSISTENT-PRODUCT-IDENTITY | Receipt drafts now validate canonical references and preserve legacy aliases; accepted-stock confirmation and full receiving workflow await Sprint 3. |
 | AP-035 | SP2-04, EXT-LABEL-OCR | Private photos and optional reviewed local OCR exist; full evidence/field workflow and operational evaluation remain open. |
 | AP-036 | SP2-05 | Versioned synthetic observations exist; real PMS profiles and effectful receipt checks remain open. |
 | AP-041 | EXT-RECEIVING-PHOTOS-STORAGE, EXT-STORAGE-DELETE-LAYOUT | Named categorized physical destinations and logical removal exist; reserve/kitchen balances and movement semantics remain open. |
@@ -94,8 +95,8 @@ The machine-readable register contains all 173 IDs, including every not-assessed
 | AP-131 | SP2-06 | Online failure states exist; durable isolated offline preloading/capture remains disabled. |
 | AP-133 | SP2-06 | Server operation recovery exists; durable offline queues, retries and full conflict coverage remain open. |
 | AP-134 | SP2-06 | Session/scope clearing exists; complete offline ownership, late-event and recovery policy remains open. |
-| AP-145 | SP1-05, SP2-03, EXT-RECEIVING-PHOTOS-STORAGE, EXT-STORAGE-DELETE-LAYOUT | Enabled receiving/catalogue/storage journeys exist; remaining product journeys are not implemented. |
-| AP-146 | SP1-05, SP2-03, EXT-RECEIVING-PHOTOS-STORAGE, EXT-STORAGE-DELETE-LAYOUT | Enabled screens have responsive/error states; complete device/accessibility review remains open. |
+| AP-145 | SP1-05, SP2-03, EXT-RECEIVING-PHOTOS-STORAGE, EXT-STORAGE-DELETE-LAYOUT, EXT-PERSISTENT-PRODUCT-IDENTITY | Enabled receiving/catalogue/storage journeys exist; remaining product journeys are not implemented. |
+| AP-146 | SP1-05, SP2-03, EXT-RECEIVING-PHOTOS-STORAGE, EXT-STORAGE-DELETE-LAYOUT, EXT-PERSISTENT-PRODUCT-IDENTITY | Enabled screens have responsive/error states; complete device/accessibility review remains open. |
 | AP-150 | SP1-02, SP1-06, SP2-06, EXT-LOCAL-COMPOSE | Focused enabled-slice verification and CI exist; full product/operations/real-device verification remains open. |
 
 ## Next planned package

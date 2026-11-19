@@ -1,5 +1,8 @@
 # Receiving product reference photos and physical storage locations
 
+> Status reconciliation — 2026-11-19: integrated through [PR #27](https://github.com/rodrigonpaiva/apptit/pull/27) with passing CI. See the [execution matrix](../planning/DELIVERY-STATUS.md). Original planned checks and counts below retain their historical context; shared browser/upgrade evidence was subsequently extended by PR #28. No independent approval is claimed.
+
+
 Status: implemented; local verification passed. Owner: coding agent. Independent review not performed. Branch `feature/receiving-product-photo-storage`, based on updated dev after AP-128.
 
 Scope: reuse protected product lookup and public reference photos, prefer scoped catalogue photos, prevent stale scanner responses, add chef-only site-scoped configuration of fixed storage categories, persist physical destination per receipt line and retain historical information. Informative temperature copy comes from the explicit user brief; no PMS rules/thresholds/stock activation are introduced.

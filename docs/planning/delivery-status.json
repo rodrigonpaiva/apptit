@@ -1,0 +1,1642 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-11-19",
+  "assessedDevCommit": "cb112eeb6775c6248e7422285f297102da871d38",
+  "owner": "repository integration owner",
+  "independentReview": "not recorded; technical CI is not independent acceptance",
+  "baseline": {
+    "specVersion": "0.80",
+    "backlogVersion": "1.0",
+    "sprintVersion": "1.0",
+    "itemCount": 173,
+    "sources": [
+      {
+        "path": "plans/APPTIT_SPEC_v0.80_EN.md",
+        "sha256": "d23e1b9f0884fe824d0023687f1e9318a50bedfc91ad54171443b2c834132c15"
+      },
+      {
+        "path": "plans/backlog/APPTIT_BACKLOG_v1.0_EN.md",
+        "sha256": "e5b3632c89c0c1987e49baec2104d999af4c41b1fbb406da4f72f740d2538bc9"
+      },
+      {
+        "path": "plans/backlog/APPTIT_BACKLOG_v1.0_EN.json",
+        "sha256": "b53d833f033d1554d9e92cf985ff595769f2a3a15595efc1a7353c85aafe3136"
+      },
+      {
+        "path": "plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md",
+        "sha256": "c9d486a7cf8cfabdda7558253437d495b706bc0be8193de105355fe4b198982f"
+      }
+    ],
+    "sourcePolicy": "Local plans remain outside Git; this register overlays execution only and does not replace product scope or copy acceptance criteria."
+  },
+  "nextPackage": "SP3-01",
+  "packages": [
+    {
+      "id": "SP1-01",
+      "title": "Record first-slice architecture and access contracts",
+      "parents": [
+        "AP-011",
+        "AP-012",
+        "AP-009",
+        "AP-010"
+      ],
+      "prerequisites": [],
+      "status": "integrated",
+      "boundary": "Partial AP-011/AP-012/AP-009/AP-010. Final local device, retention, PMS and actual integration choices remain open; no runtime infrastructure or provider is activated by an ADR.",
+      "evidence": [
+        "docs/delivery/SP1-01.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/5",
+        "commit": "f619d3b6e56d1efd45f06fc16941f4ce1b9865e0"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP1-02",
+      "title": "Create reproducible workspace and CI skeleton",
+      "parents": [
+        "AP-013",
+        "AP-021",
+        "AP-150"
+      ],
+      "prerequisites": [
+        "SP1-01"
+      ],
+      "status": "integrated",
+      "boundary": "Partial platform/CI scope. No full cloud deployment, complete broker infrastructure, all microservices or full end-to-end suite is promised in this sprint.",
+      "evidence": [
+        "docs/delivery/SP1-02.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/5",
+        "commit": "f619d3b6e56d1efd45f06fc16941f4ce1b9865e0"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP1-03",
+      "title": "Implement quantity and versioned persistence primitives",
+      "parents": [
+        "AP-014",
+        "AP-015",
+        "AP-016",
+        "AP-019"
+      ],
+      "prerequisites": [
+        "SP1-01",
+        "SP1-02"
+      ],
+      "status": "integrated",
+      "boundary": "Partial AP-014–AP-019. This establishes contracts for later ledger/evidence workflows; it does not claim every conversion, aggregate, event or audit screen is implemented.",
+      "evidence": [
+        "docs/delivery/SP1-03.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/2",
+        "commit": "ba8ca3317f52b7dab882253f430ad2f087107544"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP1-04",
+      "title": "Authenticate and scope a synthetic site",
+      "parents": [
+        "AP-022",
+        "AP-023",
+        "AP-024",
+        "AP-025"
+      ],
+      "prerequisites": [
+        "SP1-01",
+        "SP1-02",
+        "SP1-03"
+      ],
+      "status": "integrated",
+      "boundary": "Partial access capability. Complete organizational administration, director activation workflow, full capability matrix, per-product grants and offline identity policy are not marked complete.",
+      "evidence": [
+        "docs/delivery/SP1-04.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/3",
+        "commit": "11602491de435ca4e30f9f0a9ddab9a7979c7299"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP1-05",
+      "title": "Show a private touch-friendly product list",
+      "parents": [
+        "AP-029",
+        "AP-145",
+        "AP-146"
+      ],
+      "prerequisites": [
+        "SP1-03",
+        "SP1-04"
+      ],
+      "status": "integrated",
+      "boundary": "Only the needed T01/T03 navigation and catalogue read contract. Other screens and full design-system/accessibility coverage remain pending; this list does not imply stock exists.",
+      "evidence": [
+        "docs/delivery/SP1-05.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/4",
+        "commit": "fa2a934d27d954defb576eb08435262243913408"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP1-06",
+      "title": "Verify and demonstrate the executable foundation",
+      "parents": [
+        "AP-150",
+        "AP-024",
+        "AP-019"
+      ],
+      "prerequisites": [
+        "SP1-02",
+        "SP1-03",
+        "SP1-04",
+        "SP1-05"
+      ],
+      "status": "integrated",
+      "boundary": "Slice verification only. No product-wide QA, load result, restore drill or real restaurant test is asserted.",
+      "evidence": [
+        "docs/delivery/SP1-06.md",
+        "docs/delivery/SPRINT-1-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/5",
+        "commit": "f619d3b6e56d1efd45f06fc16941f4ce1b9865e0"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-01",
+      "title": "Define receiving, stock-operation and evidence contracts",
+      "parents": [
+        "AP-017",
+        "AP-032",
+        "AP-034",
+        "AP-043",
+        "AP-020"
+      ],
+      "prerequisites": [
+        "SP1-03",
+        "SP1-04",
+        "SP1-06"
+      ],
+      "status": "integrated",
+      "boundary": "Contract plus draft validation. Stock transaction and full evidence lifecycle are not complete until later implemented/tested slices; no parent dependency is silently waived.",
+      "evidence": [
+        "docs/delivery/SP2-01.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/8",
+        "commit": "d3962a9363d72b81e5e09975c55e4ae13c5922a4"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-02",
+      "title": "Identify products through OFF or reviewed local fallback",
+      "parents": [
+        "AP-030",
+        "AP-031",
+        "AP-033"
+      ],
+      "prerequisites": [
+        "SP2-01",
+        "SP1-05"
+      ],
+      "status": "integrated",
+      "boundary": "Recorded fixtures are the guaranteed development dependency. Live OFF read-only access may be used only after ordinary integration validation; no supplier or public contribution is involved. Full external update workflows remain open.",
+      "evidence": [
+        "docs/delivery/SP2-02.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/9",
+        "commit": "98e4bad061b2e16d21cc71d3a4059801ede529d1"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-03",
+      "title": "Capture receipt drafts by product and batch",
+      "parents": [
+        "AP-034",
+        "AP-032",
+        "AP-145",
+        "AP-146"
+      ],
+      "prerequisites": [
+        "SP2-01",
+        "SP2-02"
+      ],
+      "status": "integrated",
+      "boundary": "Partial T02/AP-034. Accepted-stock confirmation and partial receipt effects are intentionally unavailable until sprint 3; unknown necessary data cannot be bypassed.",
+      "evidence": [
+        "docs/delivery/SP2-03.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/10",
+        "commit": "08e476102bf4f68dea32e467697202fd8e478966"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-04",
+      "title": "Capture private label photos and manual fallback fields",
+      "parents": [
+        "AP-020",
+        "AP-035",
+        "AP-128"
+      ],
+      "prerequisites": [
+        "SP2-01",
+        "SP2-03",
+        "SP1-04"
+      ],
+      "status": "integrated",
+      "boundary": "AP-128 extraction implementation/evaluation remains pending unless genuinely delivered as an optional extension. Manual fallback and evidence capture can complete their scoped acceptance independently; full AP-035 is not Done.",
+      "evidence": [
+        "docs/delivery/SP2-04.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/11",
+        "commit": "9481acc34da7583f01f2ba0f62c5e38d0a3b3c22"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-05",
+      "title": "Record procedure-bound receiving observations in draft",
+      "parents": [
+        "AP-079",
+        "AP-080",
+        "AP-081",
+        "AP-086",
+        "AP-036",
+        "AP-025"
+      ],
+      "prerequisites": [
+        "SP2-03",
+        "SP1-03",
+        "SP1-04"
+      ],
+      "status": "integrated",
+      "boundary": "Narrow synthetic receiving profile only. Full PMS authoring/activation, 32 safety cases, equipment management and real-site validation remain pending. Real receiving release still requires G-PMS.",
+      "evidence": [
+        "docs/delivery/SP2-05.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/12",
+        "commit": "8296be63e00702c0ca7d7730bf523a3ab329d5dd"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP2-06",
+      "title": "Preserve drafts under connection failure without false success",
+      "parents": [
+        "AP-131",
+        "AP-133",
+        "AP-134",
+        "AP-017",
+        "AP-150"
+      ],
+      "prerequisites": [
+        "SP2-03",
+        "SP2-04",
+        "SP2-05"
+      ],
+      "status": "integrated",
+      "boundary": "Not a complete offline synchronization or lost-device solution. AP-130–AP-138 remain partially/unimplemented as applicable. This sprint cannot be used as a connectivity-ready live pilot.",
+      "evidence": [
+        "docs/delivery/SP2-06.md",
+        "docs/delivery/SPRINT-2-ACCEPTANCE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/15",
+        "commit": "62b0a762509de5cf92dcb812ed235b528005b069"
+      },
+      "review": "author_verified; no independent approval recorded"
+    },
+    {
+      "id": "SP3-01",
+      "title": "Implement the transactional batch ledger and operation outcomes",
+      "parents": [
+        "AP-043",
+        "AP-017",
+        "AP-046",
+        "AP-018"
+      ],
+      "prerequisites": [
+        "SP2-01",
+        "SP1-03",
+        "SP2-06"
+      ],
+      "status": "planned",
+      "boundary": "Partial AP-018/AP-043/AP-046. Production consumption, plan allocations, corrections across already-used goods and all movement types remain later work. No negative deficit is silently clamped."
+    },
+    {
+      "id": "SP3-02",
+      "title": "Confirm partial receipts with required controls",
+      "parents": [
+        "AP-036",
+        "AP-037",
+        "AP-039",
+        "AP-145"
+      ],
+      "prerequisites": [
+        "SP3-01",
+        "SP2-03",
+        "SP2-04",
+        "SP2-05"
+      ],
+      "status": "planned",
+      "boundary": "Rules are illustrative fixture configuration only until PMS validation. Production readiness, actual opening inventory and full receipt correction/release remain unproven."
+    },
+    {
+      "id": "SP3-03",
+      "title": "Keep problematic goods unavailable and capture chef review",
+      "parents": [
+        "AP-038",
+        "AP-099",
+        "AP-025"
+      ],
+      "prerequisites": [
+        "SP3-01",
+        "SP3-02",
+        "SP2-05"
+      ],
+      "status": "planned",
+      "boundary": "Receiving-specific subset of AP-099/AP-025, not the complete incident/recall/reuse or director delegation lifecycle. Full release or reversal beyond validated supported paths stays unavailable."
+    },
+    {
+      "id": "SP3-04",
+      "title": "Record synthetic opening balances and show batch quality",
+      "parents": [
+        "AP-041",
+        "AP-042",
+        "AP-045",
+        "AP-047"
+      ],
+      "prerequisites": [
+        "SP3-01",
+        "SP3-02",
+        "SP3-03"
+      ],
+      "status": "planned",
+      "boundary": "Actual representative set/count and opening eligibility policy require restaurant input. This is not a completed physical count or full stock-check/adjustment workflow."
+    },
+    {
+      "id": "SP3-05",
+      "title": "Transfer a bag while preserving site total",
+      "parents": [
+        "AP-044",
+        "AP-046",
+        "AP-019"
+      ],
+      "prerequisites": [
+        "SP3-01",
+        "SP3-04"
+      ],
+      "status": "planned",
+      "boundary": "Partial AP-044 through supervisor-operated stock movement. The cook path remains blocked until AP-026/AP-027/AP-071 are delivered; no bypass of the founder’s product-permission requirement."
+    },
+    {
+      "id": "SP3-06",
+      "title": "Demonstrate receipt-to-stock invariants and recovery",
+      "parents": [
+        "AP-151",
+        "AP-150",
+        "AP-024"
+      ],
+      "prerequisites": [
+        "SP3-01",
+        "SP3-02",
+        "SP3-03",
+        "SP3-04",
+        "SP3-05"
+      ],
+      "status": "planned",
+      "boundary": "AP-151 remains partial: production, full recipes, component stock, offline conflict and complete end-to-end safety verification still have later acceptance conditions."
+    },
+    {
+      "id": "SP4-01",
+      "title": "Define recipe drafts, generic ingredients and source mapping",
+      "parents": [
+        "AP-052",
+        "AP-053",
+        "AP-148"
+      ],
+      "prerequisites": [
+        "SP1-03",
+        "SP1-04",
+        "SP2-02",
+        "SP3-04"
+      ],
+      "status": "planned",
+      "boundary": "Flat draft subset only. This does not complete nested preparations, standard recipe validation, nutrition or actual production links."
+    },
+    {
+      "id": "SP4-02",
+      "title": "Import one standardized Excel fixture as a draft",
+      "parents": [
+        "AP-003",
+        "AP-051"
+      ],
+      "prerequisites": [
+        "SP4-01",
+        "SP2-04"
+      ],
+      "status": "planned",
+      "boundary": "A synthetic parser is not validated against the restaurant’s real template. No arbitrary Excel importer or fully approved recipe is implied."
+    },
+    {
+      "id": "SP4-03",
+      "title": "Implement gross/net references and qualitative quantities",
+      "parents": [
+        "AP-054",
+        "AP-055",
+        "AP-062"
+      ],
+      "prerequisites": [
+        "SP4-01"
+      ],
+      "status": "planned",
+      "boundary": "AP-054/AP-055/AP-062 are partial until full version review and compound/prepared recipe rules are implemented. These are estimates, not weighed consumption."
+    },
+    {
+      "id": "SP4-04",
+      "title": "Review draft changes without false recipe validation",
+      "parents": [
+        "AP-056",
+        "AP-058",
+        "AP-057",
+        "AP-019"
+      ],
+      "prerequisites": [
+        "SP4-01",
+        "SP4-02",
+        "SP4-03"
+      ],
+      "status": "planned",
+      "boundary": "This does not complete AP-056/AP-057/AP-058 or claim a recipe is ready to serve. Full validation, composition aggregation and intermediate yield support remain on the backlog."
+    },
+    {
+      "id": "SP4-05",
+      "title": "Calculate explainable capacity for fully covered flat drafts",
+      "parents": [
+        "AP-062",
+        "AP-063",
+        "AP-045"
+      ],
+      "prerequisites": [
+        "SP4-01",
+        "SP4-03",
+        "SP4-04",
+        "SP3-04",
+        "SP3-06"
+      ],
+      "status": "planned",
+      "boundary": "Partial AP-063. Rice-only output is a partial bound, not a valid whole dish; released prepared stock, nested recipes and reservations require later full contracts. Simulation changes no stock."
+    },
+    {
+      "id": "SP4-06",
+      "title": "Simulate a weekly menu and explain shortages",
+      "parents": [
+        "AP-064",
+        "AP-065",
+        "AP-066",
+        "AP-145",
+        "AP-151"
+      ],
+      "prerequisites": [
+        "SP4-02",
+        "SP4-04",
+        "SP4-05"
+      ],
+      "status": "planned",
+      "boundary": "Partial AP-064–AP-066/AP-145. Full published-week revision, future-date allocation, eligible prepared-stock offsets, AI and assisted forecasts are still required later for the MVP. Next-service deadlines remain explicit limitations."
+    }
+  ],
+  "extensions": [
+    {
+      "id": "EXT-LOCAL-COMPOSE",
+      "title": "Local published-release Compose",
+      "parents": [
+        "AP-013",
+        "AP-021",
+        "AP-150"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/LOCAL-ALPHA2-COMPOSE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/24",
+        "commit": "b07f7889c8d8c7ecd497d137649b45bca9a943a0"
+      },
+      "review": "no independent approval recorded"
+    },
+    {
+      "id": "EXT-OFF-LIVE",
+      "title": "Explicit read-only live OFF lookup",
+      "parents": [
+        "AP-030",
+        "AP-033"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/LOCAL-ALPHA2-OFF-LIVE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/25",
+        "commit": "e85a29383e2d7cdc5a138bf697fbebc5e05227f8"
+      },
+      "review": "no independent approval recorded"
+    },
+    {
+      "id": "EXT-LABEL-OCR",
+      "title": "Local label OCR with human review",
+      "parents": [
+        "AP-128",
+        "AP-035",
+        "AP-020"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/AP-128.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/26",
+        "commit": "3e20abf66602d3d565c118fc222ff142b5a0dac1"
+      },
+      "review": "no independent approval recorded"
+    },
+    {
+      "id": "EXT-RECEIVING-PHOTOS-STORAGE",
+      "title": "Reference photos and physical destinations",
+      "parents": [
+        "AP-030",
+        "AP-031",
+        "AP-041",
+        "AP-145",
+        "AP-146"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/RECEIVING-PHOTOS-STORAGE.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/27",
+        "commit": "ea212a50dbf467f3e6d803c3256f7c32df48c6ba"
+      },
+      "review": "no independent approval recorded"
+    },
+    {
+      "id": "EXT-STORAGE-DELETE-LAYOUT",
+      "title": "Chef location removal and management layout",
+      "parents": [
+        "AP-041",
+        "AP-019",
+        "AP-024",
+        "AP-145",
+        "AP-146"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/STORAGE-DELETE-LAYOUT.md"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/28",
+        "commit": "cb112eeb6775c6248e7422285f297102da871d38"
+      },
+      "review": "no independent approval recorded"
+    }
+  ],
+  "items": [
+    {
+      "id": "AP-001",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-002",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-003",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-004",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-005",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-006",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-007",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-008",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-009",
+      "status": "partial",
+      "deliveries": [
+        "SP1-01"
+      ],
+      "remaining": "Only provisional synthetic unknown/deficit assumptions; actual-site eligibility and discrepancy policy is unresolved."
+    },
+    {
+      "id": "AP-010",
+      "status": "partial",
+      "deliveries": [
+        "SP1-01"
+      ],
+      "remaining": "Only provisional private-evidence/session boundaries; retention, holds and device-loss policy remain unresolved."
+    },
+    {
+      "id": "AP-011",
+      "status": "partial",
+      "deliveries": [
+        "SP1-01"
+      ],
+      "remaining": "First-slice topology is adopted; full deployment/integration architecture remains outside delivered scope."
+    },
+    {
+      "id": "AP-012",
+      "status": "partial",
+      "deliveries": [
+        "SP1-01"
+      ],
+      "remaining": "First-slice adapter/access decisions exist; actual devices and remaining provider choices are not qualified."
+    },
+    {
+      "id": "AP-013",
+      "status": "partial",
+      "deliveries": [
+        "SP1-02",
+        "EXT-LOCAL-COMPOSE"
+      ],
+      "remaining": "Workspace/local runtime evidence is linked; record an explicit full parent AC/dependency acceptance before Done. No extra platform estate is required by this note."
+    },
+    {
+      "id": "AP-014",
+      "status": "partial",
+      "deliveries": [
+        "SP1-03"
+      ],
+      "remaining": "Exact quantity/date primitives exist; all later aggregates/conversions remain to be verified."
+    },
+    {
+      "id": "AP-015",
+      "status": "partial",
+      "deliveries": [
+        "SP1-03"
+      ],
+      "remaining": "Draft/version persistence exists; transactional stock and other domain aggregates are not implemented."
+    },
+    {
+      "id": "AP-016",
+      "status": "partial",
+      "deliveries": [
+        "SP1-03"
+      ],
+      "remaining": "Enabled HTTP/contracts exist; all future domain/error/event contracts remain open."
+    },
+    {
+      "id": "AP-017",
+      "status": "partial",
+      "deliveries": [
+        "SP2-01",
+        "SP2-06"
+      ],
+      "remaining": "Draft-save operation recovery exists; stock command outcomes, terminal rejection and contention require SP3-01."
+    },
+    {
+      "id": "AP-018",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-019",
+      "status": "partial",
+      "deliveries": [
+        "SP1-03",
+        "SP1-06",
+        "EXT-STORAGE-DELETE-LAYOUT"
+      ],
+      "remaining": "Enabled changes preserve actor/version/history; ledger and later domain audits remain open."
+    },
+    {
+      "id": "AP-020",
+      "status": "partial",
+      "deliveries": [
+        "SP2-01",
+        "SP2-04",
+        "EXT-LABEL-OCR"
+      ],
+      "remaining": "Private receipt originals exist; complete retention, holds, export, restore and evidence categories remain open."
+    },
+    {
+      "id": "AP-021",
+      "status": "partial",
+      "deliveries": [
+        "SP1-02",
+        "EXT-LOCAL-COMPOSE"
+      ],
+      "remaining": "Configuration/secret safeguards have evidence; reconcile all original parent checks and dependencies before recording full acceptance."
+    },
+    {
+      "id": "AP-022",
+      "status": "partial",
+      "deliveries": [
+        "SP1-04"
+      ],
+      "remaining": "Synthetic memberships exist; organization/site administration, operating calendars and explicit holidays/closures remain open."
+    },
+    {
+      "id": "AP-023",
+      "status": "partial",
+      "deliveries": [
+        "SP1-04"
+      ],
+      "remaining": "Online authentication/revocation has evidence; record full original AC/dependency acceptance separately. Offline capabilities belong to their own stories."
+    },
+    {
+      "id": "AP-024",
+      "status": "partial",
+      "deliveries": [
+        "SP1-04",
+        "SP1-06",
+        "EXT-STORAGE-DELETE-LAYOUT"
+      ],
+      "remaining": "Enabled routes/files are scoped; future modules/jobs and full capability administration remain open."
+    },
+    {
+      "id": "AP-025",
+      "status": "partial",
+      "deliveries": [
+        "SP1-04",
+        "SP2-05"
+      ],
+      "remaining": "Minimal fixture capabilities exist; disposition, director substitution and full grants/revocations are not implemented."
+    },
+    {
+      "id": "AP-026",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-027",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-028",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-029",
+      "status": "partial",
+      "deliveries": [
+        "SP1-05"
+      ],
+      "remaining": "Scoped reference catalogue exists; full reviewed product/presentation master and lifecycle remain open."
+    },
+    {
+      "id": "AP-030",
+      "status": "partial",
+      "deliveries": [
+        "SP2-02",
+        "EXT-OFF-LIVE",
+        "EXT-RECEIVING-PHOTOS-STORAGE"
+      ],
+      "remaining": "Protected fixture/live lookup has evidence; original parent acceptance and dependency review have not been recorded as complete."
+    },
+    {
+      "id": "AP-031",
+      "status": "partial",
+      "deliveries": [
+        "SP2-02",
+        "EXT-RECEIVING-PHOTOS-STORAGE"
+      ],
+      "remaining": "Reference candidates/manual snapshots exist; reviewed persistent master identity must precede stock confirmation."
+    },
+    {
+      "id": "AP-032",
+      "status": "partial",
+      "deliveries": [
+        "SP2-01",
+        "SP2-03"
+      ],
+      "remaining": "Checked draft pack previews exist; all conversion/version/use cases remain open."
+    },
+    {
+      "id": "AP-033",
+      "status": "partial",
+      "deliveries": [
+        "SP2-02",
+        "EXT-OFF-LIVE"
+      ],
+      "remaining": "OFF source attribution/live read policy exists; external-change differences and wider source selection/update review remain open."
+    },
+    {
+      "id": "AP-034",
+      "status": "partial",
+      "deliveries": [
+        "SP2-01",
+        "SP2-03"
+      ],
+      "remaining": "Receipt drafts persist; accepted-stock confirmation and full receiving workflow await Sprint 3."
+    },
+    {
+      "id": "AP-035",
+      "status": "partial",
+      "deliveries": [
+        "SP2-04",
+        "EXT-LABEL-OCR"
+      ],
+      "remaining": "Private photos and optional reviewed local OCR exist; full evidence/field workflow and operational evaluation remain open."
+    },
+    {
+      "id": "AP-036",
+      "status": "partial",
+      "deliveries": [
+        "SP2-05"
+      ],
+      "remaining": "Versioned synthetic observations exist; real PMS profiles and effectful receipt checks remain open."
+    },
+    {
+      "id": "AP-037",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-038",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-039",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-040",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-041",
+      "status": "partial",
+      "deliveries": [
+        "EXT-RECEIVING-PHOTOS-STORAGE",
+        "EXT-STORAGE-DELETE-LAYOUT"
+      ],
+      "remaining": "Named categorized physical destinations and logical removal exist; reserve/kitchen balances and movement semantics remain open."
+    },
+    {
+      "id": "AP-042",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-043",
+      "status": "partial",
+      "deliveries": [
+        "SP2-01"
+      ],
+      "remaining": "Future ledger contracts exist; no persisted ledger/balance projection is implemented."
+    },
+    {
+      "id": "AP-044",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-045",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-046",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-047",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-048",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-049",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-050",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-051",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-052",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-053",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-054",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-055",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-056",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-057",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-058",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-059",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-060",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-061",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-062",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-063",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-064",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-065",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-066",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-067",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-068",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-069",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-070",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-071",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-072",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-073",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-074",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-075",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-076",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-077",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-078",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-079",
+      "status": "partial",
+      "deliveries": [
+        "SP2-05"
+      ],
+      "remaining": "Synthetic receiving-profile subset exists; full applicable PMS catalogue and actual-site qualification remain open."
+    },
+    {
+      "id": "AP-080",
+      "status": "partial",
+      "deliveries": [
+        "SP2-05"
+      ],
+      "remaining": "Synthetic receiving-control subset exists; remaining control workflows and local validation remain open."
+    },
+    {
+      "id": "AP-081",
+      "status": "partial",
+      "deliveries": [
+        "SP2-05"
+      ],
+      "remaining": "Actual synthetic receiving observations exist; complete applicable control coverage remains open."
+    },
+    {
+      "id": "AP-082",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-083",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-084",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-085",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-086",
+      "status": "partial",
+      "deliveries": [
+        "SP2-05"
+      ],
+      "remaining": "Receiving observation subset is verified; assess original AC/dependencies across applicable contexts before full parent acceptance."
+    },
+    {
+      "id": "AP-087",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-088",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-089",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-090",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-091",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-092",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-093",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-094",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-095",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-096",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-097",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-098",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-099",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-100",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-101",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-102",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-103",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-104",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-105",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-106",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-107",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-108",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-109",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-110",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-111",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-112",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-113",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-114",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-115",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-116",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-117",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-118",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-119",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-120",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-121",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-122",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-123",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-124",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-125",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-126",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-127",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-128",
+      "status": "partial",
+      "deliveries": [
+        "SP2-04",
+        "EXT-LABEL-OCR"
+      ],
+      "remaining": "Local OCR, explicit review and synthetic evaluation exist; full parent acceptance/independent and real-label/device evaluation are not recorded."
+    },
+    {
+      "id": "AP-129",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-130",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-131",
+      "status": "partial",
+      "deliveries": [
+        "SP2-06"
+      ],
+      "remaining": "Online failure states exist; durable isolated offline preloading/capture remains disabled."
+    },
+    {
+      "id": "AP-132",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-133",
+      "status": "partial",
+      "deliveries": [
+        "SP2-06"
+      ],
+      "remaining": "Server operation recovery exists; durable offline queues, retries and full conflict coverage remain open."
+    },
+    {
+      "id": "AP-134",
+      "status": "partial",
+      "deliveries": [
+        "SP2-06"
+      ],
+      "remaining": "Session/scope clearing exists; complete offline ownership, late-event and recovery policy remains open."
+    },
+    {
+      "id": "AP-135",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-136",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-137",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-138",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-139",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-140",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-141",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-142",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-143",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-144",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-145",
+      "status": "partial",
+      "deliveries": [
+        "SP1-05",
+        "SP2-03",
+        "EXT-RECEIVING-PHOTOS-STORAGE",
+        "EXT-STORAGE-DELETE-LAYOUT"
+      ],
+      "remaining": "Enabled receiving/catalogue/storage journeys exist; remaining product journeys are not implemented."
+    },
+    {
+      "id": "AP-146",
+      "status": "partial",
+      "deliveries": [
+        "SP1-05",
+        "SP2-03",
+        "EXT-RECEIVING-PHOTOS-STORAGE",
+        "EXT-STORAGE-DELETE-LAYOUT"
+      ],
+      "remaining": "Enabled screens have responsive/error states; complete device/accessibility review remains open."
+    },
+    {
+      "id": "AP-147",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-148",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-149",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-150",
+      "status": "partial",
+      "deliveries": [
+        "SP1-02",
+        "SP1-06",
+        "SP2-06",
+        "EXT-LOCAL-COMPOSE"
+      ],
+      "remaining": "Focused enabled-slice verification and CI exist; full product/operations/real-device verification remains open."
+    },
+    {
+      "id": "AP-151",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-152",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-153",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-154",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-155",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-156",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-157",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-158",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-159",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-160",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-161",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-162",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-163",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-164",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-165",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-166",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-167",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-168",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-169",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-170",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-171",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-172",
+      "status": "not_assessed",
+      "deliveries": []
+    },
+    {
+      "id": "AP-173",
+      "status": "not_assessed",
+      "deliveries": []
+    }
+  ]
+}

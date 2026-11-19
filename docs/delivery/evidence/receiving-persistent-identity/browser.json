@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checks": [
+    "two batches and independent receipts reuse the same persistent product/presentation with distinct batch IDs",
+    "manual bulk resolution survives lost acknowledgement with unchanged operation and no duplicate master; no stock confirmation",
+    "explicit existing bulk selection reuses identity and pre-fills reference fields without name-based merging",
+    "real gateway/save denies stale presentation versions and foreign persistent references",
+    "legacy opaque IDs remain readable and explicitly associate without rewriting historical line identity",
+    "catalogue-reading cook cannot create receiving master references through the direct API"
+  ],
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "pageErrors": []
+}

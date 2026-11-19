@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ProductReferences } from './application/product-reference.js';
 import { StorageLocations } from './application/storage-locations.js';
 import { ReceivingObservations } from './application/receiving-observations.js';
 import { EvidenceWorkspace } from './application/evidence-workspace.js';
@@ -96,14 +97,14 @@ async function bootstrap(): Promise<void> {
     @Post('evidence/review') reviewEvidence(@Req() req: Request, @Body() input: unknown) { return this.evidence(req, input, 'review'); }
     @Post('evidence/upload') uploadEvidence(@Req() req: Request) { return this.evidence(req, undefined, 'upload'); }
     @Post('evidence/read') readEvidence(@Req() req: Request, @Body() input: unknown, @Res() response: Response) { return this.evidence(req, input, 'read', response); }
-    private async receipt(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations' | 'operation') {
+    private async receipt(req: Request, input: unknown, action: 'save' | 'read' | 'list' | 'locations' | 'operation' | 'resolve') {
       try {
         if (!matchesSecret(req.headers['x-internal-token'], config.internalToken!)) throw new AuthFailure('UNAUTHENTICATED', 401);
         const value = input as { scope?: unknown; command?: { scope?: unknown } };
         const secret = req.headers['x-session-secret'];
         const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
-          { scope: action === 'save' ? value?.command?.scope : value?.scope, capability: action === 'save' ? 'receipt.draft.write' : 'receipt.draft.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
-        return await new ReceiptWorkspace(this.database)[action](input, context);
+          { scope: action === 'save' ? value?.command?.scope : value?.scope, capability: (action === 'save' || action === 'resolve') ? 'receipt.draft.write' : 'receipt.draft.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
+        return action === 'resolve' ? await new ProductReferences(this.database).resolve(input, context) : await new ReceiptWorkspace(this.database)[action](input, context);
       } catch (error) {
         if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
         if (error instanceof ReceiptFailure) throw new HttpException({ code: error.code }, error.status);
@@ -111,6 +112,7 @@ async function bootstrap(): Promise<void> {
         throw new ServiceUnavailableException({ code: 'OUTCOME_UNCERTAIN' });
       }
     }
+    @Post('receipt-drafts/resolve') resolveProduct(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'resolve'); }
     @Post('receipt-drafts/save') saveReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'save'); }
     @Post('receipt-drafts/operation') receiptOperation(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'operation'); }
     @Post('receipt-drafts/read') readReceipt(@Req() req: Request, @Body() input: unknown) { return this.receipt(req, input, 'read'); }
@@ -139,8 +141,8 @@ async function bootstrap(): Promise<void> {
         const context = await identityCall<AuthorizedSiteContext>(config, 'authorize', typeof secret === 'string' ? secret : undefined,
           { scope: value['scope'], capability: 'catalogue.read' }, uuid(req.headers['x-correlation-id'], 'correlationId'));
         const barcode = productBarcode(value['barcode']);
-        const localCandidates = await this.database.catalogueProduct.findMany({ where: { ...context.scope, barcode }, select: { id: true, name: true, presentation: true, barcode: true, imageUrl: true }, take: 10, orderBy: { id: 'asc' } });
-        return { ...await lookup.lookup(barcode), localCandidates: localCandidates.map(row => ({ ...row, imageUrl: referenceImageUrl(row.imageUrl) })) };
+        const localCandidates = await this.database.productPresentation.findMany({ where: { ...context.scope, barcode, isActive: true, product: { isActive: true } }, include: { product: true }, take: 10, orderBy: { id: 'asc' } });
+        return { ...await lookup.lookup(barcode), localCandidates: localCandidates.map(row => ({ id: row.productId, name: row.product.name, presentation: row.label, barcode: row.barcode, imageUrl: referenceImageUrl(row.product.imageUrl), reference: { productId: row.productId, presentationId: row.id, presentationVersion: row.version }, reviewState: 'unreviewed' as const })) };
       } catch (error) {
         if (error instanceof AuthFailure) throw new HttpException({ code: error.code }, error.status);
         if (error instanceof InputError) throw new HttpException({ code: 'INVALID_INPUT', issues: [error.issue] }, 400);

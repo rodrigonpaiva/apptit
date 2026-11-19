@@ -1,12 +1,14 @@
 import { csrfForRequest, invalidateDeniedAccess, onlineSignal } from './online-request';
-import type { ReceiptItemDetails, ReceiptLineDraft, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, SiteAccess, Unit } from '@apptit/contracts';
+import type { ReceiptItemDetails, ReceiptLineDraft, ReceiptWorkspaceSnapshot, SaveReceiptWorkspace, SiteAccess, Unit, ReceiptProductIdentity, ProductReferenceResolution } from '@apptit/contracts';
+import { fr } from '../i18n/fr';
 import { decimal, fromScaled, scaledDecimal } from './receipt-decimal';
-export interface ReceiptSeed { name: string; presentation: string; barcode: string | null; photo?: { url: string; source: 'catalogue' | 'open_food_facts'; sourceUrl?: string | null } | null }
+export interface ReceiptSeed { catalogueReference?: ReceiptProductIdentity | null; name: string; presentation: string; barcode: string | null; photo?: { url: string; source: 'catalogue' | 'open_food_facts'; sourceUrl?: string | null } | null }
 export interface ReceiptEditorLine extends ReceiptSeed {
+  persistedIdentity: boolean; needsReferenceResolution: boolean; referenceOperationId: string;
   id: string; batchId: string; productId: string; presentationId: string; presentationVersion: number; batch: string; expiry: string; expiryKind: 'use_by' | 'best_before'; destination: string; destinationName?: string; legacyDestination?: string;
   amount: string; unit: 'g' | 'kg' | 'ml' | 'l' | 'each'; mode: 'direct' | 'packs'; count: string; factor: string; checked: boolean; physicalMatch: boolean; labelReview?: ReceiptItemDetails['labelReview'];
 }
-export function newReceiptLine(seed: ReceiptSeed): ReceiptEditorLine { return { ...seed, id: crypto.randomUUID(), batchId: crypto.randomUUID(), productId: crypto.randomUUID(), presentationId: crypto.randomUUID(), presentationVersion: 1, batch: '', expiry: '', expiryKind: 'use_by', destination: '', amount: '', unit: 'g', mode: 'direct', count: '', factor: '', checked: false, physicalMatch: false }; }
+export function newReceiptLine(seed: ReceiptSeed): ReceiptEditorLine { return { ...seed, id: crypto.randomUUID(), batchId: crypto.randomUUID(), productId: seed.catalogueReference?.productId ?? '', presentationId: seed.catalogueReference?.presentationId ?? '', presentationVersion: seed.catalogueReference?.presentationVersion ?? 1, persistedIdentity: false, needsReferenceResolution: !seed.catalogueReference, referenceOperationId: crypto.randomUUID(), batch: '', expiry: '', expiryKind: 'use_by', destination: '', amount: '', unit: 'g', mode: 'direct', count: '', factor: '', checked: false, physicalMatch: false }; }
 function canonical(value: string): string {
   const normalized = value.trim().replace(',', '.').replace(/^(\d+)\.0+$/, '$1').replace(/(\.\d*?[1-9])0+$/, '$1');
   return decimal(normalized);
@@ -30,8 +32,9 @@ export function receiptCommand(site: SiteAccess, id: string, version: number, su
   const items: ReceiptItemDetails[] = [];
   const payloadLines: ReceiptLineDraft[] = lines.map(line => {
     if (!line.name.trim() || !line.presentation.trim()) throw new Error('Renseignez le nom et la présentation de chaque ligne.');
+    if (!line.productId || !line.presentationId) throw new Error(fr.reference.pending);
     const q = lineQuantity(line);
-    items.push({ lineId: line.id, name: line.name.trim(), presentation: line.presentation.trim(), barcode: line.barcode, physicalMatch: line.physicalMatch, ...(line.labelReview ? { labelReview: line.labelReview } : {}), pack: line.mode === 'packs' && q ? { count: canonical(line.count), factor: baseAmount(line.factor, line.unit), unit: q.unit, checked: true } : null });
+    items.push({ catalogueReference: line.catalogueReference ?? null, lineId: line.id, name: line.name.trim(), presentation: line.presentation.trim(), barcode: line.barcode, physicalMatch: line.physicalMatch, ...(line.labelReview ? { labelReview: line.labelReview } : {}), pack: line.mode === 'packs' && q ? { count: canonical(line.count), factor: baseAmount(line.factor, line.unit), unit: q.unit, checked: true } : null });
     return { id: line.id, product: { productId: line.productId, presentationId: line.presentationId, presentationVersion: line.presentationVersion }, batch: { id: line.batchId, code: line.batch.trim() ? known(line.batch.trim()) : unknown, expiry: line.expiry ? known({ kind: line.expiryKind, date: line.expiry, sourceRef: 'operator/physical-label' }) : unknown }, received: q ? known({ ...q, basis: 'as_received', resolution: q.unit === 'each' ? '1' : '0.000000001' }) : unknown, disposition: unknown, destinationLocationId: line.destination ? known(line.destination) : unknown, evidenceIds: [] };
   });
   return { command: { schemaVersion: 1, operationId: crypto.randomUUID(), receiptId: id, scope: { tenantId: site.tenantId, siteId: site.siteId }, expectedVersion: version, payload: { supplierReference: supplier.trim() ? known(supplier.trim()) : unknown, receivedAt: receivedAt ? known(new Date(receivedAt).toISOString()) : unknown, lines: payloadLines } }, items };
@@ -39,14 +42,25 @@ export function receiptCommand(site: SiteAccess, id: string, version: number, su
 export function restoreReceipt(snapshot: ReceiptWorkspaceSnapshot): ReceiptEditorLine[] {
   return snapshot.draft.data.lines.map(line => {
     const item = snapshot.items.find(item => item.lineId === line.id)!;
-    return { id: line.id, batchId: line.batch.id, productId: line.product.productId, presentationId: line.product.presentationId, presentationVersion: line.product.presentationVersion, name: item.name, presentation: item.presentation, barcode: item.barcode, batch: line.batch.code.state === 'known' ? line.batch.code.value : '', expiry: line.batch.expiry.state === 'known' ? line.batch.expiry.value.date : '', expiryKind: line.batch.expiry.state === 'known' && line.batch.expiry.value.kind === 'best_before' ? 'best_before' : 'use_by', destinationName: item.destinationSnapshot?.name, legacyDestination: item.legacyDestination, destination: line.destinationLocationId.state === 'known' ? line.destinationLocationId.value : '', amount: line.received.state === 'known' ? line.received.value.amount : '', unit: item.pack?.unit ?? (line.received.state === 'known' ? line.received.value.unit : 'g'), mode: item.pack ? 'packs' : 'direct', count: item.pack?.count ?? '', factor: item.pack?.factor ?? '', checked: Boolean(item.pack?.checked), physicalMatch: item.physicalMatch, ...(item.labelReview ? { labelReview: item.labelReview } : {}) };
+    return { persistedIdentity: true, needsReferenceResolution: false, referenceOperationId: crypto.randomUUID(), catalogueReference: item.catalogueReference ?? null, id: line.id, batchId: line.batch.id, productId: line.product.productId, presentationId: line.product.presentationId, presentationVersion: line.product.presentationVersion, name: item.name, presentation: item.presentation, barcode: item.barcode, batch: line.batch.code.state === 'known' ? line.batch.code.value : '', expiry: line.batch.expiry.state === 'known' ? line.batch.expiry.value.date : '', expiryKind: line.batch.expiry.state === 'known' && line.batch.expiry.value.kind === 'best_before' ? 'best_before' : 'use_by', destinationName: item.destinationSnapshot?.name, legacyDestination: item.legacyDestination, destination: line.destinationLocationId.state === 'known' ? line.destinationLocationId.value : '', amount: line.received.state === 'known' ? line.received.value.amount : '', unit: item.pack?.unit ?? (line.received.state === 'known' ? line.received.value.unit : 'g'), mode: item.pack ? 'packs' : 'direct', count: item.pack?.count ?? '', factor: item.pack?.factor ?? '', checked: Boolean(item.pack?.checked), physicalMatch: item.physicalMatch, ...(item.labelReview ? { labelReview: item.labelReview } : {}) };
   });
 }
-export async function receiptRequest<T>(action: 'save' | 'read' | 'list' | 'locations' | 'operation', input: unknown, signal?: AbortSignal): Promise<T> {
+export async function receiptRequest<T>(action: 'save' | 'read' | 'list' | 'locations' | 'operation' | 'resolve', input: unknown, signal?: AbortSignal): Promise<T> {
   signal = onlineSignal(signal);
   const csrfToken = await csrfForRequest(signal);
   const response = await fetch(`/api/receipts/${action}`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal, headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken }, body: JSON.stringify(input) });
   invalidateDeniedAccess(response);
   if (!response.ok) { const body = await response.json().catch(() => ({})) as { code?: string }; throw new Error(body.code ?? 'OUTCOME_UNCERTAIN'); }
   return response.json() as Promise<T>;
+}
+
+export async function prepareReceiptReferences(site: SiteAccess, lines: ReceiptEditorLine[]): Promise<ReceiptEditorLine[]> {
+  for (const line of lines) { if (!line.name.trim() || !line.presentation.trim()) throw new Error(fr.reference.fieldsRequired); lineQuantity(line); }
+  const result: ReceiptEditorLine[] = [];
+  for (const line of lines) {
+    if (line.catalogueReference || !line.needsReferenceResolution) { result.push(line); continue; }
+    const resolved = await receiptRequest<ProductReferenceResolution>('resolve', { scope: { tenantId: site.tenantId, siteId: site.siteId }, operationId: line.referenceOperationId, selection: null, name: line.name.trim(), presentation: line.presentation.trim(), barcode: line.barcode });
+    result.push({ ...line, catalogueReference: resolved.reference, needsReferenceResolution: false, ...(!line.persistedIdentity ? resolved.reference : {}) });
+  }
+  return result;
 }

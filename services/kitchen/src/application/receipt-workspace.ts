@@ -1,3 +1,4 @@
+import { productReference, validateProductReference } from './product-reference.js';
 import { storageLock } from './storage-locations.js';
 import { storageCategories } from '@apptit/contracts';
 import type { StorageCategory, ReceiptLocation } from '@apptit/contracts';
@@ -14,7 +15,7 @@ export function parseReceiptWorkspace(input: unknown): SaveReceiptWorkspace {
   const command = saveReceiptDraft(value['command']);
   if (!Array.isArray(value['items']) || value['items'].length !== command.payload.lines.length) invalid('items', 'INVALID_LIST', 'One private identity snapshot per line is required.');
   const items: ReceiptItemDetails[] = value['items'].map((input, index) => {
-    const item = object(input, ['lineId', 'name', 'presentation', 'barcode', 'physicalMatch', 'pack', 'labelReview'], `items[${index}]`);
+    const item = object(input, ['lineId', 'name', 'presentation', 'barcode', 'physicalMatch', 'pack', 'labelReview', 'catalogueReference'], `items[${index}]`);
     if (typeof item['physicalMatch'] !== 'boolean') invalid('physicalMatch', 'INVALID_MATCH', 'Explicit match state required.');
     let pack: ReceiptItemDetails['pack'] = null;
     if (item['pack'] !== null) {
@@ -24,7 +25,7 @@ export function parseReceiptWorkspace(input: unknown): SaveReceiptWorkspace {
       if (raw['unit'] === 'each' && factor.includes('.')) invalid('pack.factor', 'INVALID_CONVERSION', 'Item conversion must be whole.');
       pack = { count, factor, unit: raw['unit'] as 'g' | 'ml' | 'each', checked: true };
     }
-    return { lineId: uuid(item['lineId'], 'lineId'), name: text(item['name'], 'name', 200), presentation: text(item['presentation'], 'presentation', 200), barcode: item['barcode'] === null ? null : productBarcode(item['barcode']), physicalMatch: item['physicalMatch'] as boolean, ...(item['labelReview'] === undefined ? {} : { labelReview: labelReview(item['labelReview']) }), pack };
+    return { ...(item['catalogueReference'] === undefined ? {} : { catalogueReference: item['catalogueReference'] === null ? null : productReference(item['catalogueReference']) }), lineId: uuid(item['lineId'], 'lineId'), name: text(item['name'], 'name', 200), presentation: text(item['presentation'], 'presentation', 200), barcode: item['barcode'] === null ? null : productBarcode(item['barcode']), physicalMatch: item['physicalMatch'] as boolean, ...(item['labelReview'] === undefined ? {} : { labelReview: labelReview(item['labelReview']) }), pack };
   });
   if (new Set(items.map(item => item.lineId)).size !== items.length) invalid('items', 'DUPLICATE_ID', 'Duplicate line details.');
   for (const line of command.payload.lines) {
@@ -82,6 +83,23 @@ export class ReceiptWorkspace {
         if (before && snapshot(before.snapshot).draft.state !== 'draft') throw new ReceiptFailure('RECEIPT_READ_ONLY', 409);
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${storageLock(command.scope.tenantId, command.scope.siteId)}, 0))`;
         const previous = before ? snapshot(before.snapshot) : null;
+        const references = new Map<string, ReceiptItemDetails['catalogueReference']>();
+        const sameReference = (a: ReceiptItemDetails['catalogueReference'], b: ReceiptItemDetails['catalogueReference']) => a?.productId === b?.productId && a?.presentationId === b?.presentationId && a?.presentationVersion === b?.presentationVersion;
+        const effectiveReference = (item: ReceiptItemDetails) => item.catalogueReference === undefined ? previous?.items.find(row => row.lineId === item.lineId)?.catalogueReference ?? null : item.catalogueReference;
+        for (const item of [...items].sort((a,b) => (effectiveReference(a)?.productId ?? '').localeCompare(effectiveReference(b)?.productId ?? '') || (effectiveReference(a)?.presentationId ?? '').localeCompare(effectiveReference(b)?.presentationId ?? ''))) {
+          const priorItem = previous?.items.find(row => row.lineId === item.lineId);
+          const reference = item.catalogueReference === undefined ? priorItem?.catalogueReference ?? null : item.catalogueReference;
+          if (priorItem?.catalogueReference && !sameReference(priorItem.catalogueReference, reference)) throw new ReceiptFailure('REFERENCE_LINK_CONFLICT', 409);
+          if (reference) {
+            const selected = await validateProductReference(tx, command.scope, reference);
+            if (item.barcode !== null && selected.barcode !== item.barcode) throw new ReceiptFailure('REFERENCE_MISMATCH', 409);
+            const line = command.payload.lines.find(row => row.id === item.lineId)!;
+            const priorLine = previous?.draft.data.lines.find(row => row.id === item.lineId);
+            if (priorLine && !sameReference(priorLine.product, line.product)) throw new ReceiptFailure('REFERENCE_LINK_CONFLICT', 409);
+            if (!sameReference(line.product, reference) && !sameReference(priorLine?.product, line.product)) throw new ReceiptFailure('INVALID_REFERENCE', 400);
+          }
+          references.set(item.lineId, reference);
+        }
         const locations = command.payload.lines.flatMap(line => line.destinationLocationId.state === 'known' ? [line.destinationLocationId.value] : []);
         const available = locations.length ? await tx.receiptLocation.findMany({ where: { ...command.scope, isActive: true, deletedAt: null, id: { in: [...new Set(locations)] } } }) : [];
         for (const line of command.payload.lines) if (line.destinationLocationId.state === 'known') {
@@ -98,7 +116,7 @@ export class ReceiptWorkspace {
           const priorItem = previous?.items.find(row => row.lineId === item.lineId);
           const priorDestination = previous?.draft.data.lines.find(row => row.id === item.lineId)?.destinationLocationId;
           const legacyDestination = priorItem?.legacyDestination ?? (priorDestination?.state === 'known' && !priorItem?.destinationSnapshot ? String(priorDestination.value) : undefined);
-          return { ...item, ...(selected ? { destinationSnapshot: priorItem?.destinationSnapshot?.id === selected.id ? priorItem.destinationSnapshot : { id: selected.id, name: selected.name, category: selected.category as StorageCategory | null } } : {}), ...(legacyDestination ? { legacyDestination } : {}) };
+          return { ...item, catalogueReference: references.get(item.lineId) ?? null, identityState: references.get(item.lineId) ? 'linked' as const : 'legacy_unresolved' as const, ...(selected ? { destinationSnapshot: priorItem?.destinationSnapshot?.id === selected.id ? priorItem.destinationSnapshot : { id: selected.id, name: selected.name, category: selected.category as StorageCategory | null } } : {}), ...(legacyDestination ? { legacyDestination } : {}) };
         });
         const recordedAt = this.clock().toISOString();
         const value: ReceiptWorkspaceSnapshot = { draft: { id: command.receiptId, scope: command.scope, version: command.expectedVersion + 1, state: 'draft', data: command.payload, createdBy: previous?.draft.createdBy ?? context.actor, updatedBy: context.actor, recordedAt }, items: enrichedItems };
@@ -127,7 +145,8 @@ export class ReceiptWorkspace {
     const operationId = uuid(value['operationId'], 'operationId'), receiptId = uuid(value['receiptId'], 'receiptId');
     const found = await this.db.receiptDraftOperation.findUnique({ where: { tenantId_siteId_actorId_operationId: { ...requested, actorId: context.actor.userId, operationId } } });
     if (!found) return { state: 'unconfirmed' };
-    const result = snapshot(found.snapshot);
+    const stored = snapshot(found.snapshot);
+    const result = { ...stored, items: stored.items.map(item => ({ ...item, catalogueReference: item.catalogueReference ?? null, identityState: item.catalogueReference ? 'linked' as const : 'legacy_unresolved' as const })) };
     if (result.draft.id !== receiptId) return { state: 'unconfirmed' };
     return { state: 'recorded', snapshot: result };
   }
@@ -135,7 +154,8 @@ export class ReceiptWorkspace {
     const value = object(input, ['scope', 'id'], 'query'); const requested = scope(value['scope']); this.authorize(context, 'receipt.draft.read', requested);
     const found = await this.db.receiptDraft.findFirst({ where: { ...requested, id: uuid(value['id'], 'id') } });
     if (!found) throw new ReceiptFailure('NOT_FOUND', 404);
-    const result = snapshot(found.snapshot);
+    const stored = snapshot(found.snapshot);
+    const result = { ...stored, items: stored.items.map(item => ({ ...item, catalogueReference: item.catalogueReference ?? null, identityState: item.catalogueReference ? 'linked' as const : 'legacy_unresolved' as const })) };
     return result.draft.state === 'draft' ? result : { ...result, readOnly: true };
   }
   async list(input: unknown, context: AuthorizedSiteContext) {

@@ -11,13 +11,15 @@ test('receipt editor preserves distinct product/presentation identity and versio
   const temporary=await mkdtemp(path.join(tmpdir(),'apptit-editor-'));
   try {
     // Execute the pure browser serializer; ordinary workspace typecheck verifies its full types.
-    for(const name of ['online-request','receipt-decimal','receipts']) {
-      const source=await readFile(new URL(`../apps/web/src/lib/${name}.ts`,import.meta.url),'utf8');
-      const result=ts.transpileModule(source.replace("'./receipt-decimal'","'./receipt-decimal.mjs'").replace("'./online-request'","'./online-request.mjs'"),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
+    for(const name of ['fr','online-request','receipt-decimal','receipts']) {
+      const source=await readFile(new URL(name === 'fr' ? '../apps/web/src/i18n/fr.ts' : `../apps/web/src/lib/${name}.ts`,import.meta.url),'utf8');
+      const result=ts.transpileModule(source.replace("'../i18n/fr'","'./fr.mjs'").replace("'./receipt-decimal'","'./receipt-decimal.mjs'").replace("'./online-request'","'./online-request.mjs'"),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
       await writeFile(path.join(temporary,name+'.mjs'),result.outputText);
     }
     const {newReceiptLine,receiptCommand,restoreReceipt}=await import(pathToFileURL(path.join(temporary,'receipts.mjs')).href);
-    const line=newReceiptLine({name:'Synthetic rice',presentation:'Physical 5 kg bag',barcode:'0012345678905'});
+    const unresolved=newReceiptLine({name:'Bulk pending',presentation:'Vrac',barcode:null}); assert.equal(unresolved.productId,''); assert.equal(unresolved.presentationId,'');
+    const reference={productId:randomUUID(),presentationId:randomUUID(),presentationVersion:7};
+    const line=newReceiptLine({catalogueReference:reference,name:'Synthetic rice',presentation:'Physical 5 kg bag',barcode:'0012345678905'});
     assert.notEqual(line.productId,line.presentationId);line.presentationVersion=7;line.batch='SYNTHETIC-A';line.amount='10';line.unit='each';
     const site={tenantId:randomUUID(),siteId:randomUUID()},id=randomUUID();
     const first=receiptCommand(site,id,0,'','',[line]);

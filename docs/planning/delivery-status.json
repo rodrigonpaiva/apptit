@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "asOf": "2026-11-19",
-  "assessedDevCommit": "cb112eeb6775c6248e7422285f297102da871d38",
+  "assessedDevCommit": "6a07dd45f48e168980688a00f895799742e3b007",
   "owner": "repository integration owner",
   "independentReview": "not recorded; technical CI is not independent acceptance",
   "baseline": {
@@ -631,6 +631,34 @@
         "commit": "cb112eeb6775c6248e7422285f297102da871d38"
       },
       "review": "no independent approval recorded"
+    },
+    {
+      "id": "EXT-PERSISTENT-PRODUCT-IDENTITY",
+      "title": "Persistent product/presentation identity in receiving",
+      "parents": [
+        "AP-029",
+        "AP-030",
+        "AP-031",
+        "AP-034",
+        "AP-017",
+        "AP-019",
+        "AP-024",
+        "AP-145",
+        "AP-146"
+      ],
+      "mapping": "Retrospective scope linkage; not full parent acceptance.",
+      "status": "integrated",
+      "evidence": [
+        "docs/delivery/RECEIVING-PERSISTENT-IDENTITY.md",
+        "docs/delivery/evidence/receiving-persistent-identity/browser.json",
+        "docs/delivery/evidence/receiving-persistent-identity/upgrade.json"
+      ],
+      "integration": {
+        "pr": "https://github.com/rodrigonpaiva/apptit/pull/30",
+        "commit": "6a07dd45f48e168980688a00f895799742e3b007"
+      },
+      "validatedSourceCommit": "ad61af3da86e81faff961c83a6f020ac65dd5a21",
+      "review": "author_verified; no independent approval recorded"
     }
   ],
   "items": [
@@ -744,9 +772,10 @@
       "status": "partial",
       "deliveries": [
         "SP2-01",
-        "SP2-06"
+        "SP2-06",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
-      "remaining": "Draft-save operation recovery exists; stock command outcomes, terminal rejection and contention require SP3-01."
+      "remaining": "Draft save and reference resolution have durable replay/outcome handling; stock command outcomes, terminal rejection and contention still require SP3-01."
     },
     {
       "id": "AP-018",
@@ -759,7 +788,8 @@
       "deliveries": [
         "SP1-03",
         "SP1-06",
-        "EXT-STORAGE-DELETE-LAYOUT"
+        "EXT-STORAGE-DELETE-LAYOUT",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
       "remaining": "Enabled changes preserve actor/version/history; ledger and later domain audits remain open."
     },
@@ -804,7 +834,8 @@
       "deliveries": [
         "SP1-04",
         "SP1-06",
-        "EXT-STORAGE-DELETE-LAYOUT"
+        "EXT-STORAGE-DELETE-LAYOUT",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
       "remaining": "Enabled routes/files are scoped; future modules/jobs and full capability administration remain open."
     },
@@ -836,9 +867,10 @@
       "id": "AP-029",
       "status": "partial",
       "deliveries": [
-        "SP1-05"
+        "SP1-05",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
-      "remaining": "Scoped reference catalogue exists; full reviewed product/presentation master and lifecycle remain open."
+      "remaining": "Persistent product/presentation IDs, scoped FK and protected identity are delivered; generic ingredients, supplier identity and full master curation remain open."
     },
     {
       "id": "AP-030",
@@ -846,7 +878,8 @@
       "deliveries": [
         "SP2-02",
         "EXT-OFF-LIVE",
-        "EXT-RECEIVING-PHOTOS-STORAGE"
+        "EXT-RECEIVING-PHOTOS-STORAGE",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
       "remaining": "Protected fixture/live lookup has evidence; original parent acceptance and dependency review have not been recorded as complete."
     },
@@ -855,9 +888,10 @@
       "status": "partial",
       "deliveries": [
         "SP2-02",
-        "EXT-RECEIVING-PHOTOS-STORAGE"
+        "EXT-RECEIVING-PHOTOS-STORAGE",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
-      "remaining": "Reference candidates/manual snapshots exist; reviewed persistent master identity must precede stock confirmation."
+      "remaining": "Durable unreviewed references and explicit receiving association are delivered; reviewed-field curation, external update differences and full parent acceptance remain open."
     },
     {
       "id": "AP-032",
@@ -882,9 +916,10 @@
       "status": "partial",
       "deliveries": [
         "SP2-01",
-        "SP2-03"
+        "SP2-03",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
-      "remaining": "Receipt drafts persist; accepted-stock confirmation and full receiving workflow await Sprint 3."
+      "remaining": "Receipt drafts now validate canonical references and preserve legacy aliases; accepted-stock confirmation and full receiving workflow await Sprint 3."
     },
     {
       "id": "AP-035",
@@ -1482,7 +1517,8 @@
         "SP1-05",
         "SP2-03",
         "EXT-RECEIVING-PHOTOS-STORAGE",
-        "EXT-STORAGE-DELETE-LAYOUT"
+        "EXT-STORAGE-DELETE-LAYOUT",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
       "remaining": "Enabled receiving/catalogue/storage journeys exist; remaining product journeys are not implemented."
     },
@@ -1493,7 +1529,8 @@
         "SP1-05",
         "SP2-03",
         "EXT-RECEIVING-PHOTOS-STORAGE",
-        "EXT-STORAGE-DELETE-LAYOUT"
+        "EXT-STORAGE-DELETE-LAYOUT",
+        "EXT-PERSISTENT-PRODUCT-IDENTITY"
       ],
       "remaining": "Enabled screens have responsive/error states; complete device/accessibility review remains open."
     },

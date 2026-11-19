@@ -79,9 +79,17 @@ test('legacy drafts stay unresolved until explicitly linked without rewriting or
 });
 test('reference validation locks master rows until the transaction commits; deactivation then rejects a new save',async()=>{
  const db=connect(),other=connect();try{
-  const ctx=context(),ref=(await new ProductReferences(db).resolve(request(ctx),ctx)).reference;let unlock,ready;const gate=new Promise(r=>{unlock=r;}),locked=new Promise(r=>{ready=r;});
-  const transaction=db.$transaction(async tx=>{await validateProductReference(tx,ctx.scope,ref);ready();await gate;});await locked;
-  const update=other.productPresentation.update({where:{id:ref.presentationId},data:{isActive:false}});unlock();await transaction;await update;
+  const ctx=context(),ref=(await new ProductReferences(db).resolve(request(ctx),ctx)).reference;let unlock,ready,started,pid;const gate=new Promise(r=>{unlock=r;}),locked=new Promise(r=>{ready=r;}),updating=new Promise(r=>{started=r;});
+  const transaction=db.$transaction(async tx=>{await validateProductReference(tx,ctx.scope,ref);ready();await gate;},{timeout:10000});
+  let update;
+  try {
+   await Promise.race([locked,transaction.then(()=>{throw new Error('Validation ended before the lock probe');})]);
+   update=other.$transaction(async tx=>{[{pid}]=await tx.$queryRaw`SELECT pg_backend_pid() AS pid`;started();return tx.productPresentation.update({where:{id:ref.presentationId},data:{isActive:false}});},{timeout:10000});
+   await Promise.race([updating,update.then(()=>{throw new Error('Deactivation completed before the lock probe');})]);
+   let blocked=false;
+   for(let attempt=0;attempt<100&&!blocked;attempt++){const rows=await db.$queryRaw`SELECT cardinality(pg_blocking_pids(${pid}::integer)) > 0 AS blocked`;blocked=rows[0].blocked;if(!blocked)await new Promise(resolve=>setTimeout(resolve,10));}
+   assert.equal(blocked,true,'The actual deactivation connection must wait for the validation transaction');
+  } finally {unlock();await transaction;if(update)await update;}
   await assert.rejects(new ReceiptWorkspace(db).save(receipt(ctx,ref),ctx),e=>e.code==='INVALID_REFERENCE');
  }finally{await db.$disconnect();await other.$disconnect();}
 });

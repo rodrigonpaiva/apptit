@@ -1,5 +1,8 @@
 # Sprint 2 — Technical acceptance record
 
+> Current-status reconciliation — 2026-11-19: retain this exact-source historical acceptance and its original results. Integration/release steps below may since have completed; the [execution register](../planning/DELIVERY-STATUS.md) records current bounded delivery status. Later OCR/storage extensions have separate evidence and do not alter this acceptance or the published tag.
+
+
 Date: 2026-11-13 (Europe/Paris).
 Result: **PASS for the implemented online synthetic Sprint 2 scope.** This is technical acceptance of SP2-01–SP2-06 under the sprint's explicit boundaries, not production readiness, full parent-backlog completion, independent security approval or real food-safety validation.
 

@@ -1,0 +1,57 @@
+// Use an isolated temporary Playwright installation passed as argv[2].
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { loadLocalEnv } from '../../scripts/lib.mjs';
+loadLocalEnv();
+if (process.argv[3] === 'compose') Object.assign(process.env, JSON.parse(await fs.readFile('.local/alpha2/settings.json', 'utf8')));
+const { chromium } = await import(pathToFileURL(path.resolve(process.argv[2])).href);
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } });
+const page = await context.newPage(); page.setDefaultTimeout(20000);
+const report = { passed: false, checks: [], externalRequests: [] }, errors = [];
+context.on('request', request => { if (/^https?:/.test(request.url()) && new URL(request.url()).hostname !== '127.0.0.1') report.externalRequests.push(new URL(request.url()).hostname); });
+page.on('pageerror', error => errors.push(error.message));
+const directory = 'docs/delivery/evidence/ap-128'; await fs.mkdir(directory, { recursive: true });
+const check = name => { report.checks.push(name); console.log('PASS: ' + name); };
+try {
+  await page.goto(process.env.WEB_ORIGIN + '/login'); await page.getByLabel('Identifiant', { exact: true }).fill('stock.a@apptit.test'); await page.getByLabel('Mot de passe', { exact: true }).fill(process.env.FIXTURE_STOREKEEPER_A_PASSWORD); await page.getByRole('button', { name: 'Se connecter', exact: true }).click(); await page.waitForURL('**/workspace');
+  await page.getByRole('link', { name: 'Réception', exact: true }).click(); await page.getByRole('heading', { name: 'Brouillon de réception', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Ajouter sans code', exact: true }).click();
+  const line = page.locator('fieldset.receipt-line').first();
+  await line.getByLabel('Nom du produit', { exact: true }).fill('Synthetic OCR label'); await line.getByLabel('Présentation observée', { exact: true }).fill('Synthetic package');
+  let savedCommand; page.on('request', request => { if (request.url().endsWith('/api/receipts/save')) savedCommand = request.postDataJSON(); });
+  await page.getByRole('button', { name: 'Enregistrer le brouillon', exact: true }).click(); await page.getByText(/Brouillon enregistré — version 1/).waitFor();
+  await line.locator('input[type=file]').setInputFiles('tests/fixtures/label-ocr/dlc.png'); await line.getByRole('button', { name: 'Envoyer la photo', exact: true }).click(); await line.getByText('Photo originale enregistrée', { exact: true }).first().waitFor();
+  const card = line.locator('article.evidence-card').first(); await card.getByRole('button', { name: 'Proposer le lot et la date depuis cette photo', exact: true }).click();
+  const review = card.locator('.label-extraction'); await review.getByLabel('Lot proposé — modifiable', { exact: true }).waitFor({ timeout: 65000 });
+  assert.equal(await review.getByLabel('Lot proposé — modifiable', { exact: true }).inputValue(), '001AB23'); assert.equal(await review.getByLabel('Date proposée — modifiable', { exact: true }).inputValue(), '2028-12-31');
+  assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), ''); assert.equal(await line.getByLabel('Date sur l’étiquette', { exact: true }).inputValue(), '');
+  await page.screenshot({ path: directory + '/proposals-1440.png', fullPage: true });
+  const apply = review.getByRole('button', { name: 'Appliquer les champs vérifiés au brouillon', exact: true }); assert.equal(await apply.isDisabled(), true);
+  await review.getByLabel('Utiliser le numéro de lot revu', { exact: true }).check(); await review.getByLabel('Utiliser la date revue', { exact: true }).check(); assert.equal(await apply.isDisabled(), true);
+  await review.getByLabel(/^J’ai comparé les valeurs sélectionnées/).check(); await apply.click(); assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), '001AB23'); check('real browser OCR produces proposals; only explicit reviewed fields change the draft');
+  await page.getByRole('button', { name: 'Enregistrer le brouillon', exact: true }).click(); await page.getByText(/Brouillon enregistré — version 2/).waitFor(); assert.equal(savedCommand.items[0].labelReview.batch, '001AB23'); assert.equal(savedCommand.items[0].labelReview.engine, 'tesseract.js@7.0.0/fra@1.0.0');
+  await page.getByRole('button', { name: new RegExp('Recharger ' + savedCommand.command.receiptId.slice(0, 8)) }).click(); await page.getByText(/Brouillon rechargé — version 2/).waitFor(); assert.equal(await line.getByLabel('Date sur l’étiquette', { exact: true }).inputValue(), '2028-12-31'); check('save/reopen preserves reviewed fields and source image provenance');
+  await page.route('**/api/receipts/save', async route => { const input = route.request().postDataJSON(); input.items[0].labelReview.imageSha256 = 'f'.repeat(64); const response = await route.fetch({ postData: JSON.stringify(input) }); assert.equal(response.status(), 409); assert.equal((await response.json()).code, 'LABEL_REVIEW_CONFLICT'); await route.fulfill({ response }); }, { times: 1 });
+  await page.getByRole('button', { name: 'Enregistrer le brouillon', exact: true }).click(); await page.getByText(/Le lien entre la photo et les valeurs a changé/).waitFor();
+  assert.equal(await line.getByLabel('Lot réel', { exact: true }).isDisabled(), false);
+  await line.getByRole('button', { name: 'Retirer l’association OCR et vérifier manuellement', exact: true }).click();
+  assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), '001AB23'); check('definite source conflict unlocks manual review and removing the OCR association retains entered values');
+  await line.getByLabel('Lot réel', { exact: true }).fill('MANUAL999'); await page.getByRole('button', { name: 'Enregistrer le brouillon', exact: true }).click(); await page.getByText(/Brouillon enregistré — version 3/).waitFor(); assert.equal(savedCommand.items[0].labelReview, undefined);
+  await card.getByRole('button', { name: 'Proposer le lot et la date depuis cette photo', exact: true }).click(); await review.getByLabel('Lot proposé — modifiable', { exact: true }).waitFor({ timeout: 65000 }); assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), 'MANUAL999'); await review.getByRole('button', { name: 'Ignorer les propositions', exact: true }).click(); check('new extraction does not silently overwrite a manually entered value; manual edits clear current OCR association');
+  let languageRequested; const languageSeen = new Promise(resolve => { languageRequested = resolve; });
+  await page.route('**/api/label-ocr/lang/fra.traineddata.gz', async route => { languageRequested(); await new Promise(resolve => setTimeout(resolve, 800)); try { await route.continue(); } catch { /* worker may already be cancelled */ } });
+  await card.getByRole('button', { name: 'Proposer le lot et la date depuis cette photo', exact: true }).click(); await languageSeen;
+  await card.getByRole('button', { name: 'Annuler la lecture', exact: true }).click(); await card.getByText(/Lecture non confirmée ou interrompue/).waitFor();
+  await page.unroute('**/api/label-ocr/lang/fra.traineddata.gz'); await new Promise(resolve => setTimeout(resolve, 1500));
+  assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), 'MANUAL999'); check('cancelling an in-flight local worker preserves entered values and manual fallback');
+  await page.route('**/api/evidence/read', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{"code":"DEPENDENCY_UNAVAILABLE"}' }));
+  await card.getByRole('button', { name: 'Proposer le lot et la date depuis cette photo', exact: true }).click(); await card.getByText(/Lecture non confirmée ou interrompue/).waitFor(); await page.unroute('**/api/evidence/read');
+  assert.equal(await line.getByLabel('Lot réel', { exact: true }).inputValue(), 'MANUAL999'); assert.ok(await card.getByText('Photo originale enregistrée', { exact: true }).isVisible()); check('failed private-photo retrieval does not manufacture an extraction or change stored photo availability');
+  await card.getByRole('button', { name: 'Signaler illisible', exact: true }).click(); await card.getByText(/illisible — nouvelle capture/).waitFor(); assert.equal(await card.getByRole('button', { name: 'Proposer le lot et la date depuis cette photo', exact: true }).isDisabled(), true); check('unreadable originals remain available with manual entry, without false extraction');
+  for (const width of [320, 375, 768, 1024, 1440]) { await page.setViewportSize({ width, height: 1100 }); assert.ok(await page.evaluate(() => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1)); }
+  await page.screenshot({ path: directory + '/review-1440.png', fullPage: true }); check('receiving form reflows at all five target widths');
+  assert.deepEqual(report.externalRequests, []); assert.deepEqual(errors, []); report.passed = true;
+} finally { await fs.writeFile(directory + '/browser.json', JSON.stringify({ ...report, pageErrors: errors }, null, 2) + '\n'); await browser.close(); }

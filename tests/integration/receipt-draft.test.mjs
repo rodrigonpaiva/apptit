@@ -18,7 +18,7 @@ function input(ctx) {
 test('receipt save/reopen keeps two same-code batches, exact checked conversion, pending data and authoritative actor without catalogue or stock effects',async()=>{
  const db=client(), reopened=client();try {
  const ctx=context(),value=input(ctx),first=value.command.payload.lines[0]; const second=structuredClone(first);second.id=randomUUID();second.batch={id:randomUUID(),code:known('BATCH-B'),expiry:known({kind:'best_before',date:'2027-01-01',sourceRef:'operator/label'})};value.command.payload.lines.push(second);value.items.push({...structuredClone(value.items[0]),lineId:second.id});
- const location=await db.receiptLocation.create({data:{id:randomUUID(),...ctx.scope,name:'Synthetic reserve'}});first.destinationLocationId=known(location.id);
+ const location=await db.receiptLocation.create({data:{id:randomUUID(),...ctx.scope,name:'Synthetic reserve',category:'dry'}});first.destinationLocationId=known(location.id);
  const catalogueBefore=await db.catalogueProduct.count({where:ctx.scope});const app=new ReceiptWorkspace(db);const result=await app.save(value,ctx);
  assert.equal(result.draft.state,'draft');assert.equal(result.draft.version,1);assert.deepEqual(result.draft.createdBy,ctx.actor);assert.equal(result.draft.data.lines[0].received.value.amount,'50000');assert.equal(result.draft.data.lines[0].batch.expiry.state,'unknown');assert.notEqual(result.draft.data.lines[0].batch.id,result.draft.data.lines[1].batch.id);assert.equal(result.draft.data.lines[0].disposition.state,'unknown');assert.equal(await db.catalogueProduct.count({where:ctx.scope}),catalogueBefore);assert.ok(!('stock' in result));
  assert.deepEqual(await new ReceiptWorkspace(reopened).read({scope:ctx.scope,id:value.command.receiptId},ctx),result);

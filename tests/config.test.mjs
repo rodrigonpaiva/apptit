@@ -57,3 +57,9 @@ test('receiving observation mode is explicitly synthetic and cannot activate liv
   assert.equal(readConfig('kitchen', fixture()).observationMode, 'disabled');
   for (const mode of ['', 'live', 'automatic']) assert.throws(() => readConfig('kitchen', { ...fixture(), OBSERVATION_MODE: mode }), ConfigurationError);
 });
+
+test('local label OCR is an explicit browser-only mode, with no cloud activation', () => {
+  assert.equal(readConfig('kitchen', fixture()).ocrMode, 'disabled');
+  assert.equal(readConfig('kitchen', { ...fixture(), OCR_MODE: 'browser_local' }).ocrMode, 'browser_local');
+  for (const OCR_MODE of ['live', 'cloud', 'fixture']) assert.throws(() => readConfig('kitchen', { ...fixture(), OCR_MODE }), ConfigurationError);
+});

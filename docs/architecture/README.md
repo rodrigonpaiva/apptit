@@ -11,6 +11,8 @@ These engineering decisions select the local synthetic implementation baseline. 
 | [0001](adr/0001-topology-and-workspace.md) | Capability-grouped microservices, Nx/npm, responsive web | Selected for first slice |
 | [0002](adr/0002-data-and-transactions.md) | PostgreSQL authority, Prisma isolation, atomic ledger and outbox | Selected; persistence implemented later |
 | [0003](adr/0003-identity-and-offline.md) | Opaque revocable sessions, site capabilities, isolated draft ownership | Selected online contract; offline capture disabled initially |
+| [0006](adr/0006-persistent-product-identity.md) | Persistent receiving product/presentation identity, explicit legacy association | Synthetic correction; no stock effect |
+| [0005](adr/0005-local-label-ocr.md) | Local label OCR proposals with explicit human review and image provenance | AP-128 synthetic extension; opt-in |
 | [0004](adr/0004-adapters-evidence-and-recovery.md) | Explicit adapter modes, private evidence, provisional retention and recovery | Local choices selected; live integrations remain gated |
 
 The [wire and domain contracts](contracts/first-slice.md) and [dependency-free TypeScript definitions](contracts/first-slice.ts) express the same baseline. They are design artifacts, not runtime validators or an application package. [SP1-01 evidence and handoff](../delivery/SP1-01.md) maps acceptance and remaining work.
@@ -46,7 +48,9 @@ Services communicate through authenticated internal HTTP/JSON contracts. Domain 
 
 [SP2-05 receiving observations](contracts/receiving-observations.md) define actual capture, synthetic versioned profiles, assessment and correction history without chef disposition or stock authority.
 
-## Implementation sequence
+## Historical implementation sequence
+
+The foundation/receiving packages below are now integrated in their bounded scope; the [execution matrix](../planning/DELIVERY-STATUS.md) is the current progress index. Sprint 3 remains planned.
 
 1. SP1-02: initialize workspace/apps and exact compatible dependency versions; record a toolchain matrix and lockfile; add local PostgreSQL and CI.
 2. SP1-03: runtime quantity/date validation, versioned persistence, schema migrations and attributable changes.

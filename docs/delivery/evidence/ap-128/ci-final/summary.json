@@ -1,0 +1,11 @@
+{
+  "validatedFeatureCommit": "66eb2a273c06a21c6c866bf1cddc7e04533f88ef",
+  "containerSourceCommit": "69953787cb31c8a62634c3d781c6eb03962becba",
+  "foundationRun": "https://github.com/rodrigonpaiva/apptit/actions/runs/43575527157",
+  "containerRun": "https://github.com/rodrigonpaiva/apptit/actions/runs/43575527164",
+  "tests": 79,
+  "integrationTests": 42,
+  "actualGatewaySourceConflict": "passed",
+  "browserChecks": 8,
+  "registryPushExecuted": false
+}

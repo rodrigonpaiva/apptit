@@ -23,8 +23,40 @@ model CatalogueProduct {
   name         String @db.VarChar(200)
   presentation String @db.VarChar(200)
   barcode      String? @db.VarChar(64)
+  imageUrl     String? @db.VarChar(500)
+  isActive     Boolean @default(true)
+  presentations ProductPresentation[]
+
+  @@unique([id, tenantId, siteId])
 
   @@index([tenantId, siteId, name, id])
+}
+
+// Persistent commercial presentation; identity is independent of receipt lines/batches.
+model ProductPresentation {
+  id String @id @db.Uuid
+  productId String @db.Uuid
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  label String @db.VarChar(200)
+  barcode String? @db.VarChar(64)
+  version Int @default(1)
+  isActive Boolean @default(true)
+  product CatalogueProduct @relation(fields: [productId, tenantId, siteId], references: [id, tenantId, siteId], onDelete: Restrict)
+  @@unique([id, tenantId, siteId])
+  @@index([tenantId, siteId, barcode])
+}
+model ProductReferenceOperation {
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  actorId String @db.Uuid
+  operationId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  intentHash String @db.VarChar(64)
+  result Json
+  @@id([tenantId, siteId, actorId, operationId])
 }
 
 // Reference draft only: no receipt, availability, reservation or stock effect.
@@ -92,6 +124,11 @@ model ReceiptLocation {
   tenantId String @db.Uuid
   siteId String @db.Uuid
   name String @db.VarChar(100)
+  category String? @db.VarChar(32)
+  isActive Boolean @default(true)
+  version Int @default(1)
+  deletedAt DateTime? @db.Timestamptz(3)
+  revisions ReceiptLocationRevision[]
   @@index([tenantId, siteId])
 }
 model ReceiptDraft {
@@ -191,4 +228,21 @@ model ReceiptObservationOperation {
   snapshot Json
   recordedAt DateTime @db.Timestamptz(3)
   @@id([tenantId, siteId, actorId, operationId])
+}
+
+model ReceiptLocationRevision {
+  id String @id @db.Uuid
+  locationId String @db.Uuid
+  location ReceiptLocation @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  tenantId String @db.Uuid
+  siteId String @db.Uuid
+  version Int
+  actorId String @db.Uuid
+  sessionId String @db.Uuid
+  correlationId String @db.Uuid
+  recordedAt DateTime @db.Timestamptz(3)
+  before Json?
+  snapshot Json
+  @@unique([locationId, version])
+  @@index([tenantId, siteId, locationId], map: "ReceiptLocationRevision_scope_idx")
 }

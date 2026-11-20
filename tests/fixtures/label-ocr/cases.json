@@ -1,0 +1,54 @@
+[
+  {
+    "id": "dlc",
+    "lines": [
+      "ETIQUETTE SYNTHETIQUE",
+      "LOT: 001AB23",
+      "DLC: 31/12/2028"
+    ],
+    "batch": "001AB23",
+    "expiry": "2028-12-31",
+    "expiryKind": "use_by"
+  },
+  {
+    "id": "ddm",
+    "lines": [
+      "ETIQUETTE SYNTHETIQUE",
+      "LOT: B456",
+      "DDM: 30/06/2029"
+    ],
+    "batch": "B456",
+    "expiry": "2029-06-30",
+    "expiryKind": "best_before"
+  },
+  {
+    "id": "invalid-date",
+    "lines": [
+      "ETIQUETTE SYNTHETIQUE",
+      "LOT: C789",
+      "DLC: 31/04/2028"
+    ],
+    "batch": "C789",
+    "expiry": null,
+    "expiryKind": null
+  },
+  {
+    "id": "conflicting",
+    "lines": [
+      "LOT: A123",
+      "LOT: B456",
+      "DLC: 31/12/2028",
+      "DLC: 01/01/2029"
+    ],
+    "batch": null,
+    "expiry": null,
+    "expiryKind": null
+  },
+  {
+    "id": "blank",
+    "lines": [],
+    "batch": null,
+    "expiry": null,
+    "expiryKind": null
+  }
+]

@@ -55,3 +55,7 @@ Six adapter test groups use controlled fetch responses to exercise states, publi
 ### Product card update
 
 The lookup now requests the public front thumbnail and displays it with Open Food Facts contributor attribution and CC BY-SA 3.0 link. Only HTTPS images.openfoodfacts.org product-image paths are accepted; no credentials or referrer are sent. Images load directly from the public host, are not persisted, and missing/failed photos show a placeholder. Declared allergen tags are highlighted with French labels; missing declarations remain unknown. The previous browser no-external-request evidence applies to fixture mode (which has no photo), not live thumbnail loads.
+
+## Reference photos in receiving (2026-11-14)
+
+Catalogue lookup candidates expose optional `imageUrl`. Receiving prefers a scoped catalogue reference image, then the front image already present in the same Open Food Facts lookup response. It performs no second lookup. Reference photos remain distinct from private batch evidence and OCR uploads. Public image URLs are validated; images use no-referrer direct loading and the shared design-system placeholder on missing/failed images. Scanner request generations and cancellation prevent late responses replacing a newer selection, while manual entry remains available.

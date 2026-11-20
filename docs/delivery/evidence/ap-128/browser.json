@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "real browser OCR produces proposals; only explicit reviewed fields change the draft",
+    "save/reopen preserves reviewed fields and source image provenance",
+    "new extraction does not silently overwrite a manually entered value; manual edits clear current OCR association",
+    "cancelling an in-flight local worker preserves entered values and manual fallback",
+    "failed private-photo retrieval does not manufacture an extraction or change stored photo availability",
+    "unreadable originals remain available with manual entry, without false extraction",
+    "receiving form reflows at all five target widths"
+  ],
+  "externalRequests": [],
+  "pageErrors": []
+}

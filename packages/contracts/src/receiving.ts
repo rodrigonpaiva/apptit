@@ -1,6 +1,8 @@
 import type { ActorSnapshot, ApplicationError, Datum, Decimal, Expiry, Instant, Quantity, Scope } from './quantity-draft.js';
 
 /** SP2-01 receiving types; SP2-03 adds draft-only persistence. Stock/evidence ports remain future contracts. */
+/** New linked lines use persistent IDs. Legacy v1 snapshots may contain opaque aliases;
+ * their server-validated catalogueReference is the canonical identity when explicitly associated. */
 export interface ReceiptProductIdentity {
   productId: string;
   presentationId: string;

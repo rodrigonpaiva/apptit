@@ -2,7 +2,7 @@ import type { CataloguePage, SiteAccess } from '@apptit/contracts';
 export async function readCatalogue(site: SiteAccess, signal: AbortSignal): Promise<CataloguePage> {
   const response = await fetch('/api/graphql', { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal,
     headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-      query: 'query Catalogue($input: SiteScopeInput!) { catalogue(input: $input) { items { id name presentation barcode } hasMore } }',
+      query: 'query Catalogue($input: SiteScopeInput!) { catalogue(input: $input) { items { id name presentation barcode reference { productId presentationId presentationVersion } reviewState } hasMore } }',
       variables: { input: { tenantId: site.tenantId, siteId: site.siteId } },
     }) });
   if (!response.ok) throw new Error('UNAVAILABLE');

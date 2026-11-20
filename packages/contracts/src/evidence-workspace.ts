@@ -9,4 +9,4 @@ export interface EvidenceView {
   readability: { state: 'unreviewed' | 'readable' | 'unreadable'; reviewedBy?: ActorSnapshot; reviewedAt?: Instant };
   extraction: { state: 'disabled' };
 }
-export interface EvidenceListing { mode: 'disabled' | 'fixture'; maxBytes: number; mediaTypes: string[]; items: EvidenceView[] }
+export interface EvidenceListing { localLabelOcr?: boolean; mode: 'disabled' | 'fixture'; maxBytes: number; mediaTypes: string[]; items: EvidenceView[] }

@@ -40,6 +40,8 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+      - name: Check delivery traceability without local planning files
+        run: node scripts/delivery-status.mjs --check
       - run: node scripts/setup-env.mjs
       - run: npm ci
       - run: npm run check

@@ -15,7 +15,8 @@ export default tseslint.config(
         depConstraints: [
           { sourceTag: 'scope:shared', onlyDependOnLibsWithTags: ['scope:shared'] },
           ...['gateway', 'identity', 'kitchen'].map(scope => ({ sourceTag: `scope:${scope}`, onlyDependOnLibsWithTags: ['scope:shared'] })),
-          { sourceTag: 'scope:web', onlyDependOnLibsWithTags: ['type:contracts'] },
+          { sourceTag: 'scope:web', onlyDependOnLibsWithTags: ['type:contracts', 'type:ui'] },
+          { sourceTag: 'scope:ui', onlyDependOnLibsWithTags: ['scope:ui'] },
         ],
       }],
       '@typescript-eslint/consistent-type-imports': 'error',

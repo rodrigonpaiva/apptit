@@ -15,6 +15,7 @@ COPY services/kitchen/package.json services/kitchen/package.json
 COPY packages/contracts/package.json packages/contracts/package.json
 COPY packages/domain-values/package.json packages/domain-values/package.json
 COPY packages/runtime/package.json packages/runtime/package.json
+COPY packages/ui/package.json packages/ui/package.json
 RUN npm ci
 
 FROM dependencies AS source

@@ -63,6 +63,10 @@ npm run smoke
 
 [Local setup, commands and troubleshooting](docs/development/local-development.md) covers configuration changes, standalone runtimes and intentional synthetic reset. No real restaurant approval, production deployment, stock availability or live recovery guarantee is claimed.
 
+## Shared interface
+
+The web application consumes the private [@apptit/ui package](packages/ui/README.md), with owned shadcn/Radix controls, Tailwind tokens and Lucide icons. [ADR 0007](docs/architecture/adr/0007-shared-ui.md) defines dependency boundaries and incremental migration. Business rules and transport remain in the application and domain packages.
+
 ## Architecture
 
 - [Setup, commands and troubleshooting](docs/development/local-development.md)

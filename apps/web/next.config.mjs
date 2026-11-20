@@ -4,6 +4,7 @@ const gatewayPort = process.env.GATEWAY_PORT ?? '4000';
 if (!/^\d+$/.test(gatewayPort) || Number(gatewayPort) < 1 || Number(gatewayPort) > 65535) throw new Error('Invalid GATEWAY_PORT');
 export default {
   poweredByHeader: false,
+  transpilePackages: ['@apptit/ui'],
   output: 'standalone',
   outputFileTracingRoot: resolve(import.meta.dirname, '../..'),
   outputFileTracingIncludes: { '/api/label-ocr/*': ['../../node_modules/tesseract.js/dist/worker.min.js', '../../node_modules/tesseract.js-core/tesseract-core*.wasm*', '../../node_modules/@tesseract.js-data/fra/4.0.0/fra.traineddata.gz'], '/api/scanner': ['../../node_modules/zxing-wasm/dist/reader/zxing_reader.wasm'] },

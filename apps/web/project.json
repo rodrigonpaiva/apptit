@@ -20,6 +20,7 @@
       "cache": true,
       "inputs": [
         "default",
+        "^default",
         {
           "env": "GATEWAY_PORT"
         }
@@ -30,7 +31,11 @@
       "options": {
         "command": "next typegen && tsc --noEmit",
         "cwd": "apps/web"
-      }
+      },
+      "inputs": [
+        "default",
+        "^default"
+      ]
     },
     "lint": {
       "executor": "nx:run-commands",

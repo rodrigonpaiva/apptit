@@ -30,6 +30,10 @@ The receiving baseline reached dev at `0d67259b233ebec8f27b4aa8901c0d9148434857`
 
 Publication does not upgrade an existing local profile or restart containers. Alpha.2 tags/evidence remain historical and unchanged. Documentation promotion does not rebuild or retag these images.
 
+## Shared UI maintenance after this checkpoint
+
+The [shared UI delivery](../delivery/UI-MIGRATION.md) introduces @apptit/ui, shadcn/Radix controls, Tailwind tokens, storage/receiving migration and scoped success notifications. This is presentation maintenance with separate evidence; the historical sprint acceptance, release tag and AP parent statuses above remain unchanged.
+
 ## Next implementation: SP3-01
 
 Start `feature/sp3-01-stock-ledger` from current dev after its exact-head CI passes. Refine and implement transactional batch entries and balance readers, durable operation outcomes, identical-command replay, payload mismatch rejection and concurrent availability protection. Preserve site/location/product/presentation/batch/unit/basis/reason/actor attribution. Verify rollback, uncertain outcomes and contention before connecting receipt confirmation in SP3-02.

@@ -23,3 +23,11 @@ Critical failures, uncertain saves and pending controls remain visible inline. A
 Components are copied from the official shadcn registry, not a binary theme dependency. Preserve upstream MIT attribution and record source/adaptations in the package README. Use explicit dependency versions and lockfile. Review generated changes, imports, client boundaries, defaults and updates; do not run init over existing configuration blindly.
 
 Deliver in three PRs: foundation; storage-management pilot and form integration; receiving migration and confirmed-success notifications. Run appropriate checks, real PostgreSQL integration and HTTP smoke, plus meaningful browser regressions. Keep historical Sprint 2 acceptance intact. This UI work does not implement SP3-01, activate stock, publish a release or change business acceptance.
+
+## Implemented consumer refinements
+
+The storage pilot uses React Hook Form with field-associated French errors and a Radix AlertDialog. The receiving editor, evidence controls, observation form and OCR review use the same primitive package while retaining their original transport/domain logic. Native file inputs, checkboxes and selects retain their platform semantics. Quantity mode/unit/date-kind selectors have explicit IDs and labels. Long button labels wrap within the viewport.
+
+Sonner notifications are exposed through a generic provider and success callback rather than a global app-wide API. The application mounts it inside the keyed authenticated actor/site subtree; each mount gets a distinct toaster ID. Disposal dismisses only owned notifications and disables retained callbacks. Success follows confirmed server results; enduring pending/error status remains inline. No actor/site contracts or HTTP imports are added to UI.
+
+The source package uses explicit TypeScript relative imports; UI verification builds rewrite extensions, and the no-emit web compiler accepts source extensions. Web build/typecheck hash dependency sources in Nx. Frontend compilation processes shared CSS; Tailwind Preflight stays disabled during the incremental migration. See [delivery evidence](../../delivery/UI-MIGRATION.md).

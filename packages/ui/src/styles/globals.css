@@ -50,6 +50,7 @@
   --radius-lg: calc(var(--radius) + 0.25rem);
 }
 @layer components {
+  .apptit-notification-host > section { padding: 0; margin: 0; max-width: none; }
   /* Scoped reset only for owned controls; no global Tailwind Preflight. */
   .apptit-ui { border: 0 solid var(--border); font-family: inherit; }
   button.apptit-ui { cursor: pointer; }

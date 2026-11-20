@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "transport": "in-memory synthetic fixture; real production Next application",
+  "checks": [
+    "required fields show associated errors without sending a command",
+    "save disables the form while pending and resets only after confirmed response",
+    "conflict preserves typed values, blocks resubmit and reload restores server version",
+    "destructive dialog focuses cancel, traps keyboard focus, closes on Escape and restores trigger",
+    "production CSS keeps storage and modal within phone/tablet/desktop viewports",
+    "confirmed removal updates the list and leaves an enduring status message",
+    "access lock unmounts private form and portal content",
+    "shared receiving controls preserve explicit pack conversion and responsive layout",
+    "unconfirmed receipt response shows no success; retry preserves exact command and confirmed success notification",
+    "private notification provider clears on lock and cannot replay previous context success"
+  ],
+  "widths": [
+    320,
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "pageErrors": []
+}

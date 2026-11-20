@@ -32,6 +32,8 @@ Executed locally: npm run check passed 88 tests with zero skipped plus schema/li
 
 [Combined browser report](evidence/ui-receiving/browser.json), [phone](evidence/ui-receiving/receiving-320.png), [desktop](evidence/ui-receiving/receiving-1440.png); screenshots inspected. The browser suite is part of foundation CI. [Storage PR #37](https://github.com/rodrigonpaiva/apptit/pull/37) passed [foundation and UI CI](https://github.com/rodrigonpaiva/apptit/actions/runs/44756883443) and [real-container regression](https://github.com/rodrigonpaiva/apptit/actions/runs/44756883430) before integration. This receiving branch requires its own checks; prior results are not reused as proof of the new runtime.
 
+The initial receiving container run exposed an immediate focus assertion after cancelling the Radix dialog. The regression now waits for the same required trigger-focus predicate with the existing bounded browser deadline, matching asynchronous focus restoration; there is no fixed sleep or omitted assertion. The isolated UI suite checks cancellation focus at every viewport in addition to Escape. The updated source must pass both suites before merge.
+
 ## Maintenance and remaining scope
 
 Use the package guide and ADR when adding components. Generic presentation belongs in @apptit/ui; feature composition, French copy, forms and transports belong in apps/web; domain authority remains in the existing contract/domain/service layers. Web Nx builds/types include UI source inputs, and backend/UI dependency prohibitions remain active.

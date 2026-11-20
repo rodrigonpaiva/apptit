@@ -286,6 +286,7 @@ try {
     assert.ok(box.x >= 0 && box.x + box.width <= width + 1);
     await page.screenshot({ path: `${directory}/storage-dialog-${width}.png`, fullPage: false });
     await cancel.click();
+    await page.waitForFunction(element => element === globalThis.document.activeElement, await remove.elementHandle());
     report.widths.push(width);
   }
   check('production CSS keeps storage and modal within phone/tablet/desktop viewports');

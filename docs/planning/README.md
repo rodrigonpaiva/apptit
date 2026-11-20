@@ -1,6 +1,6 @@
 # Execution tracking and maintenance
 
-[Current delivery matrix](DELIVERY-STATUS.md) · [Machine-readable register](delivery-status.json)
+[Current sprint/release checkpoint](CURRENT-CHECKPOINT.md) · [Delivery matrix](DELIVERY-STATUS.md) · [Machine-readable register](delivery-status.json)
 
 This versioned register reconciles execution against the original local specification v0.80, backlog v1.0 (AP-001–AP-173) and first-four-sprints v1.0. It is the execution index, not a second specification or a replacement backlog. The original planning files remain local and are not added to Git by this task. Their recorded fingerprints identify the reviewed baseline.
 
@@ -21,9 +21,11 @@ The assessed application dev baseline is `6a07dd45f48e168980688a00f895799742e3b0
 - Sprint 1 and Sprint 2 technical acceptances cover their bounded synthetic increments. They do not prove whole-parent completion, independent review or live restaurant readiness. Their original test counts and source SHAs stay historical.
 - OCR PR #26, reference photos/destinations PR #27 and logical location removal/layout PR #28 are integrated after the Sprint 2 release. Their own CI/evidence covers those extensions.
 - Persistent product/presentation identity, explicit legacy association and unreviewed manual reference resolution were integrated in PR #30. This correction enables no stock operation and does not complete full master curation.
-- Published `v0.1.0-alpha.2` is still pinned to `4c84d4663a172b7849ed222aea5e19652d1f23e0`; it does not include the OCR/photo/storage or persistent-identity extensions. Both existing packages were retained publicly by explicit owner decision; see the [recorded retention decision](../evidence/ghcr/alpha2-recovery-attempt/README.md). This is not a new publication authorization. Alpha.1's historical missing-container-source limitation remains.
+- Historical release `v0.1.0-alpha.2` remains pinned to `4c84d4663a172b7849ed222aea5e19652d1f23e0`; it does not include the OCR/photo/storage or persistent-identity extensions. Both existing packages were retained publicly by explicit owner decision; see the [recorded retention decision](../evidence/ghcr/alpha2-recovery-attempt/README.md). This is not a new publication authorization. Alpha.1's historical missing-container-source limitation remains.
 - Local preview metadata last records clean ARM64 images at `c09864ad8651679620367be53d9634ad1399d9ef`, the feature source merged by PR #28. Image IDs/profile metadata are not a running-service check or GHCR manifest proof. On the 2026-11-19 read-only inspection, the Docker daemon was unreachable and port 3000 returned no HTTP response; nothing was started.
 - Historical disk/Docker blockers in AP-128 describe its original execution. Current availability must be checked independently; an old failure is neither a permanent implementation blocker nor a current pass.
+
+Alpha.3 was published on 2026-11-20 with the receiving extensions and persistent identity correction. Its source, CI and container publication evidence are recorded in the [current checkpoint](CURRENT-CHECKPOINT.md). The dated execution snapshot and older release evidence above remain unchanged.
 
 ## Next work and open boundaries
 

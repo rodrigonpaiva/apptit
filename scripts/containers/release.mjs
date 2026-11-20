@@ -1,3 +1,4 @@
+import { alpha3Acceptance, approvedAlpha3Publication } from './alpha3-policy.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
@@ -41,6 +42,13 @@ export async function verifySource(source, metadata, execute = run) {
     const acceptance = JSON.parse(await fs.readFile(path.join(source, 'docs/delivery/sprint-2-acceptance.json'), 'utf8')); sprint2Policy(acceptance);
     if (!(await fs.lstat(path.join(source, acceptance.evidence))).isFile()) throw new Error('Sprint 2 acceptance evidence is absent');
     await execute('git', ['merge-base', '--is-ancestor', acceptance.validatedSourceCommit, metadata.revision], { cwd: source });
+    if (metadata.tag === 'v0.1.0-alpha.3') {
+      const extensionAcceptance = JSON.parse(await fs.readFile(path.join(source, 'docs/delivery/release-alpha3-acceptance.json'), 'utf8')); alpha3Acceptance(extensionAcceptance);
+      if (!(await fs.lstat(path.join(source, extensionAcceptance.evidence))).isFile()) throw new Error('alpha.3 acceptance evidence is absent');
+      await execute('git', ['merge-base', '--is-ancestor', extensionAcceptance.validatedSourceCommit, metadata.revision], { cwd: source });
+      await execute('git', ['diff', '--exit-code', extensionAcceptance.validatedSourceCommit, metadata.revision, '--', 'apps', 'services', 'packages', 'containers', 'infra', 'package.json', 'package-lock.json', '.npmrc', '.node-version', '.dockerignore', 'nx.json', 'tsconfig.json', 'tsconfig.base.json', 'scripts', ':(exclude)scripts/containers/release.mjs', ':(exclude)scripts/containers/alpha3-policy.mjs'], { cwd: source });
+      return extensionAcceptance;
+    }
     await execute('git', ['diff', '--exit-code', acceptance.validatedSourceCommit, metadata.revision, '--', 'apps', 'services', 'packages'], { cwd: source });
   }
 }
@@ -48,7 +56,7 @@ export function validatedPair(metadata, build, validation) {
   if (build.status !== 'built' || build.sourceDirty || build.version !== metadata.tag || build.revision !== metadata.revision || build.repository !== metadata.repository || validation.passed !== true) throw new Error('Both exact-tag images must build and pass validation before any push');
   for (const kind of ['api', 'web']) if (!build.images[kind]?.imageId || validation.images?.[kind]?.imageId !== build.images[kind].imageId) throw new Error(`Untested ${kind} image`);
 }
-export async function privatePackages(metadata, request = github, inspectRegistry, allowPublicRetention) {
+export async function privatePackages(metadata, request = github, inspectRegistry, allowPublicRetention, publicPublication = false) {
   const prefix = metadata.ownerType === 'Organization' ? 'orgs' : 'users'; const result = {};
   for (const kind of ['api', 'web']) {
     const route = `/${prefix}/${metadata.owner}/packages/container/apptit-${kind}`; let pkg, restUnavailable = false;
@@ -69,7 +77,7 @@ export async function privatePackages(metadata, request = github, inspectRegistr
       if ((registry.visibility === 'public' || pkg && pkg.visibility !== 'private') && !approvedPublic) throw new Error(`apptit-${kind} permits anonymous reads; no images were pushed`);
       if (result[kind].existingDigest && registry.existingDigest !== result[kind].existingDigest) throw new Error('REST and registry release digests disagree');
       if (registry.exists && !pkg && registry.visibility !== 'private' && !approvedPublic) throw new Error('Private package visibility cannot be established');
-      result[kind] = { ...result[kind], ...registry, exists: Boolean(pkg) || registry.exists, registryManifestExists: registry.exists, visibility: approvedPublic ? 'public' : pkg?.visibility ?? registry.visibility, ...(approvedPublic ? { ownerApprovedPublicRetention: true } : {}) };
+      result[kind] = { ...result[kind], ...registry, exists: Boolean(pkg) || registry.exists, registryManifestExists: registry.exists, visibility: approvedPublic ? 'public' : pkg?.visibility ?? registry.visibility, ...(approvedPublic ? publicPublication ? { ownerApprovedPublicPublication: true } : { ownerApprovedPublicRetention: true } : {}) };
     }
   }
   return result;
@@ -96,7 +104,7 @@ export function approvedPublicRetention(metadata, kind, digest, recovery, image)
   if (approval.tag !== metadata.tag || approval.revision !== metadata.revision || approval.repository !== metadata.repository || approval.digest !== digest || approval.reference !== `ghcr.io/${metadata.owner}/apptit-api:${metadata.tag}`) return false;
   return Boolean(recoveryProof(metadata, kind, digest, recovery, image));
 }
-export async function publishPair({ metadata, source, build, validation, reportFile, request = github, execute = run, token = process.env.GITHUB_TOKEN, summary = process.env.GITHUB_STEP_SUMMARY, inspectRegistry, recovery }) {
+export async function publishPair({ metadata, source, build, validation, reportFile, request = github, execute = run, token = process.env.GITHUB_TOKEN, summary = process.env.GITHUB_STEP_SUMMARY, inspectRegistry, recovery, publicApproval }) {
   const report = { tag: metadata.tag, revision: metadata.revision, status: 'preflight', published: {}, publicationPartial: false }; let credentials;
   async function checkpoint() {
     report.publicationPartial = Object.keys(report.published).length === 1 || (Object.keys(report.published).length === 0 && (report.existingPublicationPartial === true || report.priorPublicationPartial === true));
@@ -108,10 +116,13 @@ export async function publishPair({ metadata, source, build, validation, reportF
     if (recovery?.metadata.tag === metadata.tag && recovery.metadata.revision === metadata.revision && recovery.metadata.repository === metadata.repository && recovery.publication.publicationPartial) {
       validatedPair(metadata, recovery.build, recovery.validation); report.priorPublicationPartial = true;
     }
-    await verifySource(source, metadata, execute);
+    const acceptance = await verifySource(source, metadata, execute);
+    const publicPublication = Boolean(inspectRegistry) && approvedAlpha3Publication(metadata, publicApproval, acceptance, build);
+    if (publicPublication) report.ownerApprovedPublicPublication = { tag: metadata.tag, validatedSourceCommit: acceptance.validatedSourceCommit, platform: publicApproval.platform };
     const current = await resolveRelease(metadata.tag, metadata.repository, request); if (current.revision !== metadata.revision) throw new Error('Release tag moved; refusing publication');
-    const allowPublic = (kind, digest) => approvedPublicRetention(metadata, kind, digest, recovery, build.images[kind]);
-    report.packages = await privatePackages(metadata, request, inspectRegistry, allowPublic);
+    const allowPublic = (kind, digest) => publicPublication || approvedPublicRetention(metadata, kind, digest, recovery, build.images[kind]);
+    report.packages = await privatePackages(metadata, request, inspectRegistry, allowPublic, publicPublication);
+    if (publicPublication && Object.values(report.packages).some(pkg => pkg.visibility !== 'public')) throw new Error('Approved alpha.3 publication requires both existing public packages; no images were pushed');
     const existing = Object.values(report.packages).filter(pkg => pkg.existingDigest);
     report.existingPublicationPartial = existing.length === 1;
     for (const kind of ['api', 'web']) {
@@ -137,10 +148,12 @@ export async function publishPair({ metadata, source, build, validation, reportF
       delete report.pushAttempt;
       let pkg; try { pkg = await request(report.packages[kind].route); } catch (error) { if (!inspectRegistry) throw error; }
       const registry = inspectRegistry ? await inspectRegistry(kind) : null;
-      if ((pkg && pkg.visibility !== 'private') || (registry && registry.existingDigest !== digest) || (!pkg && registry?.visibility !== 'private')) throw new Error(`Post-push private visibility/digest not verified for ${kind}`);
-      if (registry?.visibility === 'public') throw new Error(`Post-push anonymous access detected for ${kind}`);
-      report.published[kind].visibility = 'private';
-      report.published[kind].verification = pkg ? 'REST-private' : registry.verification;
+      const expectedVisibility = publicPublication ? 'public' : 'private';
+      if ((pkg && pkg.visibility !== expectedVisibility) || (registry && registry.existingDigest !== digest) || (!pkg && registry?.visibility !== expectedVisibility)) throw new Error(`Post-push ${expectedVisibility} visibility/digest not verified for ${kind}`);
+      if (registry && registry.visibility !== expectedVisibility) throw new Error(`Post-push registry visibility differs for ${kind}`);
+      report.published[kind].visibility = expectedVisibility;
+      if (publicPublication) report.published[kind].ownerApprovedPublicPublication = true;
+      report.published[kind].verification = pkg ? `REST-${expectedVisibility}` : registry.verification;
     }
     if (inspectRegistry) {
       for (const kind of ['api', 'web']) {
@@ -160,7 +173,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     else {
       const metadata = JSON.parse(await fs.readFile(file, 'utf8')); const source = process.env.RELEASE_SOURCE;
       if (mode === 'verify') await verifySource(source, metadata);
-      else if (mode === 'publish') await publishPair({ metadata, source, build: JSON.parse(await fs.readFile(process.env.IMAGE_REPORT, 'utf8')), validation: JSON.parse(await fs.readFile(process.env.VALIDATION_REPORT, 'utf8')), reportFile: process.env.PUBLICATION_REPORT, inspectRegistry: registryInspector(metadata, process.env.GITHUB_TOKEN), recovery: await recordedRecovery() });
+      else if (mode === 'publish') await publishPair({ metadata, source, build: JSON.parse(await fs.readFile(process.env.IMAGE_REPORT, 'utf8')), validation: JSON.parse(await fs.readFile(process.env.VALIDATION_REPORT, 'utf8')), reportFile: process.env.PUBLICATION_REPORT, inspectRegistry: registryInspector(metadata, process.env.GITHUB_TOKEN), recovery: await recordedRecovery(), publicApproval: metadata.tag === 'v0.1.0-alpha.3' ? JSON.parse(await fs.readFile(new URL('../../docs/releases/alpha3-publication-approval.json', import.meta.url), 'utf8')) : undefined });
       else throw new Error('Unknown release operation');
     }
   } catch (error) { console.error(error.message); process.exitCode = 1; }

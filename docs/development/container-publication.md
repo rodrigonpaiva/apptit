@@ -1,5 +1,7 @@
 # Release container publication
 
+The default publication policy remains private; the explicitly authorized alpha.3 public exception is documented at the end of this guide. Historical alpha.2 incidents/retention decisions below do not grant publication rights for other versions.
+
 The release workflow publishes `ghcr.io/rodrigonpaiva/apptit-api:<release-tag>` and `ghcr.io/rodrigonpaiva/apptit-web:<release-tag>`. It runs on `release.published` or manually with the exact tag of an already published release. It never creates a tag/release, moves a tag, adds `latest`, overwrites an existing release tag or treats the current branch as a historical release.
 
 ## Source and validation
@@ -64,7 +66,7 @@ gh workflow run publish-containers.yml --ref main -f release_tag=v0.1.0-alpha.2
 This command is an operational example; it has not been executed for alpha.2. Verify the job artifact, both private package versions and both registry digests before reporting publication complete. Do not dispatch alpha.2 until Sprint 2 acceptance and the corresponding release exist.
 
 
-## Public-package blocker and reviewed alpha.2 recovery
+## Historical public-package blocker and reviewed alpha.2 recovery
 
 A REST metadata 404 does not prove a package is absent or private. The registry inspector uses GITHUB_TOKEN for a bounded GHCR bearer exchange, verifies manifest bytes/digest and checks anonymous access. It checks package existence independently when the requested tag is missing, so an existing public package cannot receive a new release tag unnoticed. An anonymous token alone grants no proof of public access; the manifest/tags read must succeed. Unexpected errors never become private proof. Organization internal visibility cannot be called private without authoritative REST metadata.
 
@@ -86,3 +88,9 @@ gh workflow run publish-containers.yml --ref main -f release_tag=v0.1.0-alpha.2 
 ```
 
 This mode skips builds, startup tests and publication. It verifies the existing digests against each image's original paired build/startup evidence and reads the registry twice. The output explicitly reports historical test provenance and no fresh build/startup execution. A mismatch fails without registry writes. Default release publication retains its private-package requirement; do not rerun an older publication job as a substitute for this read-only mode.
+
+## Explicit alpha.3 public publication
+
+On 2026-11-20 the owner authorized publishing **v0.1.0-alpha.3 publicly in the existing packages**. `docs/releases/alpha3-publication-approval.json` is bounded to that tag, repository, validated application source, both exact package names and Linux/amd64. It does not authorize public uploads for another version, altered runtime source, deletion or tag overwrite. All existing private-default and exact-retention checks remain in force for other contexts.
+
+Alpha.3 has its own `release-alpha3-acceptance.json` and `RELEASE-ALPHA3-ACCEPTANCE.md`, preserving the original Sprint 2 manifest as historical evidence. The publisher verifies both acceptances, validated-source ancestry and no runtime/dependency/container drift. Its exact-tag build and startup validation still precede the first registry write. The public exception requires both existing packages to be positively public before login/push and verifies public manifests and matching digests after each push and at final checkpoint. A partial push requires an explicitly inventoried recovery; the exception never allows overwriting an existing release tag.

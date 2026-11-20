@@ -1,3 +1,6 @@
+@import "@apptit/ui/styles.css";
+@source "./";
+@layer legacy {
 :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #183d30; background: #f8f7f2; }
 * { box-sizing: border-box; }
 body { margin: 0; }
@@ -372,3 +375,5 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-reference { min-width: 0; padding: 14px; margin-bottom: 16px; background: #f3f5ee; border: 1px solid #d8dfce; border-radius: 8px; }
 .receipt-reference select { min-width: 0; max-width: 100%; }
 .receipt-reference button { min-height: 44px; margin-top: 8px; }
+
+}

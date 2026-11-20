@@ -4,7 +4,7 @@ Private presentation package for the Apptit web application. Architecture and mi
 
 ## Consume
 
-Import explicit subpaths, for example `@apptit/ui/components/button` or `@apptit/ui/components/alert-dialog`. The application imports `@apptit/ui/styles.css` once via its root stylesheet and scans its own source with Tailwind. React/React DOM are peers; Next transpiles this source package. Nx builds it for type/declaration verification; consumers use source exports, not the generated dist directory.
+Import explicit subpaths, for example `@apptit/ui/components/button` or `@apptit/ui/components/alert-dialog`. The application imports `@apptit/ui/styles.css` once via its root stylesheet and scans its own source with Tailwind. React/React DOM and Tailwind 4 are declared peers; Next transpiles this source package. Nx builds it for type/declaration verification; consumers use source exports, not the generated dist directory.
 
 Available initial primitives: Button, Input, Label, Textarea, Card, Badge, Alert, Skeleton, Dialog and AlertDialog. Use native selects and checkboxes where their native behavior suits the workflow. DialogContent requires application-supplied `closeLabel`; all business copy belongs to the caller. Use `role="status"` for routine inline feedback and reserve alert semantics for urgent errors.
 
@@ -17,3 +17,9 @@ Run `node scripts/nx.mjs run-many -t lint,typecheck,build --projects=ui,web` fro
 Original source: official `https://ui.shadcn.com/r/styles/new-york/{component}.json`, retrieved 2026-11-20. [MIT license](LICENSE.shadcn.md). Local adaptations: explicit TypeScript imports (rewritten to JavaScript extensions by the verification build), client boundaries for forwardRef components, owned reset marker, 48px touch sizing, visible focus, viewport-safe dialogs, required translated close label, removal of unused animation-plugin classes. Radix owns interaction mechanics; avoid duplicating its focus trap.
 
 Do not import applications, domain/contracts, services, credentials or transport here. Do not add receipt-specific components to this package. Add a shared abstraction when a concrete consumer needs it, and keep its API small.
+
+## Scoped success notifications
+
+`NotificationProvider` and `useNotifications` are exported from `@apptit/ui/components/notifications`. The app supplies translated labels and mounts the provider inside its keyed actor/site view. `success(message, key?)` is for confirmed results; the optional key deduplicates a repeated operation. Each provider has its own Sonner toaster ID, dismisses owned messages when unmounted and ignores callbacks retained after disposal. Keep pending/errors visible inline and leave authentication, authorization and operation verification in the app. Do not export or call an unscoped global toast API from feature screens.
+
+The storage form uses React Hook Form in the application. Receiving keeps its existing controlled editor and exact decimal parsers. Shared UI primitives do not coerce domain quantities or own form business rules.

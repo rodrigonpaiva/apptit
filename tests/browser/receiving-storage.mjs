@@ -65,7 +65,7 @@ try {
  await page.getByRole('link', { name: 'Lieux de stockage', exact: true }).click();
  for (const width of [320,375,768,1024,1440]) { await page.setViewportSize({ width, height: 1050 }); assert.ok(await page.evaluate(() => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1)); }
  await page.screenshot({ path: directory + '/storage-populated.png', fullPage: true });
- const remove = page.getByRole('button', { name: 'Supprimer ' + room.name, exact: true }); await remove.click(); await page.getByRole('button', { name: 'Conserver ce lieu', exact: true }).click(); assert.equal(await remove.evaluate(element => element === globalThis.document.activeElement), true);
+ const remove = page.getByRole('button', { name: 'Supprimer ' + room.name, exact: true }); await remove.click(); await page.getByRole('button', { name: 'Conserver ce lieu', exact: true }).click(); await page.waitForFunction(element => element === globalThis.document.activeElement, await remove.elementHandle());
  await remove.click(); await page.getByRole('button', { name: 'Confirmer la suppression', exact: true }).click(); await page.getByText('Lieu supprimé. L’historique des réceptions est conservé.', { exact: true }).waitFor(); assert.equal(await remove.count(), 0);
  assert.equal((await post('/api/storage-locations/list', { scope })).body.some(row => row.id === room.id), false);
  await receiving(); await page.getByRole('button', { name: new RegExp('Recharger ' + command.command.receiptId.slice(0,8)) }).click(); await page.getByText(/Brouillon rechargé/).waitFor(); assert.equal(await destination.inputValue(), room.id);

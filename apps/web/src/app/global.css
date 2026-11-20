@@ -297,7 +297,7 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-line-heading, .receipt-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .receipt-quantity { margin-top: 18px; padding-top: 18px; border-top: 1px solid #e5e8dd; }
 .receipt-conversion { background: #edf2e7; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.7; }
-.receipt-message, .receipt-candidate { padding: 14px 18px; border: 1px solid #d8dfce; background: #f3f5ea; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 16px 0; }
+.receipt-candidate { padding: 14px 18px; border: 1px solid #d8dfce; background: #f3f5ea; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 16px 0; }
 .receipt-empty { padding: 25px; border: 1px dashed #cbd5c5; color: #637268; font-size: 13px; }
 .receipt-saved { border-top: 1px solid #d8dfce; margin-top: 26px; padding-top: 20px; }
 .receipt-saved h3 { font-size: 18px; font-weight: 500; }
@@ -368,5 +368,8 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-reference { min-width: 0; padding: 14px; margin-bottom: 16px; background: #f3f5ee; border: 1px solid #d8dfce; border-radius: 8px; }
 .receipt-reference select { min-width: 0; max-width: 100%; }
 .receipt-reference button { min-height: 44px; margin-top: 8px; }
+
+/* Nested receiving panels must not inherit public-page section spacing. */
+.receiving .receipt-evidence, .receiving .receipt-observations, .receiving .receipt-saved { padding-block: 20px; margin-block: 20px; max-width: none; }
 
 }

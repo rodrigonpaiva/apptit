@@ -9,7 +9,8 @@
   "exports": {
     "./components/*": "./src/components/*.tsx",
     "./lib/utils": "./src/lib/utils.ts",
-    "./styles.css": "./src/styles/globals.css"
+    "./styles.css": "./src/styles/globals.css",
+    "./icons": "./src/icons.ts"
   },
   "peerDependencies": {
     "react": "^19.0.0",

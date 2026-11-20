@@ -4,6 +4,8 @@ B2B foodservice planning, execution and inventory platform, currently implemente
 
 The integrated `dev` baseline supports individual scoped access, a private reference catalogue and traceable receiving drafts: product lookup/scanning, quantity/batch/date entry, private label photos, synthetic procedure-bound observations and committed-save recovery. Post-Sprint-2 extensions add opt-in local OCR with explicit human review, catalogue/OFF reference photos, persistent server-validated product/presentation identities, and chef-managed physical storage destinations with historical retention. Saving or reviewing a draft creates no stock. Offline capture and live operational deployment remain disabled.
 
+See the [current sprint and release checkpoint](docs/planning/CURRENT-CHECKPOINT.md) for the completed Sprint 2, published alpha.3 and next SP3-01 boundary.
+
 Start with the [current execution matrix](docs/planning/DELIVERY-STATUS.md) for SP/AP coverage, integration links, partial parent criteria and the next planned package, **SP3-01**. The [Sprint 2 acceptance](docs/delivery/SPRINT-2-ACCEPTANCE.md) is historical evidence for the bounded synthetic release, not evidence that later extensions are present in published alpha.2.
 
 ## Run locally
@@ -114,10 +116,6 @@ Follow the [branch workflow](docs/development/branch-workflow.md); never commit 
 - [Delivery backlog v1.0](plans/backlog/APPTIT_BACKLOG_v1.0_EN.md)
 - [First four sprints](plans/sprints/APPTIT_SPRINTS_01-04_v1.0_EN.md)
 
-- [SP2-03 receipt drafts](docs/delivery/SP2-03.md)
-- [SP2-04 private label evidence](docs/delivery/SP2-04.md)
-
-- [SP2-05 procedure-bound receiving observations](docs/delivery/SP2-05.md)
 
 ### Run the published alpha.2 containers
 

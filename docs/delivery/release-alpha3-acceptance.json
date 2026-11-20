@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v0.1.0-alpha.3",
+  "status": "passed",
+  "scope": "synthetic-receiving",
+  "stockEnabled": false,
+  "validatedSourceCommit": "1b8f600644d7636a31fdbdc1f48b538de881fb37",
+  "baseAcceptance": "docs/delivery/sprint-2-acceptance.json",
+  "evidence": "docs/delivery/RELEASE-ALPHA3-ACCEPTANCE.md",
+  "extensions": [
+    "EXT-LOCAL-COMPOSE",
+    "EXT-OFF-LIVE",
+    "EXT-LABEL-OCR",
+    "EXT-RECEIVING-PHOTOS-STORAGE",
+    "EXT-STORAGE-DELETE-LAYOUT",
+    "EXT-PERSISTENT-PRODUCT-IDENTITY"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "tag": "v0.1.0-alpha.3",
+  "action": "publish-new-public-images",
+  "repository": "rodrigonpaiva/apptit",
+  "visibility": "public",
+  "platform": "linux/amd64",
+  "validatedSourceCommit": "1b8f600644d7636a31fdbdc1f48b538de881fb37",
+  "packages": [
+    "ghcr.io/rodrigonpaiva/apptit-api",
+    "ghcr.io/rodrigonpaiva/apptit-web"
+  ],
+  "approvedAtDate": "2026-11-20",
+  "authorization": "Owner explicitly authorized publishing alpha.3 publicly in the same apptit-api and apptit-web packages. This does not authorize tag overwrite, deletion, changed application source or another release."
+}

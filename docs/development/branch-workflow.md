@@ -1,6 +1,6 @@
 # Branch workflow
 
-Date: 2026-11-04. Direction: isolated feature work → integration/testing on `dev` → stable `main`.
+Updated: 2026-11-20 (Europe/Paris). Direction: isolated feature work → integration/testing on `dev` → stable `main`.
 
 | Branch | Purpose | Entry |
 | --- | --- | --- |
@@ -8,7 +8,7 @@ Date: 2026-11-04. Direction: isolated feature work → integration/testing on `d
 | `dev` | Integration and complete test execution | PR from `feature/*`, `fix/*`, `chore/*`, `docs/*` or `deps/*` |
 | Topic branches | One feature, fix or bounded maintenance change | Start from current `origin/dev` |
 
-Branch names use lowercase letters, numbers, dots and hyphens after one type prefix. Current Sprint 1 verification uses `feature/sp1-06-foundation-verification`. After its integration, the next package can start as `feature/sp2-01-receiving-contracts`.
+Branch names use lowercase letters, numbers, dots and hyphens after one type prefix. Sprint 1 and Sprint 2 are integrated in their bounded synthetic scope. The next planned implementation is `feature/sp3-01-stock-ledger`; see the [execution matrix](../planning/DELIVERY-STATUS.md). Documentation maintenance uses `docs/<topic>` and follows the same PR route.
 
 ## Day-to-day sequence
 
@@ -16,7 +16,7 @@ Branch names use lowercase letters, numbers, dots and hyphens after one type pre
 git fetch origin
 git switch dev
 git pull --ff-only
-git switch -c feature/sp2-01-receiving-contracts
+git switch -c feature/sp3-01-stock-ledger
 npm run git:setup
 ```
 
@@ -45,4 +45,4 @@ The repository has one human maintainer, so no additional approval is mandatory 
 
 Before the owner's visibility change, GitHub returned 403 for rulesets/branch protection on this private repository's plan. That limitation was observed on 2026-11-04 and 2026-11-05; it is historical, not the current public-repository state. No subscription was purchased by the assistant. Existing delivery records describing that prior state remain historical evidence.
 
-The SP1-02 main baseline had a passing [push CI run 41868318492](https://github.com/rodrigonpaiva/apptit/actions/runs/41868318492); enabling rulesets does not change main's code or promote dev. Root AGENTS.md records the current workflow. These local configuration/documentation changes remain on chore/github-branch-rulesets until committed/reviewed.
+The SP1-02 main baseline had a passing [push CI run 41868318492](https://github.com/rodrigonpaiva/apptit/actions/runs/41868318492); enabling rulesets does not change main's code or promote dev. Root AGENTS.md records the current workflow. The ruleset documentation was subsequently integrated through PR #6. This historical baseline is not the current release; see the [release and sprint checkpoint](../planning/CURRENT-CHECKPOINT.md).

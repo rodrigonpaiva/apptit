@@ -1,3 +1,6 @@
+@import "@apptit/ui/styles.css";
+@source "./";
+@layer legacy {
 :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #183d30; background: #f8f7f2; }
 * { box-sizing: border-box; }
 body { margin: 0; }
@@ -294,7 +297,7 @@ button:disabled { opacity: .6; cursor: wait; }
 .receipt-line-heading, .receipt-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .receipt-quantity { margin-top: 18px; padding-top: 18px; border-top: 1px solid #e5e8dd; }
 .receipt-conversion { background: #edf2e7; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.7; }
-.receipt-message, .receipt-candidate { padding: 14px 18px; border: 1px solid #d8dfce; background: #f3f5ea; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 16px 0; }
+.receipt-candidate { padding: 14px 18px; border: 1px solid #d8dfce; background: #f3f5ea; border-radius: 8px; font-size: 13px; line-height: 1.7; margin: 16px 0; }
 .receipt-empty { padding: 25px; border: 1px dashed #cbd5c5; color: #637268; font-size: 13px; }
 .receipt-saved { border-top: 1px solid #d8dfce; margin-top: 26px; padding-top: 20px; }
 .receipt-saved h3 { font-size: 18px; font-weight: 500; }
@@ -340,7 +343,7 @@ button:disabled { opacity: .6; cursor: wait; }
 .storage-stats dd { margin: 10px 0 0; font-size: 30px; font-weight: 600; }
 .storage-stats dd span { font-size: 16px; color: #637268; font-weight: 400; }
 .storage-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: 28px; align-items: start; }
-.storage-editor { background: #fffefa; border: 1px solid #dedfd5; border-radius: 16px; padding: 24px; min-width: 0; }
+.storage-editor { min-width: 0; }
 .storage-configuration fieldset { min-width: 0; border: 0; padding: 0; margin: 0; display: grid; gap: 12px; }
 .storage-configuration legend { padding: 0 0 22px; font-size: 21px; font-weight: 600; }
 .storage-configuration input, .storage-configuration select { min-width: 0; max-width: 100%; font-size: 16px; }
@@ -357,18 +360,16 @@ button:disabled { opacity: .6; cursor: wait; }
 .storage-location-card { padding: 16px; border: 1px solid #dedfd5; background: #fffefa; border-radius: 12px; overflow-wrap: anywhere; }
 .storage-location-name { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .storage-location-name strong { font-size: 16px; }
-.storage-status { display: inline-flex; border: 1px solid #c2d2be; border-radius: 20px; padding: 4px 9px; background: #edf2e7; font-size: 11px; }
-.storage-status-inactive { color: #637268; border-color: #dedfd5; background: #f5f5f1; }
 .storage-row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .storage-row-actions button { min-height: 44px; font-size: 13px; padding: 10px 14px; }
-.storage-delete { background: #fff7f4; color: #8a3025; border: 1px solid #debdb5; }
-.storage-confirm { border-top: 1px solid #debdb5; margin-top: 16px; padding-top: 16px; }
-.storage-confirm h4 { margin: 0; font-size: 16px; }
-.storage-confirm p { font-size: 13px; line-height: 1.6; margin: 8px 0; }
-.storage-empty { padding: 32px 20px; border: 1px dashed #cbd5c5; border-radius: 12px; margin-top: 20px; line-height: 1.6; }
 @media (max-width: 1100px) { .storage-layout { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 600px) { .storage-configuration { padding: 24px 0; } .storage-stats { gap: 8px; } .storage-stats > div { padding: 12px; } .storage-stats dt { font-size: 11px; } .storage-stats dd { font-size: 24px; } .storage-editor { padding: 18px; } .storage-row-actions button { flex: 1 1 auto; } }
+@media (max-width: 600px) { .storage-configuration { padding: 24px 0; } .storage-stats { gap: 8px; } .storage-stats > div { padding: 12px; } .storage-stats dt { font-size: 11px; } .storage-stats dd { font-size: 24px; } .storage-row-actions button { flex: 1 1 auto; } }
 
 .receipt-reference { min-width: 0; padding: 14px; margin-bottom: 16px; background: #f3f5ee; border: 1px solid #d8dfce; border-radius: 8px; }
 .receipt-reference select { min-width: 0; max-width: 100%; }
 .receipt-reference button { min-height: 44px; margin-top: 8px; }
+
+/* Nested receiving panels must not inherit public-page section spacing. */
+.receiving .receipt-evidence, .receiving .receipt-observations, .receiving .receipt-saved { padding-block: 20px; margin-block: 20px; max-width: none; }
+
+}

@@ -8,6 +8,7 @@ These engineering decisions select the local synthetic implementation baseline. 
 
 | ADR | Decision | Status / scope |
 | --- | --- | --- |
+| [0007](adr/0007-shared-ui.md) | Shared shadcn/Radix web UI, Tailwind tokens and enforced Nx boundaries | Incremental UI migration |
 | [0001](adr/0001-topology-and-workspace.md) | Capability-grouped microservices, Nx/npm, responsive web | Selected for first slice |
 | [0002](adr/0002-data-and-transactions.md) | PostgreSQL authority, Prisma isolation, atomic ledger and outbox | Selected; persistence implemented later |
 | [0003](adr/0003-identity-and-offline.md) | Opaque revocable sessions, site capabilities, isolated draft ownership | Selected online contract; offline capture disabled initially |

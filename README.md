@@ -65,7 +65,7 @@ npm run smoke
 
 ## Shared interface
 
-The web application consumes the private [@apptit/ui package](packages/ui/README.md), with owned shadcn/Radix controls, Tailwind tokens and Lucide icons. [ADR 0007](docs/architecture/adr/0007-shared-ui.md) defines dependency boundaries and incremental migration. [Migration evidence](docs/delivery/UI-MIGRATION.md) records the storage/receiving migration, scoped notifications and browser checks. Business rules and transport remain in the application and domain packages.
+The web application consumes the private [@apptit/ui package](packages/ui/README.md), with owned shadcn/Radix controls, Tailwind tokens and Lucide icons. [ADR 0007](docs/architecture/adr/0007-shared-ui.md) defines dependency boundaries and incremental migration. [Migration evidence](docs/delivery/UI-MIGRATION.md) records the storage/receiving migration, scoped notifications and browser checks. The [catalogue, navigation and login follow-up](docs/delivery/UI-CATALOGUE-NAVIGATION-LOGIN.md) extends those controls across the workspace. Business rules and transport remain in the application and domain packages.
 
 ## Architecture
 

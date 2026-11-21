@@ -27,10 +27,17 @@ const site = {
     'storage.location.manage',
   ],
 };
+const secondSite = {
+  ...site,
+  siteId: '66666666-6666-4666-8666-666666666666',
+  name: 'Restaurant B UI synthétique',
+  role: 'cook',
+  capabilities: ['site.read', 'catalogue.read'],
+};
 const profile = {
   user: { id: '33333333-3333-4333-8333-333333333333', login: 'ui@apptit.test', name: 'Chef UI' },
   selectedSite: site,
-  sites: [site],
+  sites: [site, secondSite],
   expiresAt: '2099-01-01T00:00:00Z',
 };
 const reference = {
@@ -40,6 +47,15 @@ const reference = {
 };
 const receiptAttempts = [],
   recorded = new Map();
+let catalogueRows = [],
+  catalogueFailure = false,
+  catalogueGate,
+  catalogueHasMore = false;
+let loginFails = false,
+  logoutFails = false,
+  loginCalls = 0,
+  lookupCalls = 0;
+const catalogueScopes = [];
 let loseReceiptAck = false;
 let rows = [],
   saveCount = 0,
@@ -61,8 +77,40 @@ const server = http.createServer(async (request, response) => {
       return send(profile);
     case '/session/csrf':
       return send({ csrfToken: 'synthetic-ui-only' });
+    case '/session/login':
+      loginCalls++;
+      return loginFails ? send({ code: 'INVALID_CREDENTIALS' }, 401) : send(profile);
+    case '/session/logout':
+      return logoutFails ? send({ code: 'DEPENDENCY_UNAVAILABLE' }, 503) : send({ success: true });
+    case '/session/site':
+      profile.selectedSite = profile.sites.find((value) => value.siteId === input.siteId);
+      return send(profile);
     case '/graphql':
-      return send({ data: { catalogue: { items: [], hasMore: false } } });
+      if (input.query.includes('productLookup')) {
+        lookupCalls++;
+        return send({ code: 'DEPENDENCY_UNAVAILABLE' }, 503);
+      }
+      catalogueScopes.push(input.variables.input);
+      if (catalogueGate) await catalogueGate;
+      if (catalogueFailure) return send({ code: 'DEPENDENCY_UNAVAILABLE' }, 503);
+      return send({
+        data: {
+          catalogue: {
+            items:
+              input.variables.input.siteId === secondSite.siteId
+                ? [
+                    {
+                      id: 'site-b-product',
+                      name: 'Produit du restaurant B',
+                      presentation: 'Paquet UI',
+                      barcode: null,
+                    },
+                  ]
+                : catalogueRows,
+            hasMore: catalogueHasMore,
+          },
+        },
+      });
     case '/storage-locations/list':
       await pause(150);
       return send(rows);
@@ -286,7 +334,10 @@ try {
     assert.ok(box.x >= 0 && box.x + box.width <= width + 1);
     await page.screenshot({ path: `${directory}/storage-dialog-${width}.png`, fullPage: false });
     await cancel.click();
-    await page.waitForFunction(element => element === globalThis.document.activeElement, await remove.elementHandle());
+    await page.waitForFunction(
+      (element) => element === globalThis.document.activeElement,
+      await remove.elementHandle(),
+    );
     report.widths.push(width);
   }
   check('production CSS keeps storage and modal within phone/tablet/desktop viewports');
@@ -377,6 +428,216 @@ try {
   assert.equal(await page.locator('[data-sonner-toast]').count(), 0);
   assert.equal(await page.locator('fieldset.receipt-line').count(), 0);
   check('private notification provider clears on lock and cannot replay previous context success');
+  // Login UI uses only synthetic credentials against the explicit transport fixture.
+  await page.goto(origin + '/login');
+  const login = page.getByLabel('Identifiant', { exact: true });
+  const password = page.getByLabel('Mot de passe', { exact: true });
+  await login.fill('ui@apptit.test');
+  await password.fill('short');
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  assert.equal(loginCalls, 0);
+  await password.fill('Synthetic-UI-password-123');
+  await page.getByRole('button', { name: 'Afficher le mot de passe', exact: true }).click();
+  assert.equal(await password.getAttribute('type'), 'text');
+  await page.getByRole('button', { name: 'Masquer le mot de passe', exact: true }).click();
+  assert.equal(await password.getAttribute('type'), 'password');
+  loginFails = true;
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  const loginError = page.getByRole('alert');
+  await loginError.getByText('Identifiant ou mot de passe incorrect.', { exact: true }).waitFor();
+  assert.equal(await password.inputValue(), '');
+  await page.waitForFunction(() => globalThis.document.activeElement?.id === 'login-error');
+  for (const width of [320, 375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    assert.ok(
+      await page.evaluate(
+        () => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1,
+      ),
+    );
+    if ([320, 1440].includes(width))
+      await page.screenshot({ path: `${directory}/login-${width}.png`, fullPage: true });
+  }
+  check(
+    'login retains native validation, accessible password visibility and focused error feedback with cleared credentials',
+  );
+  loginFails = false;
+  catalogueFailure = true;
+  await password.fill('Synthetic-UI-password-123');
+  await password.press('Enter');
+  await page.waitForURL('**/workspace');
+  await page.getByRole('heading', { name: 'Catalogue indisponible', exact: true }).waitFor();
+  assert.equal(
+    await page.getByText('Aucune référence pour ce restaurant', { exact: true }).count(),
+    0,
+  );
+  catalogueFailure = false;
+  catalogueHasMore = true;
+  catalogueRows = [
+    {
+      id: 'ui-flour',
+      name: 'Farine UI',
+      presentation: 'Sac de 5 kg',
+      barcode: '0012345678905',
+      reviewState: 'unreviewed',
+    },
+    { id: 'ui-lentils', name: 'Lentilles UI', presentation: 'Paquet de 1 kg', barcode: null },
+  ];
+  await page.getByRole('button', { name: 'Réessayer', exact: true }).click();
+  const search = page.getByLabel('Rechercher par nom, présentation ou code-barres', {
+    exact: true,
+  });
+  await search.waitFor();
+  await page.waitForFunction(() => globalThis.document.activeElement?.id === 'product-search');
+  await search.fill('0012345678905');
+  assert.equal(await page.locator('.product-card').count(), 1);
+  await search.fill('unmatched-product');
+  await page.getByRole('heading', { name: 'Aucun résultat', exact: true }).waitFor();
+  await page
+    .locator('.catalogue-search')
+    .getByRole('button', { name: 'Effacer la recherche', exact: true })
+    .click();
+  assert.equal(await search.inputValue(), '');
+  await page.waitForFunction(() => globalThis.document.activeElement?.id === 'product-search');
+  assert.equal(await page.locator('.product-card').count(), 2);
+  for (const width of [320, 375, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    assert.ok(
+      await page.evaluate(
+        () => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1,
+      ),
+    );
+    if ([320, 1440].includes(width))
+      await page.screenshot({ path: `${directory}/catalogue-${width}.png`, fullPage: true });
+  }
+  check(
+    'catalogue distinguishes transport failure and no search results, preserves textual barcodes and restores search focus',
+  );
+  let finishCatalogue;
+  catalogueGate = new Promise((resolve) => {
+    finishCatalogue = resolve;
+  });
+  await page.reload();
+  await page.getByRole('heading', { name: 'Chargement des produits…', exact: true }).waitFor();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  assert.equal(
+    await page
+      .locator('[data-slot="skeleton"]')
+      .first()
+      .evaluate((element) => globalThis.getComputedStyle(element).animationName),
+    'none',
+  );
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  assert.equal(
+    await page.getByText('Aucune référence pour ce restaurant', { exact: true }).count(),
+    0,
+  );
+  catalogueRows = [];
+  catalogueHasMore = false;
+  finishCatalogue();
+  catalogueGate = undefined;
+  await page
+    .getByRole('heading', { name: 'Aucune référence pour ce restaurant', exact: true })
+    .waitFor();
+  check('loading skeleton is distinct from a confirmed empty catalogue');
+  await page.getByRole('link', { name: 'Identifier un produit', exact: true }).click();
+  await page.getByRole('heading', { name: 'Identifier un produit', exact: true }).waitFor();
+  assert.equal(
+    await page
+      .getByRole('link', { name: 'Identifier un produit', exact: true })
+      .getAttribute('aria-current'),
+    'page',
+  );
+  const skip = page.getByRole('link', { name: 'Aller au contenu', exact: true });
+  await skip.focus();
+  await skip.click();
+  await page.waitForFunction(() => globalThis.document.activeElement?.id === 'workspace-content');
+  await page.getByRole('heading', { name: 'Identifier un produit', exact: true }).waitFor();
+  assert.equal(
+    await page
+      .getByRole('link', { name: 'Identifier un produit', exact: true })
+      .getAttribute('aria-current'),
+    'page',
+  );
+  check('keyboard skip link focuses main content without changing the active feature');
+  await page.getByLabel('Code-barres', { exact: true }).fill('0012345678905');
+  await page.getByRole('button', { name: 'Rechercher le produit', exact: true }).click();
+  await page
+    .getByText('Identification indisponible. Vous pouvez continuer manuellement.', { exact: true })
+    .waitFor();
+  assert.equal(lookupCalls, 1);
+  await page.evaluate(() => {
+    Object.defineProperty(globalThis.navigator.mediaDevices, 'getUserMedia', {
+      configurable: true,
+      value: async () => {
+        throw new globalThis.DOMException('Synthetic denial', 'NotAllowedError');
+      },
+    });
+  });
+  await page.getByRole('button', { name: 'Lire avec la caméra', exact: true }).click();
+  await page
+    .getByText('Caméra inaccessible ou permission refusée. Saisissez le code manuellement.', {
+      exact: true,
+    })
+    .waitFor();
+  await page.getByRole('button', { name: 'Fermer la caméra', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Saisir sans code / depuis l’étiquette', exact: true })
+    .click();
+  await page.getByLabel('Nom observé', { exact: true }).fill('Produit manuel UI');
+  await page.getByLabel('Présentation observée (facultatif)', { exact: true }).fill('Sac UI');
+  await page
+    .getByLabel('J’ai comparé le nom, la marque et la présentation à l’emballage réel.', {
+      exact: true,
+    })
+    .check();
+  await page.getByRole('button', { name: 'Prévisualiser la référence', exact: true }).click();
+  await page.locator('.lookup-preview').getByText('Produit manuel UI', { exact: true }).waitFor();
+  for (const width of [320, 375, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    assert.ok(
+      await page.evaluate(
+        () => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1,
+      ),
+    );
+    const navigation = page.getByRole('navigation', { name: 'Navigation du restaurant' });
+    for (const link of await navigation.getByRole('link').all()) {
+      const box = await link.boundingBox();
+      assert.ok(box.height >= 48 && box.width >= 48);
+    }
+    if ([320, 1440].includes(width))
+      await page.screenshot({ path: `${directory}/identification-${width}.png`, fullPage: true });
+  }
+
+  await page.getByRole('button', { name: 'Préparer la réception', exact: true }).click();
+  await page.getByRole('heading', { name: 'Brouillon de réception', exact: true }).waitFor();
+  assert.equal(
+    await page.getByLabel('Nom du produit', { exact: true }).inputValue(),
+    'Produit manuel UI',
+  );
+  assert.equal(recorded.size, 1);
+  check(
+    'lookup and controlled camera denial retain manual identification and explicit unsaved receipt preparation',
+  );
+  await page.getByRole('link', { name: 'Catalogue produits', exact: true }).click();
+  await page.getByLabel('Restaurant actif', { exact: true }).selectOption(secondSite.siteId);
+  await page.getByRole('heading', { name: 'Produit du restaurant B', exact: true }).waitFor();
+  assert.equal(await page.getByRole('link', { name: 'Réception', exact: true }).count(), 0);
+  assert.equal(await page.getByRole('link', { name: 'Lieux de stockage', exact: true }).count(), 0);
+  assert.equal(await page.getByText('Produit manuel UI', { exact: true }).count(), 0);
+  assert.equal(catalogueScopes.at(-1).siteId, secondSite.siteId);
+  check('site switch requests the selected scope and hides unavailable navigation capabilities');
+  logoutFails = true;
+  await page
+    .getByRole('button', { name: 'Se déconnecter / changer d’utilisateur', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Réessayer la déconnexion', exact: true }).waitFor();
+  assert.equal(await page.locator('.product-card').count(), 0);
+  assert.equal(await page.getByLabel('Restaurant actif', { exact: true }).count(), 0);
+  logoutFails = false;
+  await page.getByRole('button', { name: 'Réessayer la déconnexion', exact: true }).click();
+  await page.waitForURL('**/login');
+  assert.equal(await page.getByLabel('Mot de passe', { exact: true }).inputValue(), '');
+  check('unconfirmed logout keeps the workspace locked until explicit retry succeeds');
   assert.deepEqual(errors, []);
   report.passed = true;
 } finally {

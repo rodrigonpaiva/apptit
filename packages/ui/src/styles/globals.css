@@ -24,6 +24,7 @@
   --border: #a8b8a9;
   --input: #a8b8a9;
   --ring: #a45228;
+  --ring-inverse: #f0bb91;
   --radius: 0.5rem;
 }
 @theme inline {
@@ -46,6 +47,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-ring-inverse: var(--ring-inverse);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 0.25rem);
 }

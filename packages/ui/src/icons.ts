@@ -1,2 +1,23 @@
 // Curated icons used by Apptit; consumers depend on the UI package only.
-export { Plus, Pencil, Trash2, RotateCw, Camera, Barcode, Save, Check, X } from 'lucide-react';
+export {
+  Plus,
+  Pencil,
+  Trash2,
+  RotateCw,
+  Camera,
+  Barcode,
+  Save,
+  Check,
+  X,
+  Eye,
+  EyeOff,
+  LogIn,
+  LayoutGrid,
+  Building2,
+  ArrowRight,
+  LogOut,
+  ShieldCheck,
+  Search,
+  Package,
+  Leaf,
+} from 'lucide-react';

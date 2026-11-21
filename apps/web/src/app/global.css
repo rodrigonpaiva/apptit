@@ -153,7 +153,6 @@ button:disabled { opacity: .6; cursor: wait; }
 .lookup-secondary { background: #edf0e5; color: #274836; border: 1px solid #cfdbc3; font-size: 12px; }
 .lookup-help { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
 .lookup-help > span, .lookup-small { font-size: 11px; line-height: 1.7; color: #637268; }
-.lookup-help button { color: #244b36; background: transparent; font-size: 12px; padding: 12px 0; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
 .lookup-status, .lookup-result, .manual-reference { margin-top: 22px; padding: 22px; border: 1px solid #dce2d2; border-radius: 10px; background: #f7f8f1; font-size: 13px; line-height: 1.7; }
 .lookup-status > a { display: block; color: #244b36; margin-top: 12px; }
 .lookup-result-heading h3 { font-size: 19px; margin: 0; font-weight: 500; }
@@ -371,5 +370,10 @@ button:disabled { opacity: .6; cursor: wait; }
 
 /* Nested receiving panels must not inherit public-page section spacing. */
 .receiving .receipt-evidence, .receiving .receipt-observations, .receiving .receipt-saved { padding-block: 20px; margin-block: 20px; max-width: none; }
+
+/* Explicit site label/control keeps the accessible name independent of options. */
+.workspace-site-field { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.workspace-site-field select { min-height: 48px; }
+.identification .lookup-allergen-panel, .identification .lookup-nutrition { padding-block: 20px; margin-block: 16px; max-width: none; }
 
 }

@@ -32,7 +32,7 @@ Publication does not upgrade an existing local profile or restart containers. Al
 
 ## Shared UI maintenance after this checkpoint
 
-The [shared UI delivery](../delivery/UI-MIGRATION.md) introduces @apptit/ui, shadcn/Radix controls, Tailwind tokens, storage/receiving migration and scoped success notifications. This is presentation maintenance with separate evidence; the historical sprint acceptance, release tag and AP parent statuses above remain unchanged.
+The [shared UI delivery](../delivery/UI-MIGRATION.md) introduces @apptit/ui, shadcn/Radix controls, Tailwind tokens, storage/receiving migration and scoped success notifications. The [catalogue/navigation/login follow-up](../delivery/UI-CATALOGUE-NAVIGATION-LOGIN.md) continues that migration. This is presentation maintenance with separate evidence; the historical sprint acceptance, release tag and AP parent statuses above remain unchanged.
 
 ## Next implementation: SP3-01
 

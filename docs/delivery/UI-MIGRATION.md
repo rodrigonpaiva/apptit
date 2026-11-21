@@ -2,6 +2,8 @@
 
 Date: 2026-11-20 (Europe/Paris). Scope: presentation architecture and incremental migration of the existing synthetic web application. No AP parent completion, stock feature or release publication is asserted.
 
+> Follow-up — 2026-11-21: [catalogue, navigation and login delivery](UI-CATALOGUE-NAVIGATION-LOGIN.md) continues the shared UI migration. Keep the original evidence and scope below historical.
+
 ## 1. Foundation
 
 [PR #36](https://github.com/rodrigonpaiva/apptit/pull/36) integrates @apptit/ui, owned shadcn/new-york primitives, Radix behavior, Tailwind 4 tokens, Lucide, source exports, Next/PostCSS integration, Docker workspace installation and Nx boundaries. [ADR 0007](../architecture/adr/0007-shared-ui.md) and [package maintenance guide](../../packages/ui/README.md) define ownership and upgrade policy. The upstream MIT license is retained.
